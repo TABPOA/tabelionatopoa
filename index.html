@@ -29,7 +29,6 @@
     <style>
         /* =====================================================
            1. VARIÁVEIS VISUAIS
-           Altere as cores principais nesta seção.
            ===================================================== */
         :root {
             --verde-principal: #123C32;
@@ -95,18 +94,21 @@
             gap: 15px;
         }
 
-        .simbolo-institucional {
-            width: 52px;
-            height: 52px;
+        /* =====================================================
+           LOGO ATONEXO
+           Imagem hospedada no GitHub Pages.
+           O tamanho pode ser alterado aqui.
+           object-fit: contain preserva a proporção original.
+           ===================================================== */
+        .logo-institucional {
+            width: 76px;
+            height: 76px;
             flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid rgba(255,255,255,.25);
-            border-radius: 14px;
-            background: rgba(255,255,255,.08);
-            font-size: 25px;
-            color: #D5E9DE;
+            display: block;
+            object-fit: contain;
+            background: #FFFFFF;
+            border-radius: 10px;
+            padding: 3px;
         }
 
         .nome-cartorio {
@@ -214,6 +216,7 @@
 
         .grupo-senha .campo-formulario {
             border-right: 0;
+            border-radius: 10px 0 0 10px;
         }
 
         .grupo-senha .btn-visualizar {
@@ -223,10 +226,6 @@
             background: var(--branco);
             color: var(--texto-secundario);
             padding: 0 15px;
-        }
-
-        .grupo-senha .campo-formulario {
-            border-radius: 10px 0 0 10px;
         }
 
         .link-auxiliar {
@@ -396,12 +395,12 @@
 
             .marca-institucional {
                 align-items: flex-start;
+                gap: 12px;
             }
 
-            .simbolo-institucional {
-                width: 45px;
-                height: 45px;
-                font-size: 22px;
+            .logo-institucional {
+                width: 64px;
+                height: 64px;
             }
 
             .identificacao-sistema {
@@ -449,19 +448,25 @@
 <body>
 
     <!-- =====================================================
-         CABEÇALHO
-         Edite aqui os dados institucionais do cartório.
+         CABEÇALHO INSTITUCIONAL
+         Logo AtoNexo hospedado no GitHub Pages.
+         Para substituir a imagem futuramente, altere o src.
          ===================================================== -->
     <header class="cabecalho">
         <div class="container cabecalho-conteudo">
             <div class="row align-items-center">
-                <div class="col-lg-9">
 
+                <div class="col-lg-9">
                     <div class="marca-institucional">
-                        <div class="simbolo-institucional"
-                             aria-hidden="true">
-                            <i class="bi bi-diagram-3"></i>
-                        </div>
+
+                        <!-- LOGO ATONEXO -->
+                        <img
+                            src="https://tabpoa.github.io/tabelionatopoa/ato-nexo.png"
+                            alt="Logotipo AtoNexo"
+                            class="logo-institucional"
+                            width="76"
+                            height="76"
+                        >
 
                         <div>
                             <h1 class="nome-cartorio">
@@ -478,8 +483,8 @@
                                 </a>
                             </p>
                         </div>
-                    </div>
 
+                    </div>
                 </div>
 
                 <div class="col-lg-3 text-lg-end">
@@ -488,6 +493,7 @@
                         <span>Sistema AtoNexo</span>
                     </div>
                 </div>
+
             </div>
         </div>
     </header>
@@ -518,20 +524,11 @@
                             Informe seu e-mail e sua senha para entrar no sistema.
                         </p>
 
-
-                        <!-- =================================================
-                             FORMULÁRIO DE LOGIN
-                             FUTURA INTEGRAÇÃO SUPABASE:
-                             1. Inicializar o cliente Supabase.
-                             2. Capturar e validar os campos.
-                             3. Executar supabase.auth.signInWithPassword().
-                             4. Encaminhar o usuário conforme suas permissões.
-                             ================================================= -->
+                        <!-- FORMULÁRIO DE LOGIN -->
                         <form id="formLogin" novalidate>
 
                             <div class="mb-3">
-                                <label for="loginEmail"
-                                       class="form-label">
+                                <label for="loginEmail" class="form-label">
                                     E-mail
                                 </label>
 
@@ -543,6 +540,7 @@
                                        autocomplete="username"
                                        maxlength="254"
                                        required>
+
                                 <div class="invalid-feedback">
                                     Informe um endereço de e-mail válido.
                                 </div>
@@ -557,10 +555,6 @@
                                         Senha
                                     </label>
 
-                                    <!-- FUTURO:
-                                         Vincular a recuperação de senha
-                                         ao Supabase Auth.
-                                    -->
                                     <a href="#"
                                        class="link-auxiliar"
                                        id="linkRecuperarSenha">
@@ -602,24 +596,17 @@
 
                         </form>
 
-
                         <div class="divisor">OU</div>
 
-
-                        <!-- =================================================
-                             ACESSO AO CADASTRO
-                             ================================================= -->
                         <div class="d-grid">
                             <button type="button"
                                     class="btn btn-cadastro"
                                     data-bs-toggle="modal"
                                     data-bs-target="#modalCadastro">
-
                                 <i class="bi bi-person-plus me-2"></i>
                                 Criar uma conta
                             </button>
                         </div>
-
 
                         <div class="nota-seguranca">
                             <i class="bi bi-shield-lock-fill"></i>
@@ -639,9 +626,7 @@
     </main>
 
 
-    <!-- =====================================================
-         RODAPÉ
-         ===================================================== -->
+    <!-- RODAPÉ -->
     <footer class="rodape">
         <div class="container">
             <div class="row align-items-center">
@@ -665,19 +650,7 @@
     </footer>
 
 
-    <!-- =====================================================
-         MODAL DE CADASTRO
-         FUTURA INTEGRAÇÃO SUPABASE:
-         supabase.auth.signUp({
-             email,
-             password,
-             options: {
-                 data: { full_name: nomeCompleto }
-             }
-         })
-         O cadastro deverá respeitar a política de autorização
-         e as regras de acesso definidas pelo administrador.
-         ===================================================== -->
+    <!-- MODAL DE CADASTRO -->
     <div class="modal fade"
          id="modalCadastro"
          tabindex="-1"
@@ -706,15 +679,11 @@
                             aria-label="Fechar"></button>
                 </div>
 
-
                 <div class="modal-body">
-
                     <form id="formCadastro" novalidate>
 
-                        <!-- NOME COMPLETO -->
                         <div class="mb-3">
-                            <label for="cadastroNome"
-                                   class="form-label">
+                            <label for="cadastroNome" class="form-label">
                                 Nome completo
                             </label>
 
@@ -732,11 +701,8 @@
                             </div>
                         </div>
 
-
-                        <!-- E-MAIL -->
                         <div class="mb-3">
-                            <label for="cadastroEmail"
-                                   class="form-label">
+                            <label for="cadastroEmail" class="form-label">
                                 E-mail
                             </label>
 
@@ -754,11 +720,8 @@
                             </div>
                         </div>
 
-
-                        <!-- SENHA -->
                         <div class="mb-3">
-                            <label for="cadastroSenha"
-                                   class="form-label">
+                            <label for="cadastroSenha" class="form-label">
                                 Senha
                             </label>
 
@@ -790,8 +753,6 @@
                             </div>
                         </div>
 
-
-                        <!-- CONFIRMAÇÃO DA SENHA -->
                         <div class="mb-4">
                             <label for="cadastroConfirmacao"
                                    class="form-label">
@@ -822,12 +783,7 @@
                             </div>
                         </div>
 
-
-                        <!-- =================================================
-                             CONSENTIMENTO PARA USO DO E-MAIL
-                             O texto poderá ser ajustado conforme a política
-                             de privacidade e a finalidade do tratamento.
-                             ================================================= -->
+                        <!-- CONSENTIMENTO PARA USO DO E-MAIL -->
                         <div class="consentimento mb-3">
                             <div class="form-check">
                                 <input class="form-check-input"
@@ -858,13 +814,10 @@
                             legislação vigente de proteção de dados.
                         </p>
 
-
-                        <!-- BOTÃO DE CADASTRO -->
                         <div class="d-grid">
                             <button type="submit"
                                     class="btn btn-principal"
                                     id="btnCadastrar">
-
                                 <i class="bi bi-person-check me-2"></i>
                                 Solicitar cadastro
                             </button>
@@ -880,16 +833,13 @@
                         </div>
 
                     </form>
-
                 </div>
             </div>
         </div>
     </div>
 
 
-    <!-- =====================================================
-         ÁREA DE NOTIFICAÇÕES
-         ===================================================== -->
+    <!-- NOTIFICAÇÕES -->
     <div class="toast-container position-fixed bottom-0 end-0 p-3"
          aria-live="polite"
          aria-atomic="true">
@@ -900,7 +850,6 @@
 
             <div class="toast-header">
                 <i class="bi bi-info-circle-fill text-success me-2"></i>
-
                 <strong class="me-auto">AtoNexo</strong>
 
                 <button type="button"
@@ -917,11 +866,8 @@
     </div>
 
 
-    <!-- =====================================================
-         JAVASCRIPT DO BOOTSTRAP
-         ===================================================== -->
+    <!-- BOOTSTRAP JAVASCRIPT -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-
 
     <script>
         "use strict";
@@ -929,22 +875,13 @@
         /* =====================================================
            1. CONFIGURAÇÃO FUTURA DO SUPABASE
 
-           Depois, preencher com os dados do projeto Supabase.
-
            const SUPABASE_URL = "https://SEU-PROJETO.supabase.co";
            const SUPABASE_ANON_KEY = "SUA_CHAVE_PUBLICAVEL";
 
-           Incluir a biblioteca oficial do Supabase JS e criar:
-           const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-           A chave publicável pode ser usada no navegador quando
-           as políticas de segurança estiverem configuradas.
-           NUNCA colocar a service_role key no HTML.
+           Nunca inserir a chave service_role neste HTML.
            ===================================================== */
 
-        /* =====================================================
-           2. ELEMENTOS DA INTERFACE
-           ===================================================== */
+        /* ELEMENTOS DA INTERFACE */
         const formLogin = document.getElementById("formLogin");
         const formCadastro = document.getElementById("formCadastro");
 
@@ -966,16 +903,12 @@
             bootstrap.Modal.getOrCreateInstance(modalCadastroElement);
 
 
-        /* =====================================================
-           3. ANO AUTOMÁTICO NO RODAPÉ
-           ===================================================== */
+        /* ANO AUTOMÁTICO */
         document.getElementById("anoAtual").textContent =
             new Date().getFullYear();
 
 
-        /* =====================================================
-           4. NOTIFICAÇÕES
-           ===================================================== */
+        /* NOTIFICAÇÕES */
         function notificar(mensagem) {
             document.getElementById("toastMensagem").textContent =
                 mensagem;
@@ -987,9 +920,7 @@
         }
 
 
-        /* =====================================================
-           5. MOSTRAR / OCULTAR SENHAS
-           ===================================================== */
+        /* MOSTRAR / OCULTAR SENHAS */
         document.querySelectorAll("[data-toggle-password]")
             .forEach(function (botao) {
 
@@ -1020,9 +951,7 @@
             });
 
 
-        /* =====================================================
-           6. VALIDAÇÃO DE SENHA E CONFIRMAÇÃO
-           ===================================================== */
+        /* VALIDAÇÃO DA CONFIRMAÇÃO DA SENHA */
         function validarConfirmacaoSenha() {
             const iguais =
                 cadastroSenha.value === cadastroConfirmacao.value;
@@ -1053,18 +982,12 @@
 
 
         /* =====================================================
-           7. LOGIN — PONTO DE INTEGRAÇÃO SUPABASE
+           LOGIN — INTEGRAÇÃO SUPABASE PENDENTE
 
-           Futuramente:
-           const { data, error } = await supabase.auth
-               .signInWithPassword({
-                   email: loginEmail.value.trim(),
-                   password: loginSenha.value
-               });
-
-           Tratar erros, sessão e redirecionamento.
-           A autorização real deve ser validada no servidor
-           e/ou por políticas RLS, não apenas no navegador.
+           supabase.auth.signInWithPassword({
+               email: loginEmail.value.trim(),
+               password: loginSenha.value
+           });
            ===================================================== */
         formLogin.addEventListener("submit", async function (evento) {
             evento.preventDefault();
@@ -1075,12 +998,6 @@
                 return;
             }
 
-            /*
-             * INTEGRAÇÃO PENDENTE:
-             * Não autenticar usuários antes de conectar o Supabase.
-             * Não armazenar senhas no navegador ou em localStorage.
-             */
-
             notificar(
                 "A tela está pronta. O acesso será habilitado após a integração com o Supabase."
             );
@@ -1088,10 +1005,9 @@
 
 
         /* =====================================================
-           8. CADASTRO — PONTO DE INTEGRAÇÃO SUPABASE
+           CADASTRO — INTEGRAÇÃO SUPABASE PENDENTE
 
-           Futuramente:
-           const { data, error } = await supabase.auth.signUp({
+           supabase.auth.signUp({
                email: cadastroEmail.value.trim(),
                password: cadastroSenha.value,
                options: {
@@ -1101,13 +1017,7 @@
                }
            });
 
-           IMPORTANTE:
-           - Não enviar a confirmação de senha ao servidor.
-           - Não salvar a senha em tabelas próprias.
-           - Configurar confirmação de e-mail conforme a política
-             de acesso do sistema.
-           - Cadastro não deve significar acesso automático
-             a funções internas do cartório.
+           Não enviar a confirmação de senha ao Supabase.
            ===================================================== */
         formCadastro.addEventListener("submit", async function (evento) {
             evento.preventDefault();
@@ -1125,24 +1035,13 @@
                 return;
             }
 
-            /*
-             * INTEGRAÇÃO PENDENTE:
-             * Os dados ainda não são enviados para lugar algum.
-             * O envio real ocorrerá depois da configuração do Supabase.
-             */
-
             notificar(
                 "Formulário validado. O cadastro será habilitado após a integração com o Supabase."
             );
         });
 
 
-        /* =====================================================
-           9. RECUPERAÇÃO DE SENHA — PONTO DE INTEGRAÇÃO
-
-           Futuramente, abrir um formulário para informar o e-mail
-           e chamar supabase.auth.resetPasswordForEmail(email).
-           ===================================================== */
+        /* RECUPERAÇÃO DE SENHA — INTEGRAÇÃO PENDENTE */
         document.getElementById("linkRecuperarSenha")
             .addEventListener("click", function (evento) {
                 evento.preventDefault();
@@ -1153,26 +1052,23 @@
             });
 
 
-        /* =====================================================
-           10. LIMPEZA DO FORMULÁRIO AO FECHAR O MODAL
-           ===================================================== */
+        /* LIMPAR FORMULÁRIO AO FECHAR O MODAL */
         modalCadastroElement.addEventListener(
             "hidden.bs.modal",
             function () {
                 formCadastro.reset();
                 formCadastro.classList.remove("was-validated");
 
-                [cadastroNome, cadastroEmail, cadastroSenha,
-                 cadastroConfirmacao].forEach(function (campo) {
+                [
+                    cadastroNome,
+                    cadastroEmail,
+                    cadastroSenha,
+                    cadastroConfirmacao
+                ].forEach(function (campo) {
                     campo.classList.remove("is-invalid", "is-valid");
                     campo.setCustomValidity("");
-                    campo.type = campo.type;
                 });
 
-                /*
-                 * Restaurar os botões de visualização para o estado
-                 * padrão, com as senhas ocultas.
-                 */
                 document.querySelectorAll(
                     '[data-toggle-password="cadastroSenha"], ' +
                     '[data-toggle-password="cadastroConfirmacao"]'
@@ -1182,6 +1078,7 @@
                     const icone = botao.querySelector("i");
 
                     campo.type = "password";
+
                     icone.classList.remove("bi-eye-slash");
                     icone.classList.add("bi-eye");
 
