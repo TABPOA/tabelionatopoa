@@ -1,0 +1,921 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro - Sistema AtoNexo</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    
+    <style>
+        :root {
+            --primary-green: #1b5e20;
+            --dark-green: #2e7d32;
+            --light-green: #4caf50;
+            --white: #ffffff;
+            --light-bg: #f5f7fa;
+            --text-dark: #2c3e50;
+            --text-muted: #6c757d;
+            --border-color: #dee2e6;
+            --success-color: #28a745;
+            --error-color: #dc3545;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--light-bg);
+            min-height: 100vh;
+            color: var(--text-dark);
+        }
+        
+        .header-section {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
+            color: white;
+            padding: 2rem 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            backdrop-filter: blur(10px);
+        }
+        
+        .header-title h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+        
+        .header-subtitle {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            margin-top: 0.3rem;
+        }
+        
+        .header-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 0.85rem;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .info-item i {
+            opacity: 0.8;
+        }
+        
+        .main-container {
+            max-width: 800px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+        
+        .card-custom {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            border: none;
+        }
+        
+        .card-header-custom {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .card-header-custom h2 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin: 0 0 0.5rem 0;
+        }
+        
+        .card-header-custom p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+        
+        .card-body-custom {
+            padding: 2.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.8rem;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.6rem;
+            font-size: 0.95rem;
+            display: block;
+        }
+        
+        .form-label .required {
+            color: var(--error-color);
+            margin-left: 0.2rem;
+        }
+        
+        .input-wrapper {
+            position: relative;
+        }
+        
+        .form-control-custom {
+            width: 100%;
+            padding: 0.9rem 1.2rem;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .form-control-custom:focus {
+            outline: none;
+            border-color: var(--dark-green);
+            box-shadow: 0 0 0 4px rgba(46, 125, 50, 0.1);
+        }
+        
+        .form-control-custom.is-invalid {
+            border-color: var(--error-color);
+        }
+        
+        .form-control-custom.is-valid {
+            border-color: var(--success-color);
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0.3rem;
+            transition: color 0.3s ease;
+        }
+        
+        .password-toggle:hover {
+            color: var(--dark-green);
+        }
+        
+        .help-text {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+        
+        .error-message {
+            color: var(--error-color);
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        .btn-submit {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .btn-submit:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(27, 94, 32, 0.3);
+        }
+        
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .alert-custom {
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            display: none;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        
+        .alert-custom.show {
+            display: flex;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .footer-section {
+            background: var(--primary-green);
+            color: white;
+            padding: 2rem 0;
+            margin-top: 4rem;
+            text-align: center;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .footer-brand {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .footer-text {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 0.3rem;
+        }
+        
+        @media (max-width: 768px) {
+            .header-info {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .card-body-custom {
+                padding: 1.5rem;
+            }
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        
+        .loading-overlay.show {
+            display: flex;
+        }
+        
+        .loading-spinner {
+            background: white;
+            padding: 2rem 3rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .loading-spinner .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            border-width: 0.3rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header-section">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <i class="fas fa-file-signature"></i>
+                </div>
+                <div class="header-title">
+                    <h1>Sistema AtoNexo</h1>
+                    <div class="header-subtitle">2º Tabelionato de Protestos de Porto Alegre</div>
+                </div>
+            </div>
+            <div class="header-info">
+                <div class="info-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Rua dos Andradas, 1234 • 4º Andar</span>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-city"></i>
+                    <span>Centro Histórico • Porto Alegre/RS • CEP 90020-008</span>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-id-card"></i>
+                    <span>CNPJ: 04.438.173/0001-47</span>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-phone"></i>
+                    <a href="tel:+555130273500" style="color: white; text-decoration: none;">(51) 3027-3500</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div class="card-custom">
+            <div class="card-header-custom">
+                <h2><i class="fas fa-user-plus"></i> Solicitação de Cadastro</h2>
+                <p>Preencha os dados abaixo para solicitar acesso ao sistema</p>
+            </div>
+            
+            <div class="card-body-custom">
+                <div id="alertSuccess" class="alert-custom alert-success" role="status" aria-live="polite">
+                    <i class="fas fa-check-circle"></i>
+                    <span id="successMessage">Solicitação enviada com sucesso!</span>
+                </div>
+                
+                <div id="alertError" class="alert-custom alert-error" role="alert" aria-live="assertive">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span id="errorMessage">Ocorreu um erro.</span>
+                </div>
+                
+                <div id="alertInfo" class="alert-custom alert-info" role="status" aria-live="polite">
+                    <i class="fas fa-info-circle"></i>
+                    <span id="infoMessage">Aguarde aprovação do administrador.</span>
+                </div>
+
+                <form id="registrationForm">
+                    <div class="form-group">
+                        <label for="fullName" class="form-label">
+                            Nome Completo
+                            <span class="required">*</span>
+                        </label>
+                        <div class="input-wrapper">
+                            <input
+                                type="text"
+                                id="fullName"
+                                name="fullName"
+                                class="form-control-custom"
+                                placeholder="Digite seu nome completo"
+                                autocomplete="name"
+                                maxlength="150"
+                                required
+                            >
+                        </div>
+                        <div class="error-message" id="fullNameError">Por favor, informe seu nome completo.</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email" class="form-label">
+                            E-mail
+                            <span class="required">*</span>
+                        </label>
+                        <div class="input-wrapper">
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                class="form-control-custom"
+                                placeholder="seu.email@gmail.com"
+                                autocomplete="email"
+                                required
+                            >
+                        </div>
+                        <div class="help-text">
+                            <i class="fas fa-info-circle"></i>
+                            Aceitamos apenas: Gmail, Hotmail, Outlook ou Yahoo
+                        </div>
+                        <div class="error-message" id="emailError">E-mail inválido ou não suportado.</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password" class="form-label">
+                            Senha
+                            <span class="required">*</span>
+                        </label>
+                        <div class="input-wrapper">
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                class="form-control-custom"
+                                placeholder="Mínimo 6 caracteres"
+                                autocomplete="new-password"
+                                required
+                                minlength="6"
+                            >
+                            <button type="button" class="password-toggle" id="togglePassword" aria-label="Mostrar ou ocultar senha">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="help-text">
+                            <i class="fas fa-shield-alt"></i>
+                            A senha será gerenciada com segurança pelo Supabase Auth.
+                        </div>
+                        <div class="error-message" id="passwordError">Senha muito curta.</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword" class="form-label">
+                            Confirmar Senha
+                            <span class="required">*</span>
+                        </label>
+                        <div class="input-wrapper">
+                            <input
+                                type="password"
+                                id="confirmPassword"
+                                name="confirmPassword"
+                                class="form-control-custom"
+                                placeholder="Repita a senha"
+                                autocomplete="new-password"
+                                required
+                            >
+                            <button type="button" class="password-toggle" id="toggleConfirmPassword" aria-label="Mostrar ou ocultar confirmação de senha">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="error-message" id="confirmPasswordError">As senhas não coincidem.</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="accessRequest" class="form-label">
+                            Solicitação de Acesso
+                            <span class="required">*</span>
+                        </label>
+                        <textarea
+                            id="accessRequest"
+                            name="accessRequest"
+                            class="form-control-custom"
+                            rows="4"
+                            maxlength="2000"
+                            placeholder="Descreva o motivo da solicitação de acesso..."
+                            required
+                        ></textarea>
+                        <div class="help-text">
+                            <i class="fas fa-comment-dots"></i>
+                            Explique brevemente por que precisa de acesso ao sistema
+                        </div>
+                        <div class="error-message" id="accessRequestError">Por favor, descreva sua solicitação.</div>
+                    </div>
+
+                    <button type="submit" class="btn-submit" id="submitBtn">
+                        <i class="fas fa-paper-plane"></i> Enviar Solicitação
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer-section">
+        <div class="footer-content">
+            <div class="footer-brand">Sistema AtoNexo</div>
+            <div class="footer-text">© AtoNexo. Todos os direitos reservados.</div>
+            <div class="footer-text">Tecnologia a serviço da organização e da eficiência.</div>
+        </div>
+    </footer>
+
+    <div class="loading-overlay" id="loadingOverlay" aria-live="polite" aria-busy="true">
+        <div class="loading-spinner">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Carregando...</span>
+            </div>
+            <p class="mt-3 mb-0">Processando solicitação...</p>
+        </div>
+    </div>
+
+    <script>
+        'use strict';
+
+        const SUPABASE_URL = 'https://dlxqahkjhuocsssosqyj.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_IJ704qHttTZHtI_q8E7CCw_siVAy7Ex';
+
+        const supabaseClient = window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_ANON_KEY,
+            {
+                auth: {
+                    persistSession: false,
+                    autoRefreshToken: false,
+                    detectSessionInUrl: false
+                }
+            }
+        );
+
+        const form = document.getElementById('registrationForm');
+        const fullNameInput = document.getElementById('fullName');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        const accessRequestInput = document.getElementById('accessRequest');
+        const submitBtn = document.getElementById('submitBtn');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+
+        document.getElementById('togglePassword').addEventListener('click', function () {
+            togglePasswordVisibility(passwordInput, this);
+        });
+
+        document.getElementById('toggleConfirmPassword').addEventListener('click', function () {
+            togglePasswordVisibility(confirmPasswordInput, this);
+        });
+
+        function togglePasswordVisibility(input, button) {
+            const icon = button.querySelector('i');
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        function isValidEmailDomain(email) {
+            const allowedDomains = [
+                'gmail.com',
+                'hotmail.com',
+                'outlook.com',
+                'yahoo.com'
+            ];
+
+            const parts = email.trim().toLowerCase().split('@');
+
+            if (parts.length !== 2 || !parts[0] || !parts[1]) {
+                return false;
+            }
+
+            return allowedDomains.includes(parts[1]);
+        }
+
+        function showAlert(type, message) {
+            hideAllAlerts();
+
+            const alertElement = document.getElementById(
+                `alert${type.charAt(0).toUpperCase() + type.slice(1)}`
+            );
+
+            const messageElement = document.getElementById(`${type}Message`);
+
+            if (!alertElement || !messageElement) {
+                return;
+            }
+
+            messageElement.textContent = message;
+            alertElement.classList.add('show');
+
+            if (type === 'success' || type === 'info') {
+                window.setTimeout(function () {
+                    alertElement.classList.remove('show');
+                }, 8000);
+            }
+        }
+
+        function hideAllAlerts() {
+            document.querySelectorAll('.alert-custom').forEach(function (alert) {
+                alert.classList.remove('show');
+            });
+        }
+
+        function clearValidation() {
+            document.querySelectorAll('.error-message').forEach(function (element) {
+                element.classList.remove('show');
+            });
+
+            document.querySelectorAll('.form-control-custom').forEach(function (element) {
+                element.classList.remove('is-invalid', 'is-valid');
+            });
+        }
+
+        function markInvalid(input, errorId) {
+            document.getElementById(errorId).classList.add('show');
+            input.classList.add('is-invalid');
+            input.classList.remove('is-valid');
+        }
+
+        function markValid(input) {
+            input.classList.add('is-valid');
+            input.classList.remove('is-invalid');
+        }
+
+        function validateForm() {
+            let isValid = true;
+
+            clearValidation();
+
+            const fullName = fullNameInput.value.trim();
+            const email = emailInput.value.trim().toLowerCase();
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+            const accessRequest = accessRequestInput.value.trim();
+
+            if (fullName.length < 3) {
+                markInvalid(fullNameInput, 'fullNameError');
+                isValid = false;
+            } else {
+                markValid(fullNameInput);
+            }
+
+            if (
+                !emailInput.validity.valid ||
+                !isValidEmailDomain(email)
+            ) {
+                markInvalid(emailInput, 'emailError');
+                isValid = false;
+            } else {
+                markValid(emailInput);
+            }
+
+            if (password.length < 6) {
+                markInvalid(passwordInput, 'passwordError');
+                isValid = false;
+            } else {
+                markValid(passwordInput);
+            }
+
+            if (!confirmPassword || confirmPassword !== password) {
+                markInvalid(confirmPasswordInput, 'confirmPasswordError');
+                isValid = false;
+            } else {
+                markValid(confirmPasswordInput);
+            }
+
+            if (!accessRequest) {
+                markInvalid(accessRequestInput, 'accessRequestError');
+                isValid = false;
+            } else {
+                markValid(accessRequestInput);
+            }
+
+            if (!isValid) {
+                showAlert('error', 'Por favor, corrija os erros indicados no formulário.');
+            }
+
+            return isValid;
+        }
+
+        function getFriendlyError(error) {
+            const message = String(error?.message || '').toLowerCase();
+            const code = String(error?.code || '').toLowerCase();
+
+            if (
+                message.includes('already registered') ||
+                message.includes('already been registered') ||
+                message.includes('user already exists') ||
+                code === 'user_already_exists'
+            ) {
+                return 'Este e-mail já possui uma conta. Entre em contato com o administrador caso precise de ajuda.';
+            }
+
+            if (
+                message.includes('password should be at least') ||
+                message.includes('password is too short') ||
+                message.includes('weak_password')
+            ) {
+                return 'A senha não atende aos requisitos de segurança configurados. Escolha outra senha.';
+            }
+
+            if (
+                message.includes('invalid api key') ||
+                message.includes('api key')
+            ) {
+                return 'Não foi possível autenticar a solicitação com o Supabase. Verifique a configuração da chave pública.';
+            }
+
+            if (
+                message.includes('email rate limit') ||
+                message.includes('rate limit')
+            ) {
+                return 'O limite temporário de solicitações foi atingido. Aguarde alguns minutos antes de tentar novamente.';
+            }
+
+            return error?.message || 'Ocorreu um erro inesperado. Tente novamente mais tarde.';
+        }
+
+        function setSubmitting(isSubmitting) {
+            submitBtn.disabled = isSubmitting;
+            loadingOverlay.classList.toggle('show', isSubmitting);
+
+            submitBtn.innerHTML = isSubmitting
+                ? '<i class="fas fa-spinner fa-spin"></i> Enviando solicitação...'
+                : '<i class="fas fa-paper-plane"></i> Enviar Solicitação';
+        }
+
+        form.addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            hideAllAlerts();
+
+            if (!validateForm()) {
+                return;
+            }
+
+            const fullName = fullNameInput.value.trim();
+            const email = emailInput.value.trim().toLowerCase();
+            const password = passwordInput.value;
+            const accessRequest = accessRequestInput.value.trim();
+
+            setSubmitting(true);
+
+            let authUserCreated = false;
+
+            try {
+                /*
+                 * ETAPA 1:
+                 * Cria a conta pelo Supabase Auth.
+                 * A senha é enviada diretamente ao serviço de autenticação.
+                 * Ela NÃO é incluída no registro da tabela user_registrations.
+                 */
+                const { data: authData, error: authError } =
+                    await supabaseClient.auth.signUp({
+                        email: email,
+                        password: password,
+                        options: {
+                            data: {
+                                full_name: fullName,
+                                access_request: accessRequest
+                            }
+                        }
+                    });
+
+                if (authError) {
+                    throw authError;
+                }
+
+                if (!authData.user || !authData.user.id) {
+                    throw new Error(
+                        'O Supabase não retornou o identificador da conta. Nenhuma solicitação foi confirmada.'
+                    );
+                }
+
+                authUserCreated = true;
+
+                /*
+                 * ETAPA 2:
+                 * Registra o pedido e associa-o à conta Auth.
+                 * Não envia a senha para a tabela.
+                 * Não usa .select(), evitando solicitar a leitura do registro inserido.
+                 *
+                 * A tabela precisa ter a coluna auth_user_id UUID.
+                 * A política RLS e a permissão INSERT precisam permitir esse cadastro.
+                 */
+                const registrationData = {
+                    auth_user_id: authData.user.id,
+                    full_name: fullName,
+                    email: email,
+                    access_request: accessRequest,
+                    status: 'pending',
+                    assigned_role: null
+                };
+
+                const { error: registrationError } = await supabaseClient
+                    .from('user_registrations')
+                    .insert(registrationData);
+
+                if (registrationError) {
+                    console.error(
+                        'A conta Auth foi criada, mas o pedido não foi gravado:',
+                        registrationError
+                    );
+
+                    throw new Error(
+                        'A conta de autenticação foi criada, mas a solicitação não pôde ser registrada na tabela. Não tente cadastrar o mesmo e-mail novamente. O administrador precisa verificar a coluna auth_user_id, as permissões INSERT e a política RLS da tabela user_registrations.'
+                    );
+                }
+
+                /*
+                 * O sucesso só é exibido depois de a conta ser criada
+                 * e a solicitação ser gravada na tabela.
+                 */
+                showAlert(
+                    'success',
+                    'Cadastro e solicitação registrados com sucesso! Aguarde a aprovação do administrador. Se a confirmação por e-mail estiver ativada, confirme seu endereço.'
+                );
+
+                form.reset();
+                clearValidation();
+
+                document.getElementById('togglePassword')
+                    .querySelector('i').className = 'fas fa-eye';
+
+                document.getElementById('toggleConfirmPassword')
+                    .querySelector('i').className = 'fas fa-eye';
+
+                passwordInput.type = 'password';
+                confirmPasswordInput.type = 'password';
+
+            } catch (error) {
+                console.error('Erro no processo de cadastro:', error);
+
+                if (authUserCreated) {
+                    showAlert(
+                        'error',
+                        error.message ||
+                        'A conta foi criada, mas não foi possível concluir o registro da solicitação. Entre em contato com o administrador antes de tentar novamente.'
+                    );
+                } else {
+                    showAlert(
+                        'error',
+                        'Não foi possível concluir o cadastro: ' + getFriendlyError(error)
+                    );
+                }
+            } finally {
+                setSubmitting(false);
+            }
+        });
+
+        emailInput.addEventListener('blur', function () {
+            const email = this.value.trim();
+
+            if (!email) {
+                return;
+            }
+
+            if (!this.validity.valid || !isValidEmailDomain(email)) {
+                markInvalid(emailInput, 'emailError');
+            } else {
+                document.getElementById('emailError').classList.remove('show');
+                markValid(emailInput);
+            }
+        });
+
+        passwordInput.addEventListener('input', function () {
+            if (this.value.length >= 6) {
+                document.getElementById('passwordError').classList.remove('show');
+                markValid(this);
+            }
+        });
+
+        confirmPasswordInput.addEventListener('input', function () {
+            if (
+                this.value &&
+                this.value === passwordInput.value
+            ) {
+                document.getElementById('confirmPasswordError').classList.remove('show');
+                markValid(this);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('Sistema AtoNexo - Página de Cadastro inicializada');
+        });
+    </script>
+</body>
+</html>
