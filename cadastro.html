@@ -493,27 +493,6 @@
                         <div class="error-message" id="confirmPasswordError">As senhas não coincidem.</div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="accessRequest" class="form-label">
-                            Solicitação de Acesso
-                            <span class="required">*</span>
-                        </label>
-                        <textarea
-                            id="accessRequest"
-                            name="accessRequest"
-                            class="form-control-custom"
-                            rows="4"
-                            maxlength="2000"
-                            placeholder="Descreva o motivo da solicitação de acesso..."
-                            required
-                        ></textarea>
-                        <div class="help-text">
-                            <i class="fas fa-comment-dots"></i>
-                            Explique brevemente por que precisa de acesso ao sistema
-                        </div>
-                        <div class="error-message" id="accessRequestError">Por favor, descreva sua solicitação.</div>
-                    </div>
-
                     <button type="submit" class="btn-submit" id="submitBtn">
                         <i class="fas fa-paper-plane"></i> Enviar Solicitação
                     </button>
@@ -562,7 +541,6 @@
         const emailInput = document.getElementById('email');
         const passwordInput = document.getElementById('password');
         const confirmPasswordInput = document.getElementById('confirmPassword');
-        const accessRequestInput = document.getElementById('accessRequest');
         const submitBtn = document.getElementById('submitBtn');
         const loadingOverlay = document.getElementById('loadingOverlay');
 
@@ -664,7 +642,6 @@
             const email = emailInput.value.trim().toLowerCase();
             const password = passwordInput.value;
             const confirmPassword = confirmPasswordInput.value;
-            const accessRequest = accessRequestInput.value.trim();
 
             if (fullName.length < 3) {
                 markInvalid(fullNameInput, 'fullNameError');
@@ -695,13 +672,6 @@
                 isValid = false;
             } else {
                 markValid(confirmPasswordInput);
-            }
-
-            if (!accessRequest) {
-                markInvalid(accessRequestInput, 'accessRequestError');
-                isValid = false;
-            } else {
-                markValid(accessRequestInput);
             }
 
             if (!isValid) {
@@ -770,7 +740,6 @@
             const fullName = fullNameInput.value.trim();
             const email = emailInput.value.trim().toLowerCase();
             const password = passwordInput.value;
-            const accessRequest = accessRequestInput.value.trim();
 
             setSubmitting(true);
 
@@ -789,8 +758,7 @@
                         password: password,
                         options: {
                             data: {
-                                full_name: fullName,
-                                access_request: accessRequest
+                                full_name: fullName
                             }
                         }
                     });
@@ -820,7 +788,6 @@
                     auth_user_id: authData.user.id,
                     full_name: fullName,
                     email: email,
-                    access_request: accessRequest,
                     status: 'pending',
                     assigned_role: null
                 };
@@ -919,3 +886,4 @@
     </script>
 </body>
 </html>
+
