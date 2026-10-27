@@ -1,1094 +1,797 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Acesso ao Sistema AtoNexo do 2º Tabelionato de Protestos de Porto Alegre.">
+  <meta name="theme-color" content="#123C32">
+  <title>AtoNexo | Acesso ao sistema</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <title>AtoNexo | Acesso ao Sistema</title>
+  <style>
+    :root {
+      --verde: #123C32;
+      --verde-escuro: #0B2B24;
+      --verde-destaque: #1C5948;
+      --verde-claro: #E8F1EC;
+      --fundo: #F3F6F4;
+      --texto: #25352F;
+      --secundario: #6B7972;
+      --borda: #DDE5E0;
+      --branco: #fff;
+      --erro: #B42318;
+    }
 
-    <meta name="description"
-          content="Acesso ao sistema AtoNexo do 2º Tabelionato de Protestos de Porto Alegre.">
+    * { box-sizing: border-box; }
 
-    <!-- =====================================================
-         BIBLIOTECAS EXTERNAS
-         Bootstrap 5.3.8
-         ===================================================== -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-          rel="stylesheet">
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      font-family: Inter, system-ui, sans-serif;
+      background: var(--fundo);
+      color: var(--texto);
+    }
 
-    <!-- Ícones Bootstrap -->
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    .cabecalho {
+      background: var(--verde);
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
 
-    <!-- Fonte profissional: Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-          rel="stylesheet">
+    .cabecalho:after {
+      content: "";
+      position: absolute;
+      width: 320px;
+      height: 320px;
+      right: -100px;
+      top: -190px;
+      border: 1px solid #ffffff17;
+      border-radius: 50%;
+      pointer-events: none;
+    }
 
-    <style>
-        /* =====================================================
-           1. VARIÁVEIS VISUAIS
-           ===================================================== */
-        :root {
-            --verde-principal: #123C32;
-            --verde-escuro: #0B2B24;
-            --verde-destaque: #1C5948;
-            --verde-claro: #E8F1EC;
-            --fundo-pagina: #F3F6F4;
-            --texto-principal: #25352F;
-            --texto-secundario: #6B7972;
-            --borda: #DDE5E0;
-            --branco: #FFFFFF;
-        }
+    .cabecalho-conteudo {
+      position: relative;
+      z-index: 1;
+      padding-top: 24px;
+      padding-bottom: 24px;
+    }
 
-        /* =====================================================
-           2. ESTILOS GERAIS
-           ===================================================== */
-        * {
-            box-sizing: border-box;
-        }
+    .marca {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
 
-        body {
-            min-height: 100vh;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            font-family: 'Inter', sans-serif;
-            background: var(--fundo-pagina);
-            color: var(--texto-principal);
-        }
+    .logo {
+      width: 76px;
+      height: 76px;
+      flex-shrink: 0;
+      object-fit: contain;
+      background: #fff;
+      border-radius: 10px;
+      padding: 3px;
+    }
 
-        /* =====================================================
-           3. CABEÇALHO INSTITUCIONAL
-           ===================================================== */
-        .cabecalho {
-            background: var(--verde-principal);
-            color: var(--branco);
-            position: relative;
-            overflow: hidden;
-        }
+    .nome-cartorio {
+      font-size: clamp(1.05rem, 2.5vw, 1.45rem);
+      font-weight: 700;
+      letter-spacing: -.045em;
+      line-height: 1.35;
+      margin: 0 0 5px;
+    }
 
-        .cabecalho::after {
-            content: "";
-            position: absolute;
-            width: 320px;
-            height: 320px;
-            right: -100px;
-            top: -190px;
-            border: 1px solid rgba(255,255,255,.09);
-            border-radius: 50%;
-            pointer-events: none;
-        }
+    .endereco {
+      font-size: .8rem;
+      line-height: 1.75;
+      color: #ffffffc7;
+      margin: 0;
+    }
 
-        .cabecalho-conteudo {
-            position: relative;
-            z-index: 1;
-            padding-top: 28px;
-            padding-bottom: 28px;
-        }
+    .identificacao {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 13px;
+      border: 1px solid #ffffff2b;
+      background: #ffffff12;
+      border-radius: 10px;
+      color: #E0EEE6;
+      font-size: .8rem;
+      font-weight: 500;
+      white-space: nowrap;
+    }
 
-        .marca-institucional {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
+    .online {
+      width: 7px;
+      height: 7px;
+      background: #8BD4A6;
+      border-radius: 50%;
+    }
 
-        /* =====================================================
-           LOGO ATONEXO
-           Imagem hospedada no GitHub Pages.
-           O tamanho pode ser alterado aqui.
-           object-fit: contain preserva a proporção original.
-           ===================================================== */
-        .logo-institucional {
-            width: 76px;
-            height: 76px;
-            flex-shrink: 0;
-            display: block;
-            object-fit: contain;
-            background: #FFFFFF;
-            border-radius: 10px;
-            padding: 3px;
-        }
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      padding: 42px 12px;
+    }
 
-        .nome-cartorio {
-            font-size: clamp(1.05rem, 2.5vw, 1.45rem);
-            font-weight: 700;
-            letter-spacing: -.045em;
-            line-height: 1.35;
-            margin: 0 0 5px;
-        }
+    .login-card {
+      width: 100%;
+      max-width: 480px;
+      margin: auto;
+      background: #fff;
+      border: 1px solid var(--borda);
+      border-radius: 20px;
+      box-shadow: 0 14px 38px #173c2b0b;
+      overflow: hidden;
+    }
 
-        .endereco-cartorio {
-            font-size: .83rem;
-            line-height: 1.8;
-            color: rgba(255,255,255,.77);
-            margin: 0;
-        }
+    .login-topo {
+      padding: 30px 32px 0;
+      text-align: center;
+    }
 
-        .identificacao-sistema {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 9px 13px;
-            border: 1px solid rgba(255,255,255,.17);
-            background: rgba(255,255,255,.07);
-            border-radius: 10px;
-            color: #E0EEE6;
-            font-size: .8rem;
-            font-weight: 500;
-            white-space: nowrap;
-        }
+    .simbolo {
+      width: 54px;
+      height: 54px;
+      margin: 0 auto 16px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      background: var(--verde-claro);
+      color: var(--verde);
+      font-size: 1.5rem;
+    }
 
-        .indicador-online {
-            width: 7px;
-            height: 7px;
-            background: #8BD4A6;
-            border-radius: 50%;
-        }
+    .login-topo h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -.045em;
+      margin: 0 0 8px;
+    }
 
-        /* =====================================================
-           4. ÁREA PRINCIPAL
-           ===================================================== */
-        main {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            padding: 54px 0;
-        }
+    .login-topo p {
+      font-size: .9rem;
+      color: var(--secundario);
+      margin: 0;
+    }
 
-        .painel-login {
-            max-width: 460px;
-            width: 100%;
-            margin: 0 auto;
-            background: var(--branco);
-            border: 1px solid var(--borda);
-            border-radius: 20px;
-            padding: 38px;
-            box-shadow: 0 12px 36px rgba(24, 54, 39, .055);
-        }
+    .login-corpo {
+      padding: 26px 32px 30px;
+    }
 
-        .icone-acesso {
-            width: 54px;
-            height: 54px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 15px;
-            background: var(--verde-claro);
-            color: var(--verde-principal);
-            font-size: 25px;
-            margin-bottom: 22px;
-        }
+    .form-label {
+      font-size: .84rem;
+      font-weight: 600;
+      margin-bottom: 7px;
+    }
 
-        .titulo-login {
-            font-size: 1.7rem;
-            font-weight: 800;
-            letter-spacing: -.055em;
-            margin-bottom: 9px;
-        }
+    .form-control {
+      min-height: 46px;
+      border-color: #d4ded8;
+      border-radius: 10px;
+      font-size: .92rem;
+    }
 
-        .subtitulo-login {
-            color: var(--texto-secundario);
-            font-size: .9rem;
-            line-height: 1.7;
-            margin-bottom: 30px;
-        }
+    .form-control:focus {
+      border-color: #4c8974;
+      box-shadow: 0 0 0 .22rem #1c59481a;
+    }
 
-        .form-label {
-            font-size: .84rem;
-            font-weight: 600;
-            margin-bottom: 9px;
-        }
+    .input-group .form-control {
+      border-radius: 10px 0 0 10px;
+    }
 
-        .campo-formulario {
-            min-height: 49px;
-            border: 1px solid var(--borda);
-            border-radius: 10px;
-            font-size: .9rem;
-            padding: 12px 14px;
-        }
+    .input-group .btn {
+      border-color: #d4ded8;
+      border-radius: 0 10px 10px 0;
+      color: var(--secundario);
+    }
 
-        .campo-formulario:focus {
-            border-color: var(--verde-destaque);
-            box-shadow: 0 0 0 .2rem rgba(28, 89, 72, .10);
-        }
+    .btn-atonexo {
+      min-height: 47px;
+      background: var(--verde);
+      color: #fff;
+      border: 0;
+      border-radius: 10px;
+      font-weight: 700;
+    }
 
-        .grupo-senha .campo-formulario {
-            border-right: 0;
-            border-radius: 10px 0 0 10px;
-        }
+    .btn-atonexo:hover,
+    .btn-atonexo:focus {
+      background: var(--verde-escuro);
+      color: #fff;
+    }
 
-        .grupo-senha .btn-visualizar {
-            border: 1px solid var(--borda);
-            border-left: 0;
-            border-radius: 0 10px 10px 0;
-            background: var(--branco);
-            color: var(--texto-secundario);
-            padding: 0 15px;
-        }
+    .btn-atonexo:disabled {
+      opacity: .7;
+    }
 
-        .link-auxiliar {
-            color: var(--verde-destaque);
-            font-size: .82rem;
-            font-weight: 600;
-            text-decoration: none;
-        }
+    .link-atonexo {
+      color: var(--verde-destaque);
+      font-weight: 600;
+      text-decoration: none;
+      font-size: .85rem;
+    }
 
-        .link-auxiliar:hover {
-            text-decoration: underline;
-        }
+    .link-atonexo:hover { text-decoration: underline; }
 
-        .btn-principal {
-            min-height: 49px;
-            background: var(--verde-principal);
-            border: 1px solid var(--verde-principal);
-            border-radius: 10px;
-            color: var(--branco);
-            font-size: .92rem;
-            font-weight: 600;
-            transition: background .2s, transform .2s;
-        }
+    .separador {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #8a968f;
+      font-size: .76rem;
+      margin: 23px 0;
+    }
 
-        .btn-principal:hover,
-        .btn-principal:focus {
-            background: var(--verde-escuro);
-            border-color: var(--verde-escuro);
-            color: var(--branco);
-        }
+    .separador:before,
+    .separador:after {
+      content: "";
+      height: 1px;
+      flex: 1;
+      background: var(--borda);
+    }
 
-        .btn-principal:active {
-            transform: translateY(1px);
-        }
+    .nota-seguranca {
+      display: flex;
+      gap: 9px;
+      align-items: flex-start;
+      background: #f5f8f6;
+      border: 1px solid #e5ece7;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: .77rem;
+      line-height: 1.5;
+      color: var(--secundario);
+    }
 
-        .divisor {
-            display: flex;
-            align-items: center;
-            gap: 13px;
-            color: #9AA59F;
-            font-size: .76rem;
-            margin: 24px 0;
-        }
+    .rodape {
+      padding: 18px 0;
+      border-top: 1px solid var(--borda);
+      background: #fff;
+    }
 
-        .divisor::before,
-        .divisor::after {
-            content: "";
-            flex: 1;
-            height: 1px;
-            background: var(--borda);
-        }
+    .rodape-texto {
+      font-size: .76rem;
+      color: var(--secundario);
+      margin: 0;
+    }
 
-        .btn-cadastro {
-            min-height: 47px;
-            background: var(--branco);
-            border: 1px solid var(--borda);
-            border-radius: 10px;
-            color: var(--texto-principal);
-            font-size: .9rem;
-            font-weight: 600;
-        }
+    .marca-atonexo {
+      color: var(--verde);
+      font-weight: 800;
+      letter-spacing: -.035em;
+    }
 
-        .btn-cadastro:hover {
-            background: #F7FAF8;
-            border-color: #B7C8BD;
-            color: var(--verde-principal);
-        }
+    .modal-content {
+      border: 0;
+      border-radius: 16px;
+      overflow: hidden;
+    }
 
-        .nota-seguranca {
-            display: flex;
-            align-items: flex-start;
-            gap: 9px;
-            margin-top: 25px;
-            color: var(--texto-secundario);
-            font-size: .77rem;
-            line-height: 1.6;
-        }
+    .modal-header {
+      background: var(--verde);
+      color: #fff;
+    }
 
-        .nota-seguranca i {
-            color: var(--verde-destaque);
-            margin-top: 2px;
-        }
+    .modal-header .btn-close { filter: invert(1); }
+    .modal-title { font-weight: 700; }
+    .small-help { font-size: .78rem; color: var(--secundario); }
 
-        /* =====================================================
-           5. RODAPÉ
-           ===================================================== */
-        .rodape {
-            padding: 20px 0;
-            border-top: 1px solid var(--borda);
-            background: #FFFFFF;
-        }
+    @media (max-width: 767.98px) {
+      .cabecalho-conteudo {
+        padding-top: 20px;
+        padding-bottom: 20px;
+      }
 
-        .rodape-texto {
-            font-size: .78rem;
-            color: var(--texto-secundario);
-            margin: 0;
-        }
+      .marca {
+        align-items: flex-start;
+        gap: 11px;
+      }
 
-        .marca-atonexo {
-            color: var(--verde-principal);
-            font-weight: 800;
-            letter-spacing: -.035em;
-        }
+      .logo {
+        width: 60px;
+        height: 60px;
+      }
 
-        /* =====================================================
-           6. MODAL DE CADASTRO
-           ===================================================== */
-        .modal-content {
-            border: 0;
-            border-radius: 18px;
-            box-shadow: 0 20px 60px rgba(0,0,0,.15);
-        }
+      .endereco { font-size: .72rem; }
+      .identificacao { margin-top: 16px; }
+      main { padding: 28px 12px; }
 
-        .modal-header {
-            padding: 25px 28px 12px;
-            border-bottom: 0;
-        }
+      .login-topo { padding: 26px 22px 0; }
+      .login-corpo { padding: 24px 22px 26px; }
 
-        .modal-body {
-            padding: 14px 28px 28px;
-        }
+      .rodape .text-md-end {
+        text-align: left !important;
+        margin-top: 7px;
+      }
+    }
 
-        .titulo-modal {
-            font-size: 1.35rem;
-            font-weight: 800;
-            letter-spacing: -.04em;
-        }
-
-        .texto-modal {
-            color: var(--texto-secundario);
-            font-size: .84rem;
-            line-height: 1.65;
-        }
-
-        .consentimento {
-            padding: 13px;
-            border: 1px solid var(--borda);
-            border-radius: 10px;
-            background: #FAFCFA;
-        }
-
-        .consentimento .form-check-label {
-            font-size: .8rem;
-            line-height: 1.6;
-            color: var(--texto-principal);
-        }
-
-        .form-check-input:checked {
-            background-color: var(--verde-principal);
-            border-color: var(--verde-principal);
-        }
-
-        .texto-privacidade {
-            font-size: .76rem;
-            line-height: 1.6;
-            color: var(--texto-secundario);
-        }
-
-        /* =====================================================
-           7. RESPONSIVIDADE
-           ===================================================== */
-        @media (max-width: 767.98px) {
-            .cabecalho-conteudo {
-                padding-top: 22px;
-                padding-bottom: 22px;
-            }
-
-            .marca-institucional {
-                align-items: flex-start;
-                gap: 12px;
-            }
-
-            .logo-institucional {
-                width: 64px;
-                height: 64px;
-            }
-
-            .identificacao-sistema {
-                margin-top: 18px;
-            }
-
-            main {
-                padding: 32px 12px;
-                align-items: flex-start;
-            }
-
-            .painel-login {
-                padding: 27px 23px;
-                border-radius: 16px;
-            }
-
-            .titulo-login {
-                font-size: 1.55rem;
-            }
-
-            .modal-header {
-                padding: 22px 22px 10px;
-            }
-
-            .modal-body {
-                padding: 12px 22px 24px;
-            }
-
-            .rodape .text-md-end {
-                text-align: left !important;
-                margin-top: 7px;
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            *,
-            *::before,
-            *::after {
-                transition-duration: .01ms !important;
-            }
-        }
-    </style>
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        transition-duration: .01ms !important;
+        animation-duration: .01ms !important;
+      }
+    }
+  </style>
 </head>
 
 <body>
-
-    <!-- =====================================================
-         CABEÇALHO INSTITUCIONAL
-         Logo AtoNexo hospedado no GitHub Pages.
-         Para substituir a imagem futuramente, altere o src.
-         ===================================================== -->
-    <header class="cabecalho">
-        <div class="container cabecalho-conteudo">
-            <div class="row align-items-center">
-
-                <div class="col-lg-9">
-                    <div class="marca-institucional">
-
-                        <!-- LOGO ATONEXO -->
-                        <img
-                            src="https://tabpoa.github.io/tabelionatopoa/ato-nexo.png"
-                            alt="Logotipo AtoNexo"
-                            class="logo-institucional"
-                            width="76"
-                            height="76"
-                        >
-
-                        <div>
-                            <h1 class="nome-cartorio">
-                                2º Tabelionato de Protestos de Porto Alegre
-                            </h1>
-
-                            <p class="endereco-cartorio">
-                                Rua dos Andradas, 1234 • 4º Andar<br>
-                                Centro Histórico • Porto Alegre/RS • CEP 90020-008<br>
-                                CNPJ: 04.438.173/0001-47 •
-                                <a href="tel:+555130273500"
-                                   class="text-white text-decoration-none">
-                                    (51) 3027-3500
-                                </a>
-                            </p>
-                        </div>
-
-                    </div>
-                </div>
-
-                <div class="col-lg-3 text-lg-end">
-                    <div class="identificacao-sistema">
-                        <span class="indicador-online"></span>
-                        <span>Sistema AtoNexo</span>
-                    </div>
-                </div>
-
+  <header class="cabecalho">
+    <div class="container cabecalho-conteudo">
+      <div class="row align-items-center">
+        <div class="col-lg-9">
+          <div class="marca">
+            <img
+              class="logo"
+              src="https://tabpoa.github.io/tabelionatopoa/ato-nexo.png"
+              alt="Logotipo AtoNexo"
+              width="76"
+              height="76"
+            >
+            <div>
+              <h1 class="nome-cartorio">2º Tabelionato de Protestos de Porto Alegre</h1>
+              <p class="endereco">
+                Rua dos Andradas, 1234 • 4º Andar<br>
+                Centro Histórico • Porto Alegre/RS • CEP 90020-008<br>
+                CNPJ: 04.438.173/0001-47 •
+                <a class="text-white text-decoration-none" href="tel:+555130273500">
+                  (51) 3027-3500
+                </a>
+              </p>
             </div>
+          </div>
         </div>
-    </header>
 
-
-    <!-- =====================================================
-         CONTEÚDO PRINCIPAL
-         ===================================================== -->
-    <main>
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-12">
-
-                    <section class="painel-login"
-                             aria-labelledby="tituloLogin">
-
-                        <div class="icone-acesso">
-                            <i class="bi bi-person-lock"
-                               aria-hidden="true"></i>
-                        </div>
-
-                        <h2 class="titulo-login" id="tituloLogin">
-                            Bem-vindo ao AtoNexo
-                        </h2>
-
-                        <p class="subtitulo-login">
-                            Acesse sua conta para continuar.
-                            Informe seu e-mail e sua senha para entrar no sistema.
-                        </p>
-
-                        <!-- FORMULÁRIO DE LOGIN -->
-                        <form id="formLogin" novalidate>
-
-                            <div class="mb-3">
-                                <label for="loginEmail" class="form-label">
-                                    E-mail
-                                </label>
-
-                                <input type="email"
-                                       class="form-control campo-formulario"
-                                       id="loginEmail"
-                                       name="email"
-                                       placeholder="seu.email@exemplo.com"
-                                       autocomplete="username"
-                                       maxlength="254"
-                                       required>
-
-                                <div class="invalid-feedback">
-                                    Informe um endereço de e-mail válido.
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between
-                                            align-items-center mb-2">
-
-                                    <label for="loginSenha"
-                                           class="form-label mb-0">
-                                        Senha
-                                    </label>
-
-                                    <a href="#"
-                                       class="link-auxiliar"
-                                       id="linkRecuperarSenha">
-                                        Esqueci minha senha
-                                    </a>
-                                </div>
-
-                                <div class="input-group grupo-senha">
-                                    <input type="password"
-                                           class="form-control campo-formulario"
-                                           id="loginSenha"
-                                           name="senha"
-                                           placeholder="Digite sua senha"
-                                           autocomplete="current-password"
-                                           required>
-
-                                    <button class="btn btn-visualizar"
-                                            type="button"
-                                            data-toggle-password="loginSenha"
-                                            aria-label="Mostrar senha"
-                                            aria-pressed="false">
-                                        <i class="bi bi-eye"></i>
-                                    </button>
-
-                                    <div class="invalid-feedback">
-                                        Informe sua senha.
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="d-grid mt-4">
-                                <button type="submit"
-                                        class="btn btn-principal"
-                                        id="btnEntrar">
-                                    <i class="bi bi-box-arrow-in-right me-2"></i>
-                                    Entrar no sistema
-                                </button>
-                            </div>
-
-                        </form>
-
-                        <div class="divisor">OU</div>
-
-                        <div class="d-grid">
-                            <button type="button"
-                                    class="btn btn-cadastro"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#modalCadastro">
-                                <i class="bi bi-person-plus me-2"></i>
-                                Criar uma conta
-                            </button>
-                        </div>
-
-                        <div class="nota-seguranca">
-                            <i class="bi bi-shield-lock-fill"></i>
-
-                            <span>
-                                O acesso ao sistema é destinado a usuários
-                                autorizados. Mantenha suas credenciais em
-                                segurança e não compartilhe sua senha.
-                            </span>
-                        </div>
-
-                    </section>
-
-                </div>
-            </div>
+        <div class="col-lg-3 text-lg-end">
+          <div class="identificacao">
+            <span class="online"></span>
+            <span>Sistema AtoNexo</span>
+          </div>
         </div>
-    </main>
-
-
-    <!-- RODAPÉ -->
-    <footer class="rodape">
-        <div class="container">
-            <div class="row align-items-center">
-
-                <div class="col-md-6">
-                    <p class="rodape-texto">
-                        &copy; <span id="anoAtual"></span>
-                        <span class="marca-atonexo">AtoNexo</span>.
-                        Todos os direitos reservados.
-                    </p>
-                </div>
-
-                <div class="col-md-6 text-md-end">
-                    <p class="rodape-texto">
-                        Tecnologia a serviço da organização e da eficiência.
-                    </p>
-                </div>
-
-            </div>
-        </div>
-    </footer>
-
-
-    <!-- MODAL DE CADASTRO -->
-    <div class="modal fade"
-         id="modalCadastro"
-         tabindex="-1"
-         aria-labelledby="tituloModalCadastro"
-         aria-hidden="true">
-
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content">
-
-                <div class="modal-header">
-                    <div>
-                        <h2 class="titulo-modal mb-2"
-                            id="tituloModalCadastro">
-                            Criar sua conta
-                        </h2>
-
-                        <p class="texto-modal mb-0">
-                            Preencha os dados abaixo para solicitar
-                            seu cadastro no AtoNexo.
-                        </p>
-                    </div>
-
-                    <button type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                            aria-label="Fechar"></button>
-                </div>
-
-                <div class="modal-body">
-                    <form id="formCadastro" novalidate>
-
-                        <div class="mb-3">
-                            <label for="cadastroNome" class="form-label">
-                                Nome completo
-                            </label>
-
-                            <input type="text"
-                                   class="form-control campo-formulario"
-                                   id="cadastroNome"
-                                   name="nomeCompleto"
-                                   placeholder="Digite seu nome completo"
-                                   autocomplete="name"
-                                   maxlength="150"
-                                   required>
-
-                            <div class="invalid-feedback">
-                                Informe seu nome completo.
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="cadastroEmail" class="form-label">
-                                E-mail
-                            </label>
-
-                            <input type="email"
-                                   class="form-control campo-formulario"
-                                   id="cadastroEmail"
-                                   name="email"
-                                   placeholder="seu.email@exemplo.com"
-                                   autocomplete="email"
-                                   maxlength="254"
-                                   required>
-
-                            <div class="invalid-feedback">
-                                Informe um endereço de e-mail válido.
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="cadastroSenha" class="form-label">
-                                Senha
-                            </label>
-
-                            <div class="input-group grupo-senha">
-                                <input type="password"
-                                       class="form-control campo-formulario"
-                                       id="cadastroSenha"
-                                       name="senha"
-                                       placeholder="Crie uma senha"
-                                       autocomplete="new-password"
-                                       minlength="8"
-                                       required>
-
-                                <button class="btn btn-visualizar"
-                                        type="button"
-                                        data-toggle-password="cadastroSenha"
-                                        aria-label="Mostrar senha"
-                                        aria-pressed="false">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-
-                                <div class="invalid-feedback">
-                                    A senha deve ter pelo menos 8 caracteres.
-                                </div>
-                            </div>
-
-                            <div class="form-text">
-                                Utilize pelo menos 8 caracteres.
-                            </div>
-                        </div>
-
-                        <div class="mb-4">
-                            <label for="cadastroConfirmacao"
-                                   class="form-label">
-                                Confirmar senha
-                            </label>
-
-                            <div class="input-group grupo-senha">
-                                <input type="password"
-                                       class="form-control campo-formulario"
-                                       id="cadastroConfirmacao"
-                                       name="confirmacaoSenha"
-                                       placeholder="Digite a senha novamente"
-                                       autocomplete="new-password"
-                                       required>
-
-                                <button class="btn btn-visualizar"
-                                        type="button"
-                                        data-toggle-password="cadastroConfirmacao"
-                                        aria-label="Mostrar senha"
-                                        aria-pressed="false">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-
-                                <div class="invalid-feedback"
-                                     id="erroConfirmacao">
-                                    As senhas não coincidem.
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- CONSENTIMENTO PARA USO DO E-MAIL -->
-                        <div class="consentimento mb-3">
-                            <div class="form-check">
-                                <input class="form-check-input"
-                                       type="checkbox"
-                                       value="sim"
-                                       id="aceiteEmail"
-                                       name="aceiteEmail"
-                                       required>
-
-                                <label class="form-check-label"
-                                       for="aceiteEmail">
-                                    Aceito o uso do meu endereço de e-mail
-                                    para a criação e o gerenciamento da minha
-                                    conta no AtoNexo, incluindo comunicações
-                                    necessárias relacionadas ao acesso.
-                                </label>
-
-                                <div class="invalid-feedback">
-                                    É necessário aceitar esta condição
-                                    para solicitar o cadastro.
-                                </div>
-                            </div>
-                        </div>
-
-                        <p class="texto-privacidade mb-4">
-                            Seus dados deverão ser tratados de acordo com
-                            a política de privacidade aplicável e a
-                            legislação vigente de proteção de dados.
-                        </p>
-
-                        <div class="d-grid">
-                            <button type="submit"
-                                    class="btn btn-principal"
-                                    id="btnCadastrar">
-                                <i class="bi bi-person-check me-2"></i>
-                                Solicitar cadastro
-                            </button>
-                        </div>
-
-                        <div class="text-center mt-3">
-                            <button type="button"
-                                    class="btn btn-link link-auxiliar
-                                           text-decoration-none"
-                                    data-bs-dismiss="modal">
-                                Já tenho uma conta
-                            </button>
-                        </div>
-
-                    </form>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
+  </header>
 
-
-    <!-- NOTIFICAÇÕES -->
-    <div class="toast-container position-fixed bottom-0 end-0 p-3"
-         aria-live="polite"
-         aria-atomic="true">
-
-        <div id="toastNotificacao"
-             class="toast"
-             role="status">
-
-            <div class="toast-header">
-                <i class="bi bi-info-circle-fill text-success me-2"></i>
-                <strong class="me-auto">AtoNexo</strong>
-
-                <button type="button"
-                        class="btn-close"
-                        data-bs-dismiss="toast"
-                        aria-label="Fechar"></button>
-            </div>
-
-            <div class="toast-body" id="toastMensagem">
-                Mensagem do sistema.
-            </div>
-
+  <main>
+    <section class="login-card" aria-labelledby="tituloLogin">
+      <div class="login-topo">
+        <div class="simbolo">
+          <i class="bi bi-shield-lock" aria-hidden="true"></i>
         </div>
+        <h2 id="tituloLogin">Acesso ao sistema</h2>
+        <p>Entre com seu e-mail e sua senha cadastrados.</p>
+      </div>
+
+      <div class="login-corpo">
+        <form id="formLogin" novalidate>
+          <div class="mb-3">
+            <label for="loginEmail" class="form-label">E-mail institucional</label>
+            <input
+              id="loginEmail"
+              name="email"
+              class="form-control"
+              type="email"
+              autocomplete="username"
+              placeholder="voce@exemplo.com.br"
+              required
+            >
+          </div>
+
+          <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center">
+              <label for="loginSenha" class="form-label">Senha</label>
+              <a href="#" id="linkRecuperarSenha" class="link-atonexo mb-2">
+                Esqueci minha senha
+              </a>
+            </div>
+
+            <div class="input-group">
+              <input
+                id="loginSenha"
+                name="password"
+                class="form-control"
+                type="password"
+                autocomplete="current-password"
+                placeholder="Digite sua senha"
+                required
+              >
+              <button
+                class="btn btn-outline-secondary"
+                type="button"
+                id="toggleSenha"
+                aria-label="Mostrar senha"
+              >
+                <i class="bi bi-eye" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+
+          <div id="mensagemLogin" class="alert d-none py-2 small" role="alert"></div>
+
+          <button id="btnEntrar" class="btn btn-atonexo w-100" type="submit">
+            <i class="bi bi-box-arrow-in-right me-2" aria-hidden="true"></i>
+            Entrar no sistema
+          </button>
+        </form>
+
+        <div class="separador">Acesso institucional</div>
+
+        <div class="text-center mb-4">
+          <span class="small-help">Ainda não tem acesso?</span><br>
+          <button
+            type="button"
+            class="btn btn-link link-atonexo p-0 mt-1"
+            data-bs-toggle="modal"
+            data-bs-target="#modalCadastro"
+          >
+            Solicitar cadastro
+          </button>
+        </div>
+
+        <div class="nota-seguranca">
+          <i class="bi bi-shield-check fs-5" aria-hidden="true"></i>
+          <span>O acesso depende da aprovação do cadastro e das permissões atribuídas pelo responsável pelo sistema.</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <p class="rodape-texto">
+            &copy; <span id="anoAtual"></span>
+            <span class="marca-atonexo">AtoNexo</span>. Todos os direitos reservados.
+          </p>
+        </div>
+        <div class="col-md-6 text-md-end">
+          <p class="rodape-texto">Tecnologia a serviço da organização e da eficiência.</p>
+        </div>
+      </div>
     </div>
+  </footer>
 
+  <div
+    class="modal fade"
+    id="modalCadastro"
+    tabindex="-1"
+    aria-labelledby="tituloCadastro"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title fs-5" id="tituloCadastro">Solicitar acesso</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
 
-    <!-- BOOTSTRAP JAVASCRIPT -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+        <div class="modal-body p-4">
+          <p class="small-help mb-3">
+            O cadastro será enviado para aprovação. Ele não concede automaticamente acesso ao sistema.
+          </p>
 
-    <script>
-        "use strict";
+          <form id="formCadastro" novalidate>
+            <div class="mb-3">
+              <label class="form-label" for="cadastroNome">Nome completo</label>
+              <input class="form-control" id="cadastroNome" autocomplete="name" required maxlength="160">
+            </div>
 
-        /* =====================================================
-           1. CONFIGURAÇÃO FUTURA DO SUPABASE
+            <div class="mb-3">
+              <label class="form-label" for="cadastroEmail">E-mail</label>
+              <input class="form-control" id="cadastroEmail" type="email" autocomplete="email" required>
+            </div>
 
-           const SUPABASE_URL = "https://SEU-PROJETO.supabase.co";
-           const SUPABASE_ANON_KEY = "SUA_CHAVE_PUBLICAVEL";
+            <div class="mb-3">
+              <label class="form-label" for="cadastroSenha">Criar senha</label>
+              <input
+                class="form-control"
+                id="cadastroSenha"
+                type="password"
+                autocomplete="new-password"
+                minlength="6"
+                required
+              >
+              <div class="form-text">Use pelo menos 6 caracteres.</div>
+            </div>
 
-           Nunca inserir a chave service_role neste HTML.
-           ===================================================== */
+            <div class="mb-3">
+              <label class="form-label" for="cadastroConfirmacao">Confirmar senha</label>
+              <input
+                class="form-control"
+                id="cadastroConfirmacao"
+                type="password"
+                autocomplete="new-password"
+                minlength="6"
+                required
+              >
+            </div>
 
-        /* ELEMENTOS DA INTERFACE */
-        const formLogin = document.getElementById("formLogin");
-        const formCadastro = document.getElementById("formCadastro");
+            <div class="form-check mb-3">
+              <input class="form-check-input" id="aceiteEmail" type="checkbox">
+              <label class="form-check-label small" for="aceiteEmail">
+                Aceito receber comunicações institucionais por e-mail.
+              </label>
+            </div>
 
-        const loginEmail = document.getElementById("loginEmail");
-        const loginSenha = document.getElementById("loginSenha");
+            <div id="mensagemCadastro" class="alert d-none py-2 small" role="alert"></div>
 
-        const cadastroNome = document.getElementById("cadastroNome");
-        const cadastroEmail = document.getElementById("cadastroEmail");
-        const cadastroSenha = document.getElementById("cadastroSenha");
-        const cadastroConfirmacao =
-            document.getElementById("cadastroConfirmacao");
+            <button id="btnCadastrar" type="submit" class="btn btn-atonexo w-100">
+              Enviar solicitação
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 
-        const aceiteEmail = document.getElementById("aceiteEmail");
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-        const modalCadastroElement =
-            document.getElementById("modalCadastro");
+  <script>
+    'use strict';
 
-        const modalCadastro =
-            bootstrap.Modal.getOrCreateInstance(modalCadastroElement);
+    const SUPABASE_URL = 'https://dlxqahkjhuocsssosqyj.supabase.co';
+    const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_IJ704qHttTZHtI_q8E7CCw_siVAy7Ex';
+    const PAINEL_TI = 'https://tabpoa.github.io/tabelionatopoa/cadastro-intimacoes.html';
 
+    const supabase = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY
+    );
 
-        /* ANO AUTOMÁTICO */
-        document.getElementById("anoAtual").textContent =
-            new Date().getFullYear();
+    const $ = (id) => document.getElementById(id);
 
+    $('anoAtual').textContent = new Date().getFullYear();
 
-        /* NOTIFICAÇÕES */
-        function notificar(mensagem) {
-            document.getElementById("toastMensagem").textContent =
-                mensagem;
+    function mostrarMensagem(id, texto, tipo = 'danger') {
+      const elemento = $(id);
+      elemento.className = `alert alert-${tipo} py-2 small`;
+      elemento.textContent = texto;
+      elemento.classList.remove('d-none');
+    }
 
-            bootstrap.Toast.getOrCreateInstance(
-                document.getElementById("toastNotificacao"),
-                { delay: 4500 }
-            ).show();
+    function limparMensagem(id) {
+      const elemento = $(id);
+      elemento.classList.add('d-none');
+      elemento.textContent = '';
+    }
+
+    function mensagemErro(error) {
+      const msg = String(error?.message || 'Erro inesperado.');
+
+      if (/Invalid login credentials/i.test(msg)) {
+        return 'E-mail ou senha inválidos. Confira também se o provedor E-mail está habilitado em Supabase > Authentication > Sign In / Providers.';
+      }
+
+      if (/Email provider is disabled|email provider.*disabled|Signups not allowed/i.test(msg)) {
+        return 'O provedor de acesso por e-mail está desabilitado no Supabase. Ative Authentication > Sign In / Providers > Email no painel do projeto.';
+      }
+
+      if (/row-level security|permission denied|42501/i.test(msg)) {
+        return 'O Supabase bloqueou a operação por permissão do banco. Execute o SQL de configuração apresentado abaixo.';
+      }
+
+      if (/Email not confirmed/i.test(msg)) {
+        return 'Confirme seu e-mail antes de entrar.';
+      }
+
+      if (/Failed to fetch|NetworkError/i.test(msg)) {
+        return 'Não foi possível conectar ao Supabase. Verifique sua conexão.';
+      }
+
+      return msg;
+    }
+
+    $('toggleSenha').addEventListener('click', () => {
+      const campo = $('loginSenha');
+      const mostrar = campo.type === 'password';
+
+      campo.type = mostrar ? 'text' : 'password';
+
+      $('toggleSenha').innerHTML = mostrar
+        ? '<i class="bi bi-eye-slash" aria-hidden="true"></i>'
+        : '<i class="bi bi-eye" aria-hidden="true"></i>';
+
+      $('toggleSenha').setAttribute(
+        'aria-label',
+        mostrar ? 'Ocultar senha' : 'Mostrar senha'
+      );
+    });
+
+    $('formLogin').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      limparMensagem('mensagemLogin');
+
+      const email = $('loginEmail').value.trim();
+      const password = $('loginSenha').value;
+
+      if (!email || !password) {
+        mostrarMensagem('mensagemLogin', 'Informe seu e-mail e sua senha.');
+        return;
+      }
+
+      const botao = $('btnEntrar');
+      botao.disabled = true;
+      botao.innerHTML =
+        '<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Verificando acesso...';
+
+      let autenticado = false;
+
+      try {
+        const { data: authData, error: authError } =
+          await supabase.auth.signInWithPassword({ email, password });
+
+        if (authError) throw authError;
+
+        autenticado = true;
+
+        const { data: perfil, error: perfilError } = await supabase
+          .from('perfis_usuarios')
+          .select('nome_completo, status_cadastro, papel')
+          .eq('id', authData.user.id)
+          .maybeSingle();
+
+        if (perfilError) {
+          throw new Error(
+            'Não foi possível consultar seu perfil no banco. Verifique as políticas de acesso da tabela perfis_usuarios.'
+          );
         }
 
-
-        /* MOSTRAR / OCULTAR SENHAS */
-        document.querySelectorAll("[data-toggle-password]")
-            .forEach(function (botao) {
-
-                botao.addEventListener("click", function () {
-                    const idCampo =
-                        botao.getAttribute("data-toggle-password");
-
-                    const campo = document.getElementById(idCampo);
-                    const icone = botao.querySelector("i");
-
-                    const mostrar = campo.type === "password";
-
-                    campo.type = mostrar ? "text" : "password";
-
-                    icone.classList.toggle("bi-eye", !mostrar);
-                    icone.classList.toggle("bi-eye-slash", mostrar);
-
-                    botao.setAttribute(
-                        "aria-label",
-                        mostrar ? "Ocultar senha" : "Mostrar senha"
-                    );
-
-                    botao.setAttribute(
-                        "aria-pressed",
-                        String(mostrar)
-                    );
-                });
-            });
-
-
-        /* VALIDAÇÃO DA CONFIRMAÇÃO DA SENHA */
-        function validarConfirmacaoSenha() {
-            const iguais =
-                cadastroSenha.value === cadastroConfirmacao.value;
-
-            cadastroConfirmacao.setCustomValidity(
-                iguais ? "" : "As senhas não coincidem."
-            );
-
-            if (!iguais) {
-                cadastroConfirmacao.classList.add("is-invalid");
-                return false;
-            }
-
-            cadastroConfirmacao.classList.remove("is-invalid");
-
-            return cadastroConfirmacao.checkValidity();
+        if (!perfil) {
+          throw new Error(
+            'Seu perfil não foi encontrado. Solicite ao administrador a regularização do cadastro.'
+          );
         }
 
-        cadastroSenha.addEventListener("input", function () {
-            if (cadastroConfirmacao.value !== "") {
-                validarConfirmacaoSenha();
-            }
+        if (perfil.status_cadastro !== 'aprovado') {
+          throw new Error(
+            'Seu cadastro ainda não está aprovado. Entre em contato com o administrador.'
+          );
+        }
+
+        if (perfil.papel !== 'ti') {
+          throw new Error(
+            'Este acesso ainda não está vinculado ao seu perfil.'
+          );
+        }
+
+        window.location.assign(PAINEL_TI);
+      } catch (error) {
+        if (autenticado) {
+          try {
+            await supabase.auth.signOut();
+          } catch (_) {
+            // Mantém a mensagem principal.
+          }
+        }
+
+        mostrarMensagem('mensagemLogin', mensagemErro(error));
+      } finally {
+        botao.disabled = false;
+        botao.innerHTML =
+          '<i class="bi bi-box-arrow-in-right me-2" aria-hidden="true"></i>Entrar no sistema';
+      }
+    });
+
+    $('linkRecuperarSenha').addEventListener('click', async (event) => {
+      event.preventDefault();
+      limparMensagem('mensagemLogin');
+
+      const email = $('loginEmail').value.trim();
+
+      if (!email) {
+        mostrarMensagem(
+          'mensagemLogin',
+          'Digite seu e-mail no campo acima e clique novamente em “Esqueci minha senha”.',
+          'warning'
+        );
+        $('loginEmail').focus();
+        return;
+      }
+
+      try {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: window.location.origin + window.location.pathname
         });
 
-        cadastroConfirmacao.addEventListener("input", function () {
-            validarConfirmacaoSenha();
+        if (error) throw error;
+
+        mostrarMensagem(
+          'mensagemLogin',
+          'Se o e-mail estiver cadastrado, as instruções de recuperação serão enviadas. Confira também a caixa de spam.',
+          'success'
+        );
+      } catch (error) {
+        mostrarMensagem(
+          'mensagemLogin',
+          'Não foi possível solicitar a recuperação: ' + mensagemErro(error)
+        );
+      }
+    });
+
+    $('formCadastro').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      limparMensagem('mensagemCadastro');
+
+      const nome = $('cadastroNome').value.trim();
+      const email = $('cadastroEmail').value.trim();
+      const password = $('cadastroSenha').value;
+      const confirmacao = $('cadastroConfirmacao').value;
+      const consentimento = $('aceiteEmail').checked;
+
+      if (!nome || !email || !password || !confirmacao) {
+        mostrarMensagem(
+          'mensagemCadastro',
+          'Preencha todos os campos obrigatórios.'
+        );
+        return;
+      }
+
+      if (password.length < 6) {
+        mostrarMensagem(
+          'mensagemCadastro',
+          'A senha precisa ter pelo menos 6 caracteres.'
+        );
+        return;
+      }
+
+      if (password !== confirmacao) {
+        mostrarMensagem(
+          'mensagemCadastro',
+          'As senhas não são iguais.'
+        );
+        return;
+      }
+
+      const botao = $('btnCadastrar');
+      botao.disabled = true;
+      botao.textContent = 'Enviando solicitação...';
+
+      try {
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              nome_completo: nome,
+              consentimento_email: consentimento
+            }
+          }
         });
 
+        if (error) throw error;
 
-        /* =====================================================
-           LOGIN — INTEGRAÇÃO SUPABASE PENDENTE
+        if (!data.user) {
+          throw new Error('Não foi possível confirmar a criação da conta.');
+        }
 
-           supabase.auth.signInWithPassword({
-               email: loginEmail.value.trim(),
-               password: loginSenha.value
-           });
-           ===================================================== */
-        formLogin.addEventListener("submit", async function (evento) {
-            evento.preventDefault();
-
-            formLogin.classList.add("was-validated");
-
-            if (!formLogin.checkValidity()) {
-                return;
-            }
-
-            notificar(
-                "A tela está pronta. O acesso será habilitado após a integração com o Supabase."
-            );
-        });
-
-
-        /* =====================================================
-           CADASTRO — INTEGRAÇÃO SUPABASE PENDENTE
-
-           supabase.auth.signUp({
-               email: cadastroEmail.value.trim(),
-               password: cadastroSenha.value,
-               options: {
-                   data: {
-                       full_name: cadastroNome.value.trim()
-                   }
-               }
-           });
-
-           Não enviar a confirmação de senha ao Supabase.
-           ===================================================== */
-        formCadastro.addEventListener("submit", async function (evento) {
-            evento.preventDefault();
-
-            formCadastro.classList.add("was-validated");
-
-            const senhaValida = validarConfirmacaoSenha();
-
-            if (!formCadastro.checkValidity() || !senhaValida) {
-                return;
-            }
-
-            if (!aceiteEmail.checked) {
-                aceiteEmail.focus();
-                return;
-            }
-
-            notificar(
-                "Formulário validado. O cadastro será habilitado após a integração com o Supabase."
-            );
-        });
-
-
-        /* RECUPERAÇÃO DE SENHA — INTEGRAÇÃO PENDENTE */
-        document.getElementById("linkRecuperarSenha")
-            .addEventListener("click", function (evento) {
-                evento.preventDefault();
-
-                notificar(
-                    "A recuperação de senha será habilitada na integração com o Supabase."
-                );
-            });
-
-
-        /* LIMPAR FORMULÁRIO AO FECHAR O MODAL */
-        modalCadastroElement.addEventListener(
-            "hidden.bs.modal",
-            function () {
-                formCadastro.reset();
-                formCadastro.classList.remove("was-validated");
-
-                [
-                    cadastroNome,
-                    cadastroEmail,
-                    cadastroSenha,
-                    cadastroConfirmacao
-                ].forEach(function (campo) {
-                    campo.classList.remove("is-invalid", "is-valid");
-                    campo.setCustomValidity("");
-                });
-
-                document.querySelectorAll(
-                    '[data-toggle-password="cadastroSenha"], ' +
-                    '[data-toggle-password="cadastroConfirmacao"]'
-                ).forEach(function (botao) {
-                    const id = botao.getAttribute("data-toggle-password");
-                    const campo = document.getElementById(id);
-                    const icone = botao.querySelector("i");
-
-                    campo.type = "password";
-
-                    icone.classList.remove("bi-eye-slash");
-                    icone.classList.add("bi-eye");
-
-                    botao.setAttribute("aria-label", "Mostrar senha");
-                    botao.setAttribute("aria-pressed", "false");
-                });
-            }
+        mostrarMensagem(
+          'mensagemCadastro',
+          data.session
+            ? 'Conta criada. A solicitação ficará pendente até a aprovação do administrador.'
+            : 'Solicitação enviada. Se o Supabase exigir confirmação de e-mail, confirme a mensagem recebida. O perfil será criado como pendente e precisará ser aprovado.',
+          'success'
         );
 
-    </script>
-
+        $('formCadastro').reset();
+      } catch (error) {
+        mostrarMensagem('mensagemCadastro', mensagemErro(error));
+      } finally {
+        botao.disabled = false;
+        botao.textContent = 'Enviar solicitação';
+      }
+    });
+  </script>
 </body>
 </html>
