@@ -1,1 +1,3003 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    <title>AtoNexo | Sistema Institucional</title>
+
+    <meta name="description"
+          content="Sistema AtoNexo do 2º Tabelionato de Protestos de Porto Alegre.">
+
+    <!-- =====================================================
+         BIBLIOTECAS EXTERNAS
+         Bootstrap 5.3.8
+         ===================================================== -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <!-- Ícones Bootstrap -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+
+    <!-- Fonte Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+    <style>
+        /* =====================================================
+           1. VARIÁVEIS VISUAIS
+           ===================================================== */
+        :root {
+            --verde-principal: #123C32;
+            --verde-escuro: #0B2B24;
+            --verde-destaque: #1C5948;
+            --verde-claro: #E8F1EC;
+            --fundo-pagina: #F3F6F4;
+            --texto-principal: #25352F;
+            --texto-secundario: #6B7972;
+            --borda: #DDE5E0;
+            --branco: #FFFFFF;
+        }
+
+        /* =====================================================
+           2. ESTILOS GERAIS
+           ===================================================== */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Inter', sans-serif;
+            background: var(--fundo-pagina);
+            color: var(--texto-principal);
+        }
+
+        /* =====================================================
+           3. CABEÇALHO INSTITUCIONAL
+           ===================================================== */
+        .cabecalho {
+            background: var(--verde-principal);
+            color: var(--branco);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cabecalho::after {
+            content: "";
+            position: absolute;
+            width: 320px;
+            height: 320px;
+            right: -100px;
+            top: -190px;
+            border: 1px solid rgba(255, 255, 255, .09);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .cabecalho-conteudo {
+            position: relative;
+            z-index: 1;
+            padding-top: 28px;
+            padding-bottom: 28px;
+        }
+
+        .marca-institucional {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* LOGO ATONEXO */
+        .logo-institucional {
+            width: 76px;
+            height: 76px;
+            flex-shrink: 0;
+            display: block;
+            object-fit: contain;
+            background: #FFFFFF;
+            border-radius: 10px;
+            padding: 3px;
+        }
+
+        .nome-cartorio {
+            font-size: clamp(1.05rem, 2.5vw, 1.45rem);
+            font-weight: 700;
+            letter-spacing: -.045em;
+            line-height: 1.35;
+            margin: 0 0 5px;
+        }
+
+        .endereco-cartorio {
+            font-size: .83rem;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, .77);
+            margin: 0;
+        }
+
+        .identificacao-sistema {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 13px;
+            border: 1px solid rgba(255, 255, 255, .17);
+            background: rgba(255, 255, 255, .07);
+            border-radius: 10px;
+            color: #E0EEE6;
+            font-size: .8rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .indicador-online {
+            width: 7px;
+            height: 7px;
+            background: #8BD4A6;
+            border-radius: 50%;
+        }
+
+        /* =====================================================
+           4. ÁREA PRINCIPAL
+           Espaço reservado para os próximos componentes.
+           ===================================================== */
+        main {
+            flex: 1;
+            min-width: 0;
+            padding: 54px 0;
+        }
+
+        /* =====================================================
+           5. RODAPÉ
+           ===================================================== */
+        .rodape {
+            padding: 20px 0;
+            border-top: 1px solid var(--borda);
+            background: #FFFFFF;
+        }
+
+        .rodape-texto {
+            font-size: .78rem;
+            color: var(--texto-secundario);
+            margin: 0;
+        }
+
+        .marca-atonexo {
+            color: var(--verde-principal);
+            font-weight: 800;
+            letter-spacing: -.035em;
+        }
+
+        /* =====================================================
+           6. RESPONSIVIDADE
+           ===================================================== */
+        @media (max-width: 767.98px) {
+            .cabecalho-conteudo {
+                padding-top: 22px;
+                padding-bottom: 22px;
+            }
+
+            .marca-institucional {
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .logo-institucional {
+                width: 64px;
+                height: 64px;
+            }
+
+            .identificacao-sistema {
+                margin-top: 18px;
+            }
+
+            main {
+                padding: 32px 12px;
+            }
+
+            .rodape .text-md-end {
+                text-align: left !important;
+                margin-top: 7px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                transition-duration: .01ms !important;
+            }
+        }
+
+/* =====================================================
+   ATONEXO — PAINEL DE INTIMAÇÕES (SIMULAÇÃO)
+   ===================================================== */
+
+.painel-intimacoes {
+    --painel-raio: 14px;
+}
+
+.painel-intimacoes .painel-card {
+    background: var(--branco);
+    border: 1px solid var(--borda);
+    border-radius: var(--painel-raio);
+    box-shadow: 0 3px 12px rgba(18, 60, 50, .035);
+}
+
+.painel-intimacoes .painel-titulo {
+    color: var(--verde-principal);
+    font-weight: 700;
+    letter-spacing: -.035em;
+}
+
+.painel-intimacoes .painel-subtitulo {
+    color: var(--texto-secundario);
+    font-size: .9rem;
+}
+
+.painel-intimacoes .indicador-card {
+    border-left: 4px solid var(--verde-destaque);
+}
+
+.painel-intimacoes .indicador-numero {
+    color: var(--verde-principal);
+    font-size: 1.8rem;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.painel-intimacoes .form-label {
+    font-size: .84rem;
+    font-weight: 600;
+    color: var(--texto-principal);
+}
+
+.painel-intimacoes .form-control,
+.painel-intimacoes .form-select {
+    border-color: var(--borda);
+    border-radius: 8px;
+    min-height: 43px;
+}
+
+.painel-intimacoes .form-control:focus,
+.painel-intimacoes .form-select:focus {
+    border-color: var(--verde-destaque);
+    box-shadow: 0 0 0 .2rem rgba(28, 89, 72, .12);
+}
+
+.painel-intimacoes .btn-atonexo {
+    background: var(--verde-principal);
+    color: #fff;
+    border-color: var(--verde-principal);
+}
+
+.painel-intimacoes .btn-atonexo:hover {
+    background: var(--verde-escuro);
+    color: #fff;
+}
+
+.painel-intimacoes .badge-prioritario {
+    background: #fff0d4;
+    color: #805300;
+}
+
+.painel-intimacoes .badge-comum {
+    background: var(--verde-claro);
+    color: var(--verde-principal);
+}
+
+.painel-intimacoes .badge-cartorio {
+    background: #edf0ff;
+    color: #34458b;
+}
+
+.painel-intimacoes .tabela-registros th {
+    white-space: nowrap;
+    font-size: .78rem;
+    text-transform: uppercase;
+    letter-spacing: .035em;
+    color: var(--texto-secundario);
+    background: #f7f9f8;
+}
+
+.painel-intimacoes .tabela-registros td {
+    vertical-align: middle;
+    font-size: .87rem;
+}
+
+.painel-intimacoes .area-importacao {
+    border: 2px dashed var(--borda);
+    border-radius: 12px;
+    background: #fafcfb;
+    padding: 24px;
+}
+
+.painel-intimacoes .area-importacao:focus-within {
+    border-color: var(--verde-destaque);
+}
+
+.painel-intimacoes .separador-secao {
+    border-top: 1px solid var(--borda);
+    margin: 1.5rem 0;
+}
+
+.painel-intimacoes .texto-pequeno {
+    color: var(--texto-secundario);
+    font-size: .8rem;
+}
+
+.painel-intimacoes .acoes-registro {
+    display: flex;
+    gap: 5px;
+    white-space: nowrap;
+}
+
+@media (max-width: 767.98px) {
+    .painel-intimacoes .area-importacao {
+        padding: 16px;
+    }
+
+    .painel-intimacoes .indicador-numero {
+        font-size: 1.5rem;
+    }
+}
+
+      /* =========================================================
+   ATONEXO — ESTILOS COMPLEMENTARES DO CADASTRO DE INTIMAÇÕES
+   ========================================================= */
+
+#conteudo-principal {
+    color: var(--texto-principal, #25352F);
+}
+
+#conteudo-principal .card {
+    border-radius: 0.85rem;
+}
+
+#conteudo-principal .card-header {
+    border-radius: 0.85rem 0.85rem 0 0;
+}
+
+#conteudo-principal .form-label {
+    font-weight: 600;
+    font-size: 0.925rem;
+}
+
+#conteudo-principal .form-control,
+#conteudo-principal .form-select {
+    border-color: var(--borda, #DDE5E0);
+    min-height: 43px;
+}
+
+#conteudo-principal textarea.form-control {
+    min-height: 90px;
+}
+
+#conteudo-principal .form-control:focus,
+#conteudo-principal .form-select:focus {
+    border-color: var(--verde-destaque, #1C5948);
+    box-shadow: 0 0 0 0.2rem rgba(28, 89, 72, 0.14);
+}
+
+#conteudo-principal .btn-success {
+    background-color: var(--verde-principal, #123C32);
+    border-color: var(--verde-principal, #123C32);
+}
+
+#conteudo-principal .btn-success:hover {
+    background-color: var(--verde-escuro, #0B2B24);
+    border-color: var(--verde-escuro, #0B2B24);
+}
+
+#conteudo-principal .nav-tabs .nav-link {
+    color: var(--texto-secundario, #6B7972);
+    border-radius: 0.55rem 0.55rem 0 0;
+}
+
+#conteudo-principal .nav-tabs .nav-link.active {
+    color: var(--verde-principal, #123C32);
+    font-weight: 700;
+    border-bottom-color: #FFFFFF;
+}
+
+#conteudo-principal .table th {
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+#conteudo-principal .table td {
+    font-size: 0.9rem;
+}
+
+#conteudo-principal .badge {
+    font-weight: 600;
+}
+
+#conteudo-principal .identificador-intimacao {
+    font-family: monospace;
+    font-size: 0.82rem;
+    overflow-wrap: anywhere;
+}
+
+#conteudo-principal .acoes-intimacao {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+}
+
+#conteudo-principal .acoes-intimacao .btn {
+    padding: 0.3rem 0.5rem;
+}
+
+#conteudo-principal .historico-evento {
+    position: relative;
+    padding: 0 0 1.25rem 1.5rem;
+    border-left: 2px solid var(--borda, #DDE5E0);
+    margin-left: 0.35rem;
+}
+
+#conteudo-principal .historico-evento:last-child {
+    border-left-color: transparent;
+    padding-bottom: 0;
+}
+
+#conteudo-principal .historico-evento::before {
+    content: "";
+    position: absolute;
+    left: -0.42rem;
+    top: 0.15rem;
+    width: 0.7rem;
+    height: 0.7rem;
+    background: var(--verde-destaque, #1C5948);
+    border-radius: 50%;
+}
+
+@media (max-width: 575.98px) {
+    #conteudo-principal .nav-tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+
+    #conteudo-principal .nav-tabs .nav-link {
+        white-space: nowrap;
+        font-size: 0.875rem;
+    }
+
+    #conteudo-principal .acoes-intimacao {
+        justify-content: flex-start;
+    }
+}
+
+      /* =========================================================
+   ATONEXO — AJUSTES FINAIS DO CADASTRO DE INTIMAÇÕES
+   ========================================================= */
+
+/* Ajusta o espaçamento apenas nesta página */
+main#conteudo-principal {
+    padding: 24px 0;
+}
+
+/* Evita que o conteúdo fique colado nas bordas */
+#conteudo-principal > .container-fluid {
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+/* Mantém os campos e botões dentro dos limites */
+#conteudo-principal *,
+#conteudo-principal *::before,
+#conteudo-principal *::after {
+    box-sizing: border-box;
+}
+
+/* Evita que textos longos estourem as células */
+#conteudo-principal .table td {
+    overflow-wrap: anywhere;
+}
+
+/* Abas utilizáveis em telas estreitas */
+#conteudo-principal .nav-tabs {
+    scrollbar-width: thin;
+}
+
+/* Botões com transição discreta */
+#conteudo-principal .btn {
+    transition: background-color 0.15s ease,
+                border-color 0.15s ease,
+                color 0.15s ease;
+}
+
+/* Respeita a preferência por movimento reduzido */
+@media (prefers-reduced-motion: reduce) {
+    #conteudo-principal .btn {
+        transition: none;
+    }
+}
+
+/* Ajustes para celulares */
+@media (max-width: 767.98px) {
+    main#conteudo-principal {
+        padding: 20px 0;
+    }
+
+    #conteudo-principal > .container-fluid {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+}
+    </style>
+</head>
+
+<body>
+
+    <!-- =====================================================
+         CABEÇALHO INSTITUCIONAL
+         ===================================================== -->
+    <header class="cabecalho">
+        <div class="container cabecalho-conteudo">
+            <div class="row align-items-center">
+
+                <div class="col-lg-9">
+                    <div class="marca-institucional">
+
+                        <img
+                            src="https://tabpoa.github.io/tabelionatopoa/ato-nexo.png"
+                            alt="Logotipo AtoNexo"
+                            class="logo-institucional"
+                            width="76"
+                            height="76"
+                        >
+
+                        <div>
+                            <h1 class="nome-cartorio">
+                                2º Tabelionato de Protestos de Porto Alegre
+                            </h1>
+
+                            <p class="endereco-cartorio">
+                                Rua dos Andradas, 1234 • 4º Andar<br>
+                                Centro Histórico • Porto Alegre/RS • CEP 90020-008<br>
+                                CNPJ: 04.438.173/0001-47 •
+                                <a href="tel:+555130273500"
+                                   class="text-white text-decoration-none">
+                                    (51) 3027-3500
+                                </a>
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="col-lg-3 text-lg-end">
+                    <div class="identificacao-sistema">
+                        <span class="indicador-online"></span>
+                        <span>Sistema AtoNexo</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+   <main id="conteudo-principal" role="main">
+
+    <!-- =====================================================
+         ATONEXO — CADASTRO DE INTIMAÇÕES
+         Estrutura preparada para futura integração com Supabase.
+         Os registros ainda não são persistidos no banco.
+         ===================================================== -->
+
+    <section class="container-fluid py-4">
+
+        <!-- CABEÇALHO DA PÁGINA -->
+        <div class="d-flex flex-wrap justify-content-between
+                    align-items-center gap-3 mb-4">
+
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <i class="bi bi-envelope-paper fs-3"
+                       aria-hidden="true"></i>
+
+                    <h1 class="h3 fw-bold mb-0">
+                        Cadastro de intimações
+                    </h1>
+                </div>
+
+                <p class="text-secondary mb-0">
+                    Cadastre, importe, consulte e gerencie as intimações
+                    dos cartórios atendidos pelo AtoNexo.
+                </p>
+            </div>
+
+            <span class="badge rounded-pill text-bg-warning
+                         px-3 py-2">
+                <i class="bi bi-tools me-1" aria-hidden="true"></i>
+                Modo de demonstração
+            </span>
+
+        </div>
+
+        <!-- AVISO SOBRE O FUNCIONAMENTO -->
+        <div class="alert alert-info border-0 shadow-sm mb-4"
+             role="status">
+
+            <div class="d-flex gap-3">
+
+                <i class="bi bi-info-circle-fill fs-4"
+                   aria-hidden="true"></i>
+
+                <div>
+                    <strong>Ambiente ainda não conectado ao Supabase</strong>
+
+                    <p class="mb-0 mt-1">
+                        A interface está sendo preparada para a integração.
+                        Antes da conexão, os registros serão mantidos apenas
+                        na memória do navegador e poderão ser perdidos ao
+                        recarregar a página.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- INDICADORES -->
+        <div class="row g-3 mb-4">
+
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between
+                                    align-items-center">
+
+                            <div>
+                                <p class="text-secondary small mb-1">
+                                    Total de registros
+                                </p>
+
+                                <div class="fs-3 fw-bold"
+                                     id="total-intimacoes">0</div>
+                            </div>
+
+                            <div class="rounded-3 p-3 bg-light">
+                                <i class="bi bi-files fs-4"
+                                   aria-hidden="true"></i>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between
+                                    align-items-center">
+
+                            <div>
+                                <p class="text-secondary small mb-1">
+                                    Prioritárias
+                                </p>
+
+                                <div class="fs-3 fw-bold text-danger"
+                                     id="total-prioritarias">0</div>
+                            </div>
+
+                            <div class="rounded-3 p-3 bg-danger-subtle">
+                                <i class="bi bi-exclamation-triangle
+                                          fs-4 text-danger"
+                                   aria-hidden="true"></i>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between
+                                    align-items-center">
+
+                            <div>
+                                <p class="text-secondary small mb-1">
+                                    Comuns
+                                </p>
+
+                                <div class="fs-3 fw-bold text-success"
+                                     id="total-comuns">0</div>
+                            </div>
+
+                            <div class="rounded-3 p-3 bg-success-subtle">
+                                <i class="bi bi-envelope-check
+                                          fs-4 text-success"
+                                   aria-hidden="true"></i>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between
+                                    align-items-center">
+
+                            <div>
+                                <p class="text-secondary small mb-1">
+                                    Sem cartório
+                                </p>
+
+                                <div class="fs-3 fw-bold"
+                                     id="total-sem-cartorio">0</div>
+                            </div>
+
+                            <div class="rounded-3 p-3 bg-secondary-subtle">
+                                <i class="bi bi-building-x fs-4"
+                                   aria-hidden="true"></i>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- NAVEGAÇÃO PRINCIPAL -->
+        <div class="card border-0 shadow-sm">
+
+            <div class="card-header bg-white border-bottom p-0">
+
+                <ul class="nav nav-tabs card-header-tabs px-3 pt-3"
+                    id="abas-intimacoes"
+                    role="tablist">
+
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active"
+                                id="aba-cadastro"
+                                data-bs-toggle="tab"
+                                data-bs-target="#painel-cadastro"
+                                type="button"
+                                role="tab"
+                                aria-controls="painel-cadastro"
+                                aria-selected="true">
+
+                            <i class="bi bi-plus-circle me-1"
+                               aria-hidden="true"></i>
+                            Cadastro manual
+                        </button>
+                    </li>
+
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link"
+                                id="aba-importacao"
+                                data-bs-toggle="tab"
+                                data-bs-target="#painel-importacao"
+                                type="button"
+                                role="tab"
+                                aria-controls="painel-importacao"
+                                aria-selected="false">
+
+                            <i class="bi bi-file-earmark-arrow-up me-1"
+                               aria-hidden="true"></i>
+                            Importar arquivo
+                        </button>
+                    </li>
+
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link"
+                                id="aba-consulta"
+                                data-bs-toggle="tab"
+                                data-bs-target="#painel-consulta"
+                                type="button"
+                                role="tab"
+                                aria-controls="painel-consulta"
+                                aria-selected="false">
+
+                            <i class="bi bi-search me-1"
+                               aria-hidden="true"></i>
+                            Consultar registros
+                        </button>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="card-body p-3 p-lg-4">
+
+                <div class="tab-content" id="conteudo-abas-intimacoes">
+
+                    <!-- =================================================
+                         ABA 1 — CADASTRO MANUAL
+                         ================================================= -->
+
+                    <div class="tab-pane fade show active"
+                         id="painel-cadastro"
+                         role="tabpanel"
+                         aria-labelledby="aba-cadastro"
+                         tabindex="0">
+
+                        <div class="mb-4">
+                            <h2 class="h5 fw-bold">
+                                <i class="bi bi-pencil-square me-2"
+                                   aria-hidden="true"></i>
+                                Nova intimação
+                            </h2>
+
+                            <p class="text-secondary small mb-0">
+                                Preencha os dados disponíveis.
+                                Os campos identificados com * são obrigatórios.
+                            </p>
+                        </div>
+
+                        <form id="form-intimacao" novalidate>
+
+                            <!-- CLASSIFICAÇÃO -->
+                            <div class="row g-3 mb-4">
+
+                                <div class="col-12">
+                                    <h3 class="h6 fw-bold border-bottom
+                                               pb-2">
+                                        1. Classificação e responsabilidade
+                                    </h3>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <label for="categoria"
+                                           class="form-label">
+                                        Categoria *
+                                    </label>
+
+                                    <select class="form-select"
+                                            id="categoria"
+                                            name="categoria"
+                                            required>
+
+                                        <option value="">
+                                            Selecione a categoria
+                                        </option>
+
+                                        <option value="prioritario">
+                                            Prioritária
+                                        </option>
+
+                                        <option value="comum">
+                                            Comum
+                                        </option>
+
+                                    </select>
+
+                                    <div class="invalid-feedback">
+                                        Selecione uma categoria.
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <label for="cartorio"
+                                           class="form-label">
+                                        Cartório responsável *
+                                    </label>
+
+                                    <select class="form-select"
+                                            id="cartorio"
+                                            name="cartorio"
+                                            required>
+
+                                        <option value="">
+                                            Selecione o cartório
+                                        </option>
+
+                                        <option value="cartorio_1">
+                                            Cartório 1 — nome a configurar
+                                        </option>
+
+                                        <option value="cartorio_2">
+                                            Cartório 2 — nome a configurar
+                                        </option>
+
+                                    </select>
+
+                                    <div class="invalid-feedback">
+                                        Selecione o cartório responsável.
+                                    </div>
+
+                                    <div class="form-text">
+                                        Os nomes oficiais serão configurados
+                                        antes da integração definitiva.
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <label for="protocolo"
+                                           class="form-label">
+                                        Número do protocolo
+                                    </label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           id="protocolo"
+                                           name="protocolo"
+                                           maxlength="100"
+                                           placeholder="Número do protocolo">
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <label for="referencia"
+                                           class="form-label">
+                                        Referência externa
+                                    </label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           id="referencia"
+                                           name="referencia"
+                                           maxlength="150"
+                                           placeholder="Identificador do sistema de origem">
+                                </div>
+
+                            </div>
+
+                            <!-- DEVEDOR -->
+                            <div class="row g-3 mb-4">
+
+                                <div class="col-12">
+                                    <h3 class="h6 fw-bold border-bottom
+                                               pb-2">
+                                        2. Dados do devedor
+                                    </h3>
+                                </div>
+
+                                <div class="col-12 col-md-8">
+                                    <label for="devedor"
+                                           class="form-label">
+                                        Nome ou razão social *
+                                    </label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           id="devedor"
+                                           name="devedor"
+                                           maxlength="200"
+                                           autocomplete="off"
+                                           required
+                                           placeholder="Nome completo ou razão social">
+
+                                    <div class="invalid-feedback">
+                                        Informe o nome ou a razão social.
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-4">
+                                    <label for="cpf_cnpj"
+                                           class="form-label">
+                                        CPF ou CNPJ
+                                    </label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           id="cpf_cnpj"
+                                           name="cpf_cnpj"
+                                           maxlength="18"
+                                           autocomplete="off"
+                                           placeholder="Documento do devedor">
+                                </div>
+
+                            </div>
+
+                            <!-- ENDEREÇO -->
+                            <div class="row g-3 mb-4">
+
+                                <div class="col-12">
+                                    <h3 class="h6 fw-bold border-bottom
+                                               pb-2">
+                                        3. Endereço para intimação
+                                    </h3>
+                                </div>
+
+                                <div class="col-12 col-sm-4 col-lg-2">
+                                    <label for="cep"
+                                           class="form-label">
+                                        CEP
+                                    </label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           id="cep"
+                                           name="cep"
+                                           maxlength="9"
+                                           autocomplete="off"
+                                           placeholder="00000-000">
+                                </div>
+
+                                <div class="col-12 col-sm-8 col-lg-7">
+                                    <label for="logradouro"
+                                           class="form-label">
+                                        Logradouro
+                                    </label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           id="logradouro"
+                                           name="logradouro"
+                                           maxlength="200"
+                                           placeholder="Rua, avenida, travessa...">
+                                </div>
+
+                                <div class="col-12 col-sm-4 col-lg-3">
+                                    <label for="numero"
+                                           class="form-label">
+                                        Número
+                                    </label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           id="numero"
+                                           name="numero"
+                                           maxlength="30"
+                                           placeholder="Número">
+                                </div>
+
+                                <div class="col-12 col-md-5">
+                                    <label for="complemento"
+                                           class="form-label">
+                                        Complemento
+                                    </label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           id="complemento"
+                                           name="complemento"
+                                           maxlength="100"
+                                           placeholder="Sala, bloco, apartamento...">
+                                </div>
+
+                                <div class="col-12 col-md-7">
+                                    <label for="bairro"
+                                           class="form-label">
+                                        Bairro
+                                    </label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           id="bairro"
+                                           name="bairro"
+                                           maxlength="100">
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <label for="cidade"
+                                           class="form-label">
+                                        Município
+                                    </label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           id="cidade"
+                                           name="cidade"
+                                           maxlength="100">
+                                </div>
+
+                                <div class="col-12 col-md-2">
+                                    <label for="uf"
+                                           class="form-label">
+                                        UF
+                                    </label>
+
+                                    <select class="form-select"
+                                            id="uf"
+                                            name="uf">
+
+                                        <option value="">UF</option>
+                                        <option>AC</option>
+                                        <option>AL</option>
+                                        <option>AP</option>
+                                        <option>AM</option>
+                                        <option>BA</option>
+                                        <option>CE</option>
+                                        <option>DF</option>
+                                        <option>ES</option>
+                                        <option>GO</option>
+                                        <option>MA</option>
+                                        <option>MT</option>
+                                        <option>MS</option>
+                                        <option>MG</option>
+                                        <option>PA</option>
+                                        <option>PB</option>
+                                        <option>PR</option>
+                                        <option>PE</option>
+                                        <option>PI</option>
+                                        <option>RJ</option>
+                                        <option>RN</option>
+                                        <option>RS</option>
+                                        <option>RO</option>
+                                        <option>RR</option>
+                                        <option>SC</option>
+                                        <option>SP</option>
+                                        <option>SE</option>
+                                        <option>TO</option>
+
+                                    </select>
+                                </div>
+
+                            </div>
+
+                            <!-- DADOS DO TÍTULO -->
+                            <div class="row g-3 mb-4">
+
+                                <div class="col-12">
+                                    <h3 class="h6 fw-bold border-bottom
+                                               pb-2">
+                                        4. Dados do título
+                                    </h3>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <label for="tipo_titulo"
+                                           class="form-label">
+                                        Tipo de título
+                                    </label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           id="tipo_titulo"
+                                           name="tipo_titulo"
+                                           maxlength="100"
+                                           placeholder="Ex.: duplicata, nota promissória...">
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <label for="apresentante"
+                                           class="form-label">
+                                        Apresentante ou credor
+                                    </label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           id="apresentante"
+                                           name="apresentante"
+                                           maxlength="200"
+                                           placeholder="Nome do apresentante ou credor">
+                                </div>
+
+                                <div class="col-12 col-md-4">
+                                    <label for="valor_titulo"
+                                           class="form-label">
+                                        Valor do título (R$)
+                                    </label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           id="valor_titulo"
+                                           name="valor_titulo"
+                                           inputmode="decimal"
+                                           maxlength="30"
+                                           placeholder="0,00">
+                                </div>
+
+                                <div class="col-12 col-md-4">
+                                    <label for="data_apresentacao"
+                                           class="form-label">
+                                        Data de apresentação
+                                    </label>
+
+                                    <input type="date"
+                                           class="form-control"
+                                           id="data_apresentacao"
+                                           name="data_apresentacao">
+                                </div>
+
+                                <div class="col-12 col-md-4">
+                                    <label for="data_vencimento"
+                                           class="form-label">
+                                        Data de vencimento
+                                    </label>
+
+                                    <input type="date"
+                                           class="form-control"
+                                           id="data_vencimento"
+                                           name="data_vencimento">
+                                </div>
+
+                                <div class="col-12">
+                                    <label for="observacoes"
+                                           class="form-label">
+                                        Observações
+                                    </label>
+
+                                    <textarea class="form-control"
+                                              id="observacoes"
+                                              name="observacoes"
+                                              rows="3"
+                                              maxlength="2000"
+                                              placeholder="Informações complementares..."></textarea>
+                                </div>
+
+                            </div>
+
+                            <!-- BOTÕES DO FORMULÁRIO -->
+                            <div class="d-flex flex-wrap justify-content-end
+                                        gap-2 border-top pt-3">
+
+                                <button type="reset"
+                                        class="btn btn-outline-secondary"
+                                        id="btn-limpar-formulario">
+
+                                    <i class="bi bi-eraser me-1"
+                                       aria-hidden="true"></i>
+                                    Limpar campos
+                                </button>
+
+                                <button type="submit"
+                                        class="btn btn-success"
+                                        id="btn-salvar-intimacao">
+
+                                    <i class="bi bi-check2-circle me-1"
+                                       aria-hidden="true"></i>
+                                    Cadastrar intimação
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                    <!-- =================================================
+                         ABA 2 — IMPORTAÇÃO CSV / JSON
+                         ================================================= -->
+
+                    <div class="tab-pane fade"
+                         id="painel-importacao"
+                         role="tabpanel"
+                         aria-labelledby="aba-importacao"
+                         tabindex="0">
+
+                        <div class="mb-4">
+                            <h2 class="h5 fw-bold">
+                                <i class="bi bi-file-earmark-arrow-up me-2"
+                                   aria-hidden="true"></i>
+                                Importação em lote
+                            </h2>
+
+                            <p class="text-secondary mb-0">
+                                Selecione um arquivo, confira os dados
+                                identificados e valide os registros antes
+                                de confirmar a importação.
+                            </p>
+                        </div>
+
+                        <div class="alert alert-warning border-0">
+                            <i class="bi bi-exclamation-triangle me-2"
+                               aria-hidden="true"></i>
+
+                            A importação não deve ser considerada concluída
+                            até que os registros sejam validados e gravados
+                            no banco de dados.
+                        </div>
+
+                        <div class="border rounded-3 p-3 p-md-4 mb-4">
+
+                            <div class="row g-3 align-items-end">
+
+                                <div class="col-12 col-lg-8">
+                                    <label for="arquivo-importacao"
+                                           class="form-label fw-semibold">
+                                        Arquivo CSV ou JSON
+                                    </label>
+
+                                    <input type="file"
+                                           class="form-control"
+                                           id="arquivo-importacao"
+                                           accept=".csv,.json,text/csv,application/json">
+
+                                    <div class="form-text">
+                                        CSV em UTF-8 ou JSON contendo uma lista
+                                        de registros. Limite inicial sugerido:
+                                        10 MB por arquivo.
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-lg-4">
+                                    <button type="button"
+                                            class="btn btn-outline-success w-100"
+                                            id="btn-analisar-arquivo">
+
+                                        <i class="bi bi-search me-1"
+                                           aria-hidden="true"></i>
+                                        Analisar arquivo
+                                    </button>
+                                </div>
+
+                            </div>
+
+                            <hr class="my-4">
+
+                            <div class="d-flex flex-wrap gap-2">
+
+                                <button type="button"
+                                        class="btn btn-outline-secondary"
+                                        id="btn-baixar-modelo-csv">
+
+                                    <i class="bi bi-filetype-csv me-1"
+                                       aria-hidden="true"></i>
+                                    Baixar modelo CSV
+                                </button>
+
+                                <button type="button"
+                                        class="btn btn-outline-secondary"
+                                        id="btn-baixar-modelo-json">
+
+                                    <i class="bi bi-filetype-json me-1"
+                                       aria-hidden="true"></i>
+                                    Baixar modelo JSON
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                        <!-- RESULTADO DA ANÁLISE -->
+                        <div id="resultado-importacao"
+                             class="d-none mb-4"
+                             aria-live="polite">
+
+                            <h3 class="h6 fw-bold mb-3">
+                                Resultado da análise
+                            </h3>
+
+                            <div class="row g-3 mb-3">
+
+                                <div class="col-6 col-lg-3">
+                                    <div class="border rounded-3 p-3">
+                                        <div class="small text-secondary">
+                                            Identificados
+                                        </div>
+
+                                        <div class="fs-4 fw-bold"
+                                             id="importacao-total">0</div>
+                                    </div>
+                                </div>
+
+                                <div class="col-6 col-lg-3">
+                                    <div class="border rounded-3 p-3">
+                                        <div class="small text-secondary">
+                                            Válidos
+                                        </div>
+
+                                        <div class="fs-4 fw-bold text-success"
+                                             id="importacao-validos">0</div>
+                                    </div>
+                                </div>
+
+                                <div class="col-6 col-lg-3">
+                                    <div class="border rounded-3 p-3">
+                                        <div class="small text-secondary">
+                                            Com problemas
+                                        </div>
+
+                                        <div class="fs-4 fw-bold text-danger"
+                                             id="importacao-invalidos">0</div>
+                                    </div>
+                                </div>
+
+                                <div class="col-6 col-lg-3">
+                                    <div class="border rounded-3 p-3">
+                                        <div class="small text-secondary">
+                                            Duplicados
+                                        </div>
+
+                                        <div class="fs-4 fw-bold"
+                                             id="importacao-duplicados">0</div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="table-responsive border rounded-3">
+
+                                <table class="table table-hover align-middle
+                                              mb-0">
+
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th scope="col">Linha</th>
+                                            <th scope="col">Devedor</th>
+                                            <th scope="col">Categoria</th>
+                                            <th scope="col">Cartório</th>
+                                            <th scope="col">Validação</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody id="tabela-previa-importacao">
+                                        <tr>
+                                            <td colspan="5"
+                                                class="text-center text-secondary
+                                                       py-4">
+                                                Nenhum arquivo analisado.
+                                            </td>
+                                        </tr>
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
+                            <div class="d-flex flex-wrap justify-content-end
+                                        gap-2 mt-3">
+
+                                <button type="button"
+                                        class="btn btn-outline-secondary"
+                                        id="btn-cancelar-importacao">
+
+                                    Cancelar
+                                </button>
+
+                                <button type="button"
+                                        class="btn btn-success"
+                                        id="btn-confirmar-importacao"
+                                        disabled>
+
+                                    <i class="bi bi-check2-circle me-1"
+                                       aria-hidden="true"></i>
+                                    Importar registros válidos
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- =================================================
+                         ABA 3 — CONSULTA E MANUTENÇÃO
+                         ================================================= -->
+
+                    <div class="tab-pane fade"
+                         id="painel-consulta"
+                         role="tabpanel"
+                         aria-labelledby="aba-consulta"
+                         tabindex="0">
+
+                        <div class="d-flex flex-wrap justify-content-between
+                                    align-items-center gap-3 mb-4">
+
+                            <div>
+                                <h2 class="h5 fw-bold mb-1">
+                                    Consultar intimações
+                                </h2>
+
+                                <p class="text-secondary small mb-0">
+                                    Pesquise e gerencie os registros cadastrados.
+                                </p>
+                            </div>
+
+                            <button type="button"
+                                    class="btn btn-outline-success"
+                                    id="btn-exportar-json">
+
+                                <i class="bi bi-download me-1"
+                                   aria-hidden="true"></i>
+                                Exportar JSON
+                            </button>
+
+                        </div>
+
+                        <!-- FILTROS -->
+                        <form id="form-filtros" class="mb-4">
+
+                            <div class="row g-3">
+
+                                <div class="col-12 col-lg-6">
+                                    <label for="filtro-busca"
+                                           class="form-label">
+                                        Buscar registro
+                                    </label>
+
+                                    <input type="search"
+                                           class="form-control"
+                                           id="filtro-busca"
+                                           placeholder="ID, devedor, CPF/CNPJ ou protocolo">
+
+                                </div>
+
+                                <div class="col-12 col-sm-6 col-lg-3">
+                                    <label for="filtro-categoria"
+                                           class="form-label">
+                                        Categoria
+                                    </label>
+
+                                    <select class="form-select"
+                                            id="filtro-categoria">
+
+                                        <option value="">
+                                            Todas as categorias
+                                        </option>
+
+                                        <option value="prioritario">
+                                            Prioritária
+                                        </option>
+
+                                        <option value="comum">
+                                            Comum
+                                        </option>
+
+                                    </select>
+                                </div>
+
+                                <div class="col-12 col-sm-6 col-lg-3">
+                                    <label for="filtro-cartorio"
+                                           class="form-label">
+                                        Cartório
+                                    </label>
+
+                                    <select class="form-select"
+                                            id="filtro-cartorio">
+
+                                        <option value="">
+                                            Todos os cartórios
+                                        </option>
+
+                                        <option value="cartorio_1">
+                                            Cartório 1
+                                        </option>
+
+                                        <option value="cartorio_2">
+                                            Cartório 2
+                                        </option>
+
+                                    </select>
+                                </div>
+
+                                <div class="col-12 d-flex flex-wrap gap-2">
+
+                                    <button type="submit"
+                                            class="btn btn-success">
+
+                                        <i class="bi bi-search me-1"
+                                           aria-hidden="true"></i>
+                                        Filtrar
+                                    </button>
+
+                                    <button type="reset"
+                                            class="btn btn-outline-secondary"
+                                            id="btn-limpar-filtros">
+
+                                        Limpar filtros
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        </form>
+
+                        <!-- CONTAGEM -->
+                        <div class="d-flex flex-wrap justify-content-between
+                                    align-items-center gap-2 mb-3">
+
+                            <span class="small text-secondary"
+                                  id="resultado-contagem"
+                                  aria-live="polite">
+                                0 registros encontrados
+                            </span>
+
+                            <span class="small text-secondary">
+                                Os identificadores são independentes
+                                do número do protocolo.
+                            </span>
+
+                        </div>
+
+                        <!-- TABELA -->
+                        <div class="table-responsive border rounded-3">
+
+                            <table class="table table-hover align-middle mb-0"
+                                   id="tabela-intimacoes">
+
+                                <thead class="table-light">
+                                    <tr>
+                                        <th scope="col">Identificador</th>
+                                        <th scope="col">Devedor</th>
+                                        <th scope="col">Categoria</th>
+                                        <th scope="col">Cartório</th>
+                                        <th scope="col">Protocolo</th>
+                                        <th scope="col"
+                                            class="text-end">
+                                            Ações
+                                        </th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="lista-intimacoes">
+
+                                    <tr>
+                                        <td colspan="6"
+                                            class="text-center text-secondary
+                                                   py-5">
+
+                                            <i class="bi bi-inbox fs-2 d-block
+                                                      mb-2"
+                                               aria-hidden="true"></i>
+
+                                            Nenhuma intimação cadastrada.
+                                        </td>
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                        <p class="small text-secondary mt-3 mb-0">
+                            A exclusão, a edição e as transferências deverão
+                            ser protegidas por permissões e registradas em
+                            histórico auditável na versão conectada ao banco.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </section>
+
+    <!-- =====================================================
+         MODAL — EDITAR INTIMAÇÃO
+         ===================================================== -->
+
+    <div class="modal fade"
+         id="modal-editar-intimacao"
+         tabindex="-1"
+         aria-labelledby="titulo-modal-editar"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <h2 class="modal-title fs-5"
+                        id="titulo-modal-editar">
+
+                        <i class="bi bi-pencil-square me-2"
+                           aria-hidden="true"></i>
+                        Editar intimação
+                    </h2>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Fechar"></button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="alert alert-info small">
+                        O identificador do registro não pode ser alterado
+                        por este formulário.
+                    </div>
+
+                    <form id="form-editar-intimacao" novalidate>
+
+                        <input type="hidden" id="editar-id" name="id">
+
+                        <div class="row g-3">
+
+                            <div class="col-12 col-md-6">
+                                <label for="editar-categoria"
+                                       class="form-label">
+                                    Categoria *
+                                </label>
+
+                                <select class="form-select"
+                                        id="editar-categoria"
+                                        name="categoria"
+                                        required>
+
+                                    <option value="prioritario">
+                                        Prioritária
+                                    </option>
+
+                                    <option value="comum">
+                                        Comum
+                                    </option>
+
+                                </select>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label for="editar-cartorio"
+                                       class="form-label">
+                                    Cartório responsável *
+                                </label>
+
+                                <select class="form-select"
+                                        id="editar-cartorio"
+                                        name="cartorio"
+                                        required>
+
+                                    <option value="cartorio_1">
+                                        Cartório 1
+                                    </option>
+
+                                    <option value="cartorio_2">
+                                        Cartório 2
+                                    </option>
+
+                                </select>
+                            </div>
+
+                            <div class="col-12 col-md-8">
+                                <label for="editar-devedor"
+                                       class="form-label">
+                                    Nome ou razão social *
+                                </label>
+
+                                <input type="text"
+                                       class="form-control"
+                                       id="editar-devedor"
+                                       name="devedor"
+                                       maxlength="200"
+                                       required>
+                            </div>
+
+                            <div class="col-12 col-md-4">
+                                <label for="editar-cpf-cnpj"
+                                       class="form-label">
+                                    CPF ou CNPJ
+                                </label>
+
+                                <input type="text"
+                                       class="form-control"
+                                       id="editar-cpf-cnpj"
+                                       name="cpf_cnpj"
+                                       maxlength="18">
+                            </div>
+
+                            <div class="col-12 col-md-8">
+                                <label for="editar-logradouro"
+                                       class="form-label">
+                                    Logradouro
+                                </label>
+
+                                <input type="text"
+                                       class="form-control"
+                                       id="editar-logradouro"
+                                       name="logradouro"
+                                       maxlength="200">
+                            </div>
+
+                            <div class="col-12 col-md-4">
+                                <label for="editar-numero"
+                                       class="form-label">
+                                    Número
+                                </label>
+
+                                <input type="text"
+                                       class="form-control"
+                                       id="editar-numero"
+                                       name="numero"
+                                       maxlength="30">
+                            </div>
+
+                            <div class="col-12 col-md-4">
+                                <label for="editar-cep"
+                                       class="form-label">
+                                    CEP
+                                </label>
+
+                                <input type="text"
+                                       class="form-control"
+                                       id="editar-cep"
+                                       name="cep"
+                                       maxlength="9">
+                            </div>
+
+                            <div class="col-12 col-md-4">
+                                <label for="editar-bairro"
+                                       class="form-label">
+                                    Bairro
+                                </label>
+
+                                <input type="text"
+                                       class="form-control"
+                                       id="editar-bairro"
+                                       name="bairro"
+                                       maxlength="100">
+                            </div>
+
+                            <div class="col-12 col-md-4">
+                                <label for="editar-cidade"
+                                       class="form-label">
+                                    Município
+                                </label>
+
+                                <input type="text"
+                                       class="form-control"
+                                       id="editar-cidade"
+                                       name="cidade"
+                                       maxlength="100">
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label for="editar-protocolo"
+                                       class="form-label">
+                                    Número do protocolo
+                                </label>
+
+                                <input type="text"
+                                       class="form-control"
+                                       id="editar-protocolo"
+                                       name="protocolo"
+                                       maxlength="100">
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label for="editar-referencia"
+                                       class="form-label">
+                                    Referência externa
+                                </label>
+
+                                <input type="text"
+                                       class="form-control"
+                                       id="editar-referencia"
+                                       name="referencia"
+                                       maxlength="150">
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label for="editar-tipo-titulo"
+                                       class="form-label">
+                                    Tipo de título
+                                </label>
+
+                                <input type="text"
+                                       class="form-control"
+                                       id="editar-tipo-titulo"
+                                       name="tipo_titulo"
+                                       maxlength="100">
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label for="editar-apresentante"
+                                       class="form-label">
+                                    Apresentante ou credor
+                                </label>
+
+                                <input type="text"
+                                       class="form-control"
+                                       id="editar-apresentante"
+                                       name="apresentante"
+                                       maxlength="200">
+                            </div>
+
+                            <div class="col-12 col-md-4">
+                                <label for="editar-valor"
+                                       class="form-label">
+                                    Valor do título (R$)
+                                </label>
+
+                                <input type="text"
+                                       class="form-control"
+                                       id="editar-valor"
+                                       name="valor_titulo"
+                                       maxlength="30">
+                            </div>
+
+                            <div class="col-12 col-md-4">
+                                <label for="editar-data-apresentacao"
+                                       class="form-label">
+                                    Data de apresentação
+                                </label>
+
+                                <input type="date"
+                                       class="form-control"
+                                       id="editar-data-apresentacao"
+                                       name="data_apresentacao">
+                            </div>
+
+                            <div class="col-12 col-md-4">
+                                <label for="editar-data-vencimento"
+                                       class="form-label">
+                                    Data de vencimento
+                                </label>
+
+                                <input type="date"
+                                       class="form-control"
+                                       id="editar-data-vencimento"
+                                       name="data_vencimento">
+                            </div>
+
+                            <div class="col-12">
+                                <label for="editar-observacoes"
+                                       class="form-label">
+                                    Observações
+                                </label>
+
+                                <textarea class="form-control"
+                                          id="editar-observacoes"
+                                          name="observacoes"
+                                          rows="3"
+                                          maxlength="2000"></textarea>
+                            </div>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+
+                    <button type="submit"
+                            form="form-editar-intimacao"
+                            class="btn btn-success"
+                            id="btn-confirmar-edicao">
+
+                        <i class="bi bi-check2 me-1"
+                           aria-hidden="true"></i>
+                        Salvar alterações
+                    </button>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================
+         MODAL — TRANSFERIR ENTRE CARTÓRIOS
+         ===================================================== -->
+
+    <div class="modal fade"
+         id="modal-transferir-intimacao"
+         tabindex="-1"
+         aria-labelledby="titulo-modal-transferir"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <h2 class="modal-title fs-5"
+                        id="titulo-modal-transferir">
+
+                        <i class="bi bi-arrow-left-right me-2"
+                           aria-hidden="true"></i>
+                        Transferir intimação
+                    </h2>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Fechar"></button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="alert alert-warning small">
+                        A transferência deverá registrar o cartório de origem,
+                        o destino, a data, o responsável e a justificativa.
+                    </div>
+
+                    <form id="form-transferir-intimacao" novalidate>
+
+                        <input type="hidden"
+                               id="transferir-id"
+                               name="id">
+
+                        <div class="mb-3">
+                            <label for="transferir-destino"
+                                   class="form-label">
+                                Cartório de destino *
+                            </label>
+
+                            <select class="form-select"
+                                    id="transferir-destino"
+                                    name="destino"
+                                    required>
+
+                                <option value="">
+                                    Selecione o destino
+                                </option>
+
+                                <option value="cartorio_1">
+                                    Cartório 1
+                                </option>
+
+                                <option value="cartorio_2">
+                                    Cartório 2
+                                </option>
+
+                            </select>
+
+                            <div class="invalid-feedback">
+                                Selecione o cartório de destino.
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="transferir-motivo"
+                                   class="form-label">
+                                Justificativa da transferência *
+                            </label>
+
+                            <textarea class="form-control"
+                                      id="transferir-motivo"
+                                      name="motivo"
+                                      rows="3"
+                                      maxlength="1000"
+                                      required
+                                      placeholder="Informe o motivo da transferência"></textarea>
+
+                            <div class="invalid-feedback">
+                                Informe a justificativa.
+                            </div>
+                        </div>
+
+                    </form>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+
+                    <button type="submit"
+                            form="form-transferir-intimacao"
+                            class="btn btn-success">
+
+                        Confirmar transferência
+                    </button>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================
+         MODAL — HISTÓRICO DE ALTERAÇÕES
+         ===================================================== -->
+
+    <div class="modal fade"
+         id="modal-historico-intimacao"
+         tabindex="-1"
+         aria-labelledby="titulo-modal-historico"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <h2 class="modal-title fs-5"
+                        id="titulo-modal-historico">
+
+                        <i class="bi bi-clock-history me-2"
+                           aria-hidden="true"></i>
+                        Histórico da intimação
+                    </h2>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Fechar"></button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="mb-3">
+                        <div class="small text-secondary">
+                            Identificador
+                        </div>
+
+                        <div class="fw-semibold"
+                             id="historico-identificador">
+                            —
+                        </div>
+                    </div>
+
+                    <div id="historico-conteudo"
+                         aria-live="polite">
+
+                        <p class="text-secondary">
+                            Nenhum evento registrado.
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                        Fechar
+                    </button>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================
+         MODAL — CONFIRMAR EXCLUSÃO
+         ===================================================== -->
+
+    <div class="modal fade"
+         id="modal-excluir-intimacao"
+         tabindex="-1"
+         aria-labelledby="titulo-modal-excluir"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <h2 class="modal-title fs-5 text-danger"
+                        id="titulo-modal-excluir">
+
+                        <i class="bi bi-trash me-2"
+                           aria-hidden="true"></i>
+                        Excluir intimação
+                    </h2>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Fechar"></button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <p>
+                        Deseja realmente excluir este registro?
+                    </p>
+
+                    <div class="alert alert-danger small mb-0">
+                        A exclusão definitiva no sistema conectado deverá
+                        respeitar as permissões e as regras de retenção
+                        aplicáveis. O histórico de auditoria não deve ser
+                        apagado junto com o registro.
+                    </div>
+
+                    <input type="hidden"
+                           id="excluir-id"
+                           name="excluir-id">
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-danger"
+                            id="btn-confirmar-exclusao">
+
+                        Confirmar exclusão
+                    </button>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ÁREA DE NOTIFICAÇÕES -->
+    <div class="toast-container position-fixed bottom-0 end-0
+                p-3"
+         id="atonexo-notificacoes"
+         aria-live="polite"
+         aria-atomic="true">
+    </div>
+
+</main>
+
+    <!-- =====================================================
+         RODAPÉ INSTITUCIONAL
+         ===================================================== -->
+    <footer class="rodape">
+        <div class="container">
+            <div class="row align-items-center">
+
+                <div class="col-md-6">
+                    <p class="rodape-texto">
+                        &copy; <span id="anoAtual"></span>
+                        <span class="marca-atonexo">AtoNexo</span>.
+                        Todos os direitos reservados.
+                    </p>
+                </div>
+
+                <div class="col-md-6 text-md-end">
+                    <p class="rodape-texto">
+                        Tecnologia a serviço da organização e da eficiência.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </footer>
+
+    <!-- =====================================================
+         JAVASCRIPT ESSENCIAL
+         ===================================================== -->
+    <script>
+        "use strict";
+
+        // Atualiza automaticamente o ano do rodapé.
+        document.getElementById("anoAtual").textContent =
+            new Date().getFullYear();
+    </script>
+
+<script>
+"use strict";
+
+/* =====================================================
+   ATONEXO — SIMULAÇÃO LOCAL DE INTIMAÇÕES
+   Sem conexão com Supabase e sem persistência.
+   ===================================================== */
+
+(() => {
+    const $ = (id) => document.getElementById(id);
+
+    let registros = [
+        {
+            id: "5831049271",
+            cartorio: "cartorio_1",
+            categoria: "prioritario",
+            protocolo: "DEMO-2026-001",
+            devedor: "CIMAFER COMERCIO DE MATERIAL DE CONSTR",
+            documento: "04.438.173/0001-47",
+            logradouro: "Av. Dr. Carlos Barbosa",
+            numero: "760",
+            complemento: "",
+            bairro: "Medianeira",
+            cep: "90880-000",
+            municipio: "Porto Alegre",
+            uf: "RS",
+            credor: "MEBER METAIS SA",
+            documentoCredor: "",
+            apresentante: "",
+            numeroTitulo: "",
+            especie: "",
+            dataApontamento: "",
+            vencimento: "",
+            valorTitulo: 1250.50,
+            ocorrencia: "Registro de demonstração"
+        },
+        {
+            id: "7916253048",
+            cartorio: "cartorio_2",
+            categoria: "comum",
+            protocolo: "DEMO-2026-002",
+            devedor: "COMÉRCIO EXEMPLO LTDA",
+            documento: "12.345.678/0001-90",
+            logradouro: "Rua das Flores",
+            numero: "120",
+            complemento: "Sala 3",
+            bairro: "Centro",
+            cep: "90000-000",
+            municipio: "Porto Alegre",
+            uf: "RS",
+            credor: "EMPRESA DEMONSTRATIVA SA",
+            documentoCredor: "",
+            apresentante: "",
+            numeroTitulo: "T-102",
+            especie: "DMI",
+            dataApontamento: "",
+            vencimento: "",
+            valorTitulo: 875.00,
+            ocorrencia: ""
+        },
+        {
+            id: "4268071935",
+            cartorio: "cartorio_1",
+            categoria: "prioritario",
+            protocolo: "DEMO-2026-003",
+            devedor: "PESSOA FÍSICA FICTÍCIA",
+            documento: "123.456.789-00",
+            logradouro: "Rua Exemplo",
+            numero: "45",
+            complemento: "",
+            bairro: "Partenon",
+            cep: "91530-000",
+            municipio: "Porto Alegre",
+            uf: "RS",
+            credor: "BANCO DE DEMONSTRAÇÃO",
+            documentoCredor: "",
+            apresentante: "",
+            numeroTitulo: "T-103",
+            especie: "DSI",
+            dataApontamento: "",
+            vencimento: "",
+            valorTitulo: 320.75,
+            ocorrencia: ""
+        }
+    ];
+
+    let previaImportacao = [];
+
+    const campos = [
+        "cartorio", "categoria", "protocolo", "devedor", "documento",
+        "logradouro", "numero", "complemento", "bairro", "cep",
+        "municipio", "uf", "credor", "documentoCredor", "apresentante",
+        "numeroTitulo", "especie", "dataApontamento", "vencimento",
+        "valorTitulo", "ocorrencia"
+    ];
+
+    const mapaCampos = {
+        id: ["id", "id_intimacao", "identificador"],
+        protocolo: ["protocolo", "numero_protocolo", "n_protocolo"],
+        devedor: ["devedor", "nome_devedor", "nome", "razao_social"],
+        documento: ["cpf_cnpj", "documento", "cpf", "cnpj",
+                    "cpf_cnpj_devedor", "documento_devedor"],
+        logradouro: ["logradouro", "endereco", "endereço", "rua"],
+        numero: ["numero", "número", "numero_endereco", "n_endereco"],
+        complemento: ["complemento"],
+        bairro: ["bairro"],
+        cep: ["cep"],
+        municipio: ["municipio", "município", "cidade"],
+        uf: ["uf", "estado"],
+        credor: ["credor", "nome_credor"],
+        documentoCredor: ["documento_credor", "cpf_cnpj_credor"],
+        apresentante: ["apresentante", "nome_apresentante"],
+        numeroTitulo: ["numero_titulo", "n_titulo", "titulo"],
+        especie: ["especie", "esp", "tipo_titulo"],
+        dataApontamento: ["data_apontamento", "data_aponte"],
+        vencimento: ["vencimento", "vencimento_titulo", "dt_venc_tit"],
+        valorTitulo: ["valor", "valor_titulo", "valor_documento"],
+        ocorrencia: ["ocorrencia", "observacao", "observação"]
+    };
+
+    function escapar(valor) {
+        return String(valor ?? "").replace(/[&<>"']/g, caractere => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        })[caractere]);
+    }
+
+    function normalizarChave(valor) {
+        return String(valor ?? "")
+            .trim()
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/[^a-z0-9]+/g, "_")
+            .replace(/^_+|_+$/g, "");
+    }
+
+    function gerarId() {
+        let id;
+
+        do {
+            const numeros = new Uint32Array(2);
+            crypto.getRandomValues(numeros);
+
+            const numero = (
+                BigInt(numeros[0]) * 4294967296n +
+                BigInt(numeros[1])
+            ) % 10000000000n;
+
+            id = numero.toString().padStart(10, "0");
+        } while (registros.some(r => r.id === id));
+
+        return id;
+    }
+
+    function nomeCartorio(valor) {
+        if (valor === "cartorio_1") {
+            return "Primeiro tabelionato";
+        }
+        if (valor === "cartorio_2") {
+            return "Segundo tabelionato";
+        }
+        return "Não definido";
+    }
+
+    function nomeCategoria(valor) {
+        return valor === "prioritario"
+            ? "Prioritário"
+            : "Comum";
+    }
+
+    function moeda(valor) {
+        const numero = Number(valor);
+        if (!Number.isFinite(numero)) return "—";
+
+        return numero.toLocaleString("pt-BR", {
+            style: "currency",
+            currency: "BRL"
+        });
+    }
+
+    function endereco(r) {
+        const partes = [
+            r.logradouro,
+            r.numero,
+            r.complemento,
+            r.bairro,
+            r.municipio,
+            r.uf
+        ].filter(Boolean);
+
+        return partes.join(", ");
+    }
+
+    function mostrarMensagem(elemento, mensagem, tipo = "info") {
+        $(elemento).innerHTML = `
+            <div class="alert alert-${tipo} mb-0" role="status">
+                ${escapar(mensagem)}
+            </div>
+        `;
+    }
+
+    function atualizarIndicadores() {
+        $("totalRegistros").textContent = registros.length;
+
+        $("totalPrioritarios").textContent =
+            registros.filter(r => r.categoria === "prioritario").length;
+
+        $("totalComuns").textContent =
+            registros.filter(r => r.categoria === "comum").length;
+
+        $("totalCartorios").textContent = new Set(
+            registros.map(r => r.cartorio)
+        ).size;
+    }
+
+    function filtrarRegistros() {
+        const busca = $("filtroBusca").value
+            .trim()
+            .toLocaleLowerCase("pt-BR");
+
+        const cartorio = $("filtroCartorio").value;
+        const categoria = $("filtroCategoria").value;
+
+        return registros.filter(r => {
+            const texto = [
+                r.id, r.protocolo, r.devedor, r.documento,
+                r.cep, endereco(r), r.credor, r.numeroTitulo
+            ].join(" ").toLocaleLowerCase("pt-BR");
+
+            return (!busca || texto.includes(busca)) &&
+                (!cartorio || r.cartorio === cartorio) &&
+                (!categoria || r.categoria === categoria);
+        });
+    }
+
+    function renderizarLista() {
+        const filtrados = filtrarRegistros();
+        const corpo = $("corpoRegistros");
+
+        $("resultadoContagem").textContent =
+            `${filtrados.length} registro(s) encontrado(s)`;
+
+        $("mensagemLista").hidden = filtrados.length !== 0;
+
+        corpo.innerHTML = filtrados.map(r => `
+            <tr>
+                <td>
+                    <span class="fw-semibold">${escapar(r.id)}</span>
+                    <div class="texto-pequeno">
+                        ${escapar(r.protocolo || "Sem protocolo")}
+                    </div>
+                </td>
+                <td>
+                    <div class="fw-semibold">${escapar(r.devedor)}</div>
+                    <div class="texto-pequeno">
+                        ${escapar(r.credor || "Credor não informado")}
+                    </div>
+                </td>
+                <td>${escapar(r.documento || "—")}</td>
+                <td>
+                    <div>${escapar(r.cep || "CEP não informado")}</div>
+                    <div class="texto-pequeno">
+                        ${escapar(endereco(r) || "Endereço não informado")}
+                    </div>
+                </td>
+                <td>
+                    <span class="badge ${
+                        r.categoria === "prioritario"
+                            ? "badge-prioritario"
+                            : "badge-comum"
+                    }">${escapar(nomeCategoria(r.categoria))}</span>
+                </td>
+                <td>
+                    <span class="badge badge-cartorio">
+                        ${escapar(nomeCartorio(r.cartorio))}
+                    </span>
+                </td>
+                <td class="text-nowrap">${moeda(r.valorTitulo)}</td>
+                <td>
+                    <div class="acoes-registro">
+                        <button type="button"
+                                class="btn btn-sm btn-outline-success"
+                                data-acao="editar"
+                                data-id="${escapar(r.id)}"
+                                title="Editar registro"
+                                aria-label="Editar registro">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-danger"
+                                data-acao="excluir"
+                                data-id="${escapar(r.id)}"
+                                title="Excluir registro"
+                                aria-label="Excluir registro">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `).join("");
+
+        atualizarIndicadores();
+    }
+
+    function limparFormulario() {
+        $("formIntimacao").reset();
+        $("registroEditando").value = "";
+        $("categoria").value = "prioritario";
+        $("tituloFormulario").innerHTML =
+            '<i class="bi bi-pencil-square me-2"></i> Cadastro manual';
+        $("btnSalvar").innerHTML =
+            '<i class="bi bi-check2-circle me-1"></i> Salvar intimação';
+        $("btnCancelarEdicao").hidden = true;
+    }
+
+    function preencherFormulario(r) {
+        campos.forEach(campo => {
+            const elemento = $(campo);
+            if (elemento) {
+                elemento.value = r[campo] ?? "";
+            }
+        });
+
+        $("registroEditando").value = r.id;
+        $("tituloFormulario").innerHTML =
+            '<i class="bi bi-pencil-square me-2"></i> Editar intimação';
+        $("btnSalvar").innerHTML =
+            '<i class="bi bi-check2-circle me-1"></i> Salvar alterações';
+        $("btnCancelarEdicao").hidden = false;
+
+        $("secaoCadastro").scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+    }
+
+    $("formIntimacao").addEventListener("submit", evento => {
+        evento.preventDefault();
+
+        const dados = {};
+
+        campos.forEach(campo => {
+            dados[campo] = $(campo).value.trim();
+        });
+
+        dados.valorTitulo = dados.valorTitulo === ""
+            ? ""
+            : Number(dados.valorTitulo);
+
+        if (!dados.devedor || !dados.cartorio || !dados.categoria) {
+            alert("Preencha o devedor, o tabelionato e a categoria.");
+            return;
+        }
+
+        const idEditando = $("registroEditando").value;
+
+        if (idEditando) {
+            const indice = registros.findIndex(r => r.id === idEditando);
+
+            if (indice < 0) {
+                alert("Registro não encontrado.");
+                return;
+            }
+
+            registros[indice] = {
+                ...registros[indice],
+                ...dados,
+                id: idEditando
+            };
+
+            alert("Registro atualizado na simulação.");
+        } else {
+            registros.unshift({
+                ...dados,
+                id: gerarId()
+            });
+
+            alert("Intimação cadastrada na simulação.");
+        }
+
+        limparFormulario();
+        renderizarLista();
+    });
+
+    $("btnLimparFormulario").addEventListener("click", limparFormulario);
+    $("btnCancelarEdicao").addEventListener("click", limparFormulario);
+
+    $("btnNovaIntimacao").addEventListener("click", () => {
+        limparFormulario();
+        $("secaoCadastro").scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+    });
+
+    $("corpoRegistros").addEventListener("click", evento => {
+        const botao = evento.target.closest("button[data-acao]");
+        if (!botao) return;
+
+        const id = botao.dataset.id;
+        const registro = registros.find(r => r.id === id);
+        if (!registro) return;
+
+        if (botao.dataset.acao === "editar") {
+            preencherFormulario(registro);
+        }
+
+        if (botao.dataset.acao === "excluir") {
+            const confirmar = confirm(
+                `Excluir a intimação ${id} da simulação?\n\n` +
+                "Essa exclusão é apenas local e não pode ser desfeita nesta demonstração."
+            );
+
+            if (!confirmar) return;
+
+            registros = registros.filter(r => r.id !== id);
+
+            if ($("registroEditando").value === id) {
+                limparFormulario();
+            }
+
+            renderizarLista();
+        }
+    });
+
+    ["filtroBusca", "filtroCartorio", "filtroCategoria"].forEach(id => {
+        $(id).addEventListener("input", renderizarLista);
+        $(id).addEventListener("change", renderizarLista);
+    });
+
+    $("btnPesquisar").addEventListener("click", renderizarLista);
+
+    $("btnLimparFiltros").addEventListener("click", () => {
+        $("filtroBusca").value = "";
+        $("filtroCartorio").value = "";
+        $("filtroCategoria").value = "";
+        renderizarLista();
+    });
+
+    /* =====================================================
+       IMPORTAÇÃO CSV / JSON
+       ===================================================== */
+
+    function separarCSV(texto, delimitador) {
+        const linhas = [];
+        let linha = [];
+        let campo = "";
+        let aspas = false;
+
+        for (let i = 0; i < texto.length; i++) {
+            const caractere = texto[i];
+
+            if (caractere === '"') {
+                if (aspas && texto[i + 1] === '"') {
+                    campo += '"';
+                    i++;
+                } else {
+                    aspas = !aspas;
+                }
+            } else if (caractere === delimitador && !aspas) {
+                linha.push(campo.trim());
+                campo = "";
+            } else if (
+                (caractere === "\n" || caractere === "\r") && !aspas
+            ) {
+                if (caractere === "\r" && texto[i + 1] === "\n") i++;
+
+                linha.push(campo.trim());
+                if (linha.some(v => v !== "")) linhas.push(linha);
+
+                linha = [];
+                campo = "";
+            } else {
+                campo += caractere;
+            }
+        }
+
+        linha.push(campo.trim());
+        if (linha.some(v => v !== "")) linhas.push(linha);
+
+        return linhas;
+    }
+
+    function converterCSV(texto) {
+        const primeiraLinha = texto.split(/\r?\n/, 1)[0] || "";
+        const delimitador = (
+            (primeiraLinha.match(/;/g) || []).length >
+            (primeiraLinha.match(/,/g) || []).length
+        ) ? ";" : ",";
+
+        const linhas = separarCSV(texto.replace(/^\uFEFF/, ""), delimitador);
+
+        if (linhas.length < 2) {
+            throw new Error("O CSV precisa conter cabeçalhos e ao menos um registro.");
+        }
+
+        const cabecalhos = linhas[0].map(normalizarChave);
+
+        return linhas.slice(1).map(linha => {
+            const objeto = {};
+            cabecalhos.forEach((chave, i) => {
+                objeto[chave] = linha[i] ?? "";
+            });
+            return objeto;
+        });
+    }
+
+    function localizarValor(objeto, aliases) {
+        const normalizado = {};
+
+        Object.entries(objeto).forEach(([chave, valor]) => {
+            normalizado[normalizarChave(chave)] = valor;
+        });
+
+        for (const alias of aliases) {
+            const chave = normalizarChave(alias);
+
+            if (
+                Object.prototype.hasOwnProperty.call(normalizado, chave) &&
+                normalizado[chave] !== null &&
+                normalizado[chave] !== undefined
+            ) {
+                return normalizado[chave];
+            }
+        }
+
+        return "";
+    }
+
+    function normalizarRegistro(objeto) {
+        const registro = {};
+
+        Object.entries(mapaCampos).forEach(([campo, aliases]) => {
+            registro[campo] = localizarValor(objeto, aliases);
+        });
+
+        registro.devedor = String(registro.devedor ?? "").trim();
+        registro.documento = String(registro.documento ?? "").trim();
+        registro.protocolo = String(registro.protocolo ?? "").trim();
+
+        const valorOriginal = String(registro.valorTitulo ?? "")
+            .trim()
+            .replace(/\s/g, "");
+
+        if (valorOriginal.includes(",") && valorOriginal.includes(".")) {
+            registro.valorTitulo = Number(
+                valorOriginal.replace(/\./g, "").replace(",", ".")
+            );
+        } else if (valorOriginal.includes(",")) {
+            registro.valorTitulo = Number(valorOriginal.replace(",", "."));
+        } else {
+            registro.valorTitulo = valorOriginal === ""
+                ? ""
+                : Number(valorOriginal);
+        }
+
+        registro.valido = Boolean(registro.devedor);
+        registro.erro = registro.valido
+            ? ""
+            : "Nome do devedor ausente";
+
+        return registro;
+    }
+
+    $("btnLerArquivo").addEventListener("click", async () => {
+        const arquivo = $("arquivoImportacao").files[0];
+
+        $("areaPreviaImportacao").hidden = true;
+        previaImportacao = [];
+
+        if (!arquivo) {
+            mostrarMensagem(
+                "mensagemImportacao",
+                "Selecione um arquivo CSV ou JSON.",
+                "warning"
+            );
+            return;
+        }
+
+        if (!$("destinoImportacao").value) {
+            mostrarMensagem(
+                "mensagemImportacao",
+                "Selecione o tabelionato de destino.",
+                "warning"
+            );
+            return;
+        }
+
+        if (!["prioritario", "comum"].includes(
+            $("categoriaImportacao").value
+        )) {
+            mostrarMensagem(
+                "mensagemImportacao",
+                "Selecione uma categoria válida.",
+                "warning"
+            );
+            return;
+        }
+
+        try {
+            const texto = await arquivo.text();
+            let dados;
+
+            if (arquivo.name.toLowerCase().endsWith(".json")) {
+                dados = JSON.parse(texto);
+
+                if (!Array.isArray(dados)) {
+                    dados = dados.intimacoes ?? dados.registros ?? dados.data;
+                }
+            } else if (arquivo.name.toLowerCase().endsWith(".csv")) {
+                dados = converterCSV(texto);
+            } else {
+                throw new Error("Formato não suportado. Use CSV ou JSON.");
+            }
+
+            if (!Array.isArray(dados) || dados.length === 0) {
+                throw new Error(
+                    "Não encontrei uma lista de registros no arquivo."
+                );
+            }
+
+            previaImportacao = dados.map(item => {
+                const registro = normalizarRegistro(item);
+
+                registro.cartorio = $("destinoImportacao").value;
+                registro.categoria = $("categoriaImportacao").value;
+
+                return registro;
+            });
+
+            renderizarPrevia();
+
+            mostrarMensagem(
+                "mensagemImportacao",
+                `Arquivo lido: ${arquivo.name}. Confira os dados antes de importar.`,
+                "success"
+            );
+        } catch (erro) {
+            mostrarMensagem(
+                "mensagemImportacao",
+                erro.message || "Não foi possível ler o arquivo.",
+                "danger"
+            );
+        }
+    });
+
+    function renderizarPrevia() {
+        $("areaPreviaImportacao").hidden = false;
+
+        const validos = previaImportacao.filter(r => r.valido).length;
+        const invalidos = previaImportacao.length - validos;
+
+        $("resumoPrevia").textContent =
+            `${previaImportacao.length} registro(s): ` +
+            `${validos} válido(s), ${invalidos} com erro. ` +
+            `Destino: ${nomeCartorio($("destinoImportacao").value)}.`;
+
+        $("corpoPrevia").innerHTML = previaImportacao.map(r => `
+            <tr>
+                <td>${escapar(r.devedor || "—")}</td>
+                <td>${escapar(r.documento || "—")}</td>
+                <td>${escapar(r.protocolo || "—")}</td>
+                <td>${moeda(r.valorTitulo)}</td>
+                <td>
+                    ${r.valido
+                        ? '<span class="badge text-bg-success">Válido</span>'
+                        : `<span class="badge text-bg-danger">${escapar(r.erro)}</span>`
+                    }
+                </td>
+            </tr>
+        `).join("");
+
+        $("btnConfirmarImportacao").disabled = validos === 0;
+    }
+
+    $("btnConfirmarImportacao").addEventListener("click", () => {
+        const validos = previaImportacao.filter(r => r.valido);
+
+        if (!validos.length) {
+            alert("Não há registros válidos para importar.");
+            return;
+        }
+
+        const confirmar = confirm(
+            `Adicionar ${validos.length} registro(s) à simulação?\n\n` +
+            `Destino: ${nomeCartorio($("destinoImportacao").value)}\n` +
+            `Categoria: ${nomeCategoria($("categoriaImportacao").value)}`
+        );
+
+        if (!confirmar) return;
+
+        const novos = validos.map(r => {
+            const novo = {};
+
+            campos.forEach(campo => {
+                novo[campo] = r[campo] ?? "";
+            });
+
+            novo.id = gerarId();
+            novo.cartorio = $("destinoImportacao").value;
+            novo.categoria = $("categoriaImportacao").value;
+
+            return novo;
+        });
+
+        registros.unshift(...novos);
+        previaImportacao = [];
+        $("areaPreviaImportacao").hidden = true;
+        $("arquivoImportacao").value = "";
+
+        mostrarMensagem(
+            "mensagemImportacao",
+            `${novos.length} registro(s) incluído(s) na simulação. ` +
+            "Os registros com erros foram ignorados.",
+            "success"
+        );
+
+        renderizarLista();
+    });
+
+    /* INICIALIZAÇÃO */
+    renderizarLista();
+})();
+</script>
+
+</body>
+</html>
