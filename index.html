@@ -1,189 +1,158 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Acesso ao Sistema AtoNexo do 2º Tabelionato de Protestos de Porto Alegre.">
   <meta name="theme-color" content="#123C32">
+  <meta name="description" content="Acesso ao Sistema AtoNexo do 2º Tabelionato de Protestos de Porto Alegre.">
+
   <title>AtoNexo | Acesso ao sistema</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+
+  <!-- Bootstrap -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  >
+
+  <!-- Bootstrap Icons -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    rel="stylesheet"
+  >
+
+  <!-- Fonte Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+
+  <!-- Supabase JavaScript v2 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     :root {
       --verde: #123C32;
       --verde-escuro: #0B2B24;
-      --verde-destaque: #1C5948;
-      --verde-claro: #E8F1EC;
+      --verde-medio: #1C5948;
       --fundo: #F3F6F4;
-      --texto: #25352F;
-      --secundario: #6B7972;
-      --borda: #DDE5E0;
-      --branco: #fff;
-      --erro: #B42318;
+      --verde-claro: #E8F1EC;
+      --texto: #1D3029;
+      --texto-suave: #687870;
+      --borda: #DCE5DF;
+      --branco: #FFFFFF;
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       min-height: 100vh;
       margin: 0;
       display: flex;
       flex-direction: column;
-      font-family: Inter, system-ui, sans-serif;
       background: var(--fundo);
       color: var(--texto);
+      font-family: "Inter", sans-serif;
     }
 
-    .cabecalho {
-      background: var(--verde);
-      color: #fff;
-      position: relative;
-      overflow: hidden;
+    .topbar {
+      background: var(--verde-escuro);
+      color: white;
+      padding: 17px 24px;
     }
 
-    .cabecalho:after {
-      content: "";
-      position: absolute;
-      width: 320px;
-      height: 320px;
-      right: -100px;
-      top: -190px;
-      border: 1px solid #ffffff17;
-      border-radius: 50%;
-      pointer-events: none;
-    }
-
-    .cabecalho-conteudo {
-      position: relative;
-      z-index: 1;
-      padding-top: 24px;
-      padding-bottom: 24px;
-    }
-
-    .marca {
+    .brand {
       display: flex;
       align-items: center;
-      gap: 15px;
-    }
-
-    .logo {
-      width: 76px;
-      height: 76px;
-      flex-shrink: 0;
-      object-fit: contain;
-      background: #fff;
-      border-radius: 10px;
-      padding: 3px;
-    }
-
-    .nome-cartorio {
-      font-size: clamp(1.05rem, 2.5vw, 1.45rem);
+      gap: 12px;
       font-weight: 700;
-      letter-spacing: -.045em;
-      line-height: 1.35;
-      margin: 0 0 5px;
+      letter-spacing: -0.3px;
     }
 
-    .endereco {
-      font-size: .8rem;
-      line-height: 1.75;
-      color: #ffffffc7;
-      margin: 0;
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: #FFFFFF;
+      color: var(--verde);
+      font-size: 22px;
     }
 
-    .identificacao {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 9px 13px;
-      border: 1px solid #ffffff2b;
-      background: #ffffff12;
-      border-radius: 10px;
-      color: #E0EEE6;
-      font-size: .8rem;
+    .brand small {
+      display: block;
+      margin-top: 3px;
+      color: #C4D8CE;
+      font-size: 11px;
       font-weight: 500;
-      white-space: nowrap;
-    }
-
-    .online {
-      width: 7px;
-      height: 7px;
-      background: #8BD4A6;
-      border-radius: 50%;
+      letter-spacing: 0;
     }
 
     main {
       flex: 1;
       display: flex;
       align-items: center;
-      padding: 42px 12px;
+      justify-content: center;
+      padding: 36px 16px;
     }
 
     .login-card {
       width: 100%;
-      max-width: 480px;
-      margin: auto;
-      background: #fff;
+      max-width: 440px;
+      padding: 36px;
       border: 1px solid var(--borda);
       border-radius: 20px;
-      box-shadow: 0 14px 38px #173c2b0b;
-      overflow: hidden;
+      background: var(--branco);
+      box-shadow: 0 12px 36px rgba(11, 43, 36, 0.07);
     }
 
-    .login-topo {
-      padding: 30px 32px 0;
-      text-align: center;
-    }
-
-    .simbolo {
-      width: 54px;
-      height: 54px;
-      margin: 0 auto 16px;
+    .login-icon {
+      width: 58px;
+      height: 58px;
       display: grid;
       place-items: center;
+      margin-bottom: 22px;
       border-radius: 16px;
       background: var(--verde-claro);
       color: var(--verde);
-      font-size: 1.5rem;
+      font-size: 27px;
     }
 
-    .login-topo h2 {
-      font-size: 1.5rem;
+    h1 {
+      margin-bottom: 9px;
+      font-size: 25px;
       font-weight: 800;
-      letter-spacing: -.045em;
-      margin: 0 0 8px;
+      letter-spacing: -0.8px;
     }
 
-    .login-topo p {
-      font-size: .9rem;
-      color: var(--secundario);
-      margin: 0;
-    }
-
-    .login-corpo {
-      padding: 26px 32px 30px;
+    .subtitle {
+      margin-bottom: 28px;
+      color: var(--texto-suave);
+      font-size: 13px;
+      line-height: 1.7;
     }
 
     .form-label {
-      font-size: .84rem;
+      margin-bottom: 8px;
+      font-size: 13px;
       font-weight: 600;
-      margin-bottom: 7px;
     }
 
     .form-control {
-      min-height: 46px;
-      border-color: #d4ded8;
+      min-height: 48px;
+      border-color: var(--borda);
       border-radius: 10px;
-      font-size: .92rem;
+      font-size: 14px;
     }
 
     .form-control:focus {
-      border-color: #4c8974;
-      box-shadow: 0 0 0 .22rem #1c59481a;
+      border-color: var(--verde-medio);
+      box-shadow: 0 0 0 3px rgba(28, 89, 72, 0.12);
     }
 
     .input-group .form-control {
@@ -191,343 +160,364 @@
     }
 
     .input-group .btn {
-      border-color: #d4ded8;
+      border-color: var(--borda);
       border-radius: 0 10px 10px 0;
-      color: var(--secundario);
     }
 
-    .btn-atonexo {
-      min-height: 47px;
-      background: var(--verde);
-      color: #fff;
+    .btn-primary-custom {
+      min-height: 49px;
       border: 0;
       border-radius: 10px;
+      background: var(--verde);
+      color: white;
+      font-size: 14px;
       font-weight: 700;
     }
 
-    .btn-atonexo:hover,
-    .btn-atonexo:focus {
-      background: var(--verde-escuro);
-      color: #fff;
+    .btn-primary-custom:hover,
+    .btn-primary-custom:focus {
+      background: var(--verde-medio);
+      color: white;
     }
 
-    .btn-atonexo:disabled {
-      opacity: .7;
+    .btn-primary-custom:disabled {
+      background: #789187;
+      color: white;
     }
 
-    .link-atonexo {
-      color: var(--verde-destaque);
+    .text-link {
+      padding: 0;
+      border: 0;
+      background: none;
+      color: var(--verde-medio);
+      font-size: 13px;
       font-weight: 600;
       text-decoration: none;
-      font-size: .85rem;
     }
 
-    .link-atonexo:hover { text-decoration: underline; }
+    .text-link:hover {
+      color: var(--verde-escuro);
+      text-decoration: underline;
+    }
 
-    .separador {
-      display: flex;
+    .online-status {
+      display: inline-flex;
       align-items: center;
-      gap: 12px;
-      color: #8a968f;
-      font-size: .76rem;
-      margin: 23px 0;
+      gap: 7px;
+      color: var(--texto-suave);
+      font-size: 11px;
     }
 
-    .separador:before,
-    .separador:after {
-      content: "";
-      height: 1px;
-      flex: 1;
-      background: var(--borda);
+    .online-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #279768;
     }
 
-    .nota-seguranca {
+    .security-note {
       display: flex;
-      gap: 9px;
-      align-items: flex-start;
-      background: #f5f8f6;
-      border: 1px solid #e5ece7;
+      gap: 10px;
+      margin-top: 24px;
+      padding: 13px;
       border-radius: 10px;
-      padding: 12px;
-      font-size: .77rem;
-      line-height: 1.5;
-      color: var(--secundario);
+      background: var(--fundo);
+      color: var(--texto-suave);
+      font-size: 11px;
+      line-height: 1.6;
     }
 
-    .rodape {
-      padding: 18px 0;
-      border-top: 1px solid var(--borda);
-      background: #fff;
-    }
-
-    .rodape-texto {
-      font-size: .76rem;
-      color: var(--secundario);
-      margin: 0;
-    }
-
-    .marca-atonexo {
-      color: var(--verde);
-      font-weight: 800;
-      letter-spacing: -.035em;
+    footer {
+      padding: 20px 16px;
+      background: var(--verde-escuro);
+      color: #C4D8CE;
+      text-align: center;
+      font-size: 11px;
+      line-height: 1.8;
     }
 
     .modal-content {
       border: 0;
       border-radius: 16px;
-      overflow: hidden;
     }
 
     .modal-header {
-      background: var(--verde);
-      color: #fff;
+      border-bottom-color: var(--borda);
     }
 
-    .modal-header .btn-close { filter: invert(1); }
-    .modal-title { font-weight: 700; }
-    .small-help { font-size: .78rem; color: var(--secundario); }
-
-    @media (max-width: 767.98px) {
-      .cabecalho-conteudo {
-        padding-top: 20px;
-        padding-bottom: 20px;
-      }
-
-      .marca {
-        align-items: flex-start;
-        gap: 11px;
-      }
-
-      .logo {
-        width: 60px;
-        height: 60px;
-      }
-
-      .endereco { font-size: .72rem; }
-      .identificacao { margin-top: 16px; }
-      main { padding: 28px 12px; }
-
-      .login-topo { padding: 26px 22px 0; }
-      .login-corpo { padding: 24px 22px 26px; }
-
-      .rodape .text-md-end {
-        text-align: left !important;
-        margin-top: 7px;
-      }
+    .modal-title {
+      font-weight: 700;
     }
 
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        transition-duration: .01ms !important;
-        animation-duration: .01ms !important;
+    .modal-body {
+      padding: 24px;
+    }
+
+    .form-text {
+      font-size: 11px;
+    }
+
+    @media (max-width: 480px) {
+      .topbar {
+        padding: 15px 18px;
+      }
+
+      .login-card {
+        padding: 26px 21px;
+        border-radius: 16px;
+      }
+
+      h1 {
+        font-size: 23px;
       }
     }
   </style>
 </head>
 
 <body>
-  <header class="cabecalho">
-    <div class="container cabecalho-conteudo">
-      <div class="row align-items-center">
-        <div class="col-lg-9">
-          <div class="marca">
-            <img
-              class="logo"
-              src="https://tabpoa.github.io/tabelionatopoa/ato-nexo.png"
-              alt="Logotipo AtoNexo"
-              width="76"
-              height="76"
-            >
-            <div>
-              <h1 class="nome-cartorio">2º Tabelionato de Protestos de Porto Alegre</h1>
-              <p class="endereco">
-                Rua dos Andradas, 1234 • 4º Andar<br>
-                Centro Histórico • Porto Alegre/RS • CEP 90020-008<br>
-                CNPJ: 04.438.173/0001-47 •
-                <a class="text-white text-decoration-none" href="tel:+555130273500">
-                  (51) 3027-3500
-                </a>
-              </p>
-            </div>
-          </div>
+  <header class="topbar">
+    <div class="container">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <i class="bi bi-diagram-3"></i>
         </div>
-
-        <div class="col-lg-3 text-lg-end">
-          <div class="identificacao">
-            <span class="online"></span>
-            <span>Sistema AtoNexo</span>
-          </div>
+        <div>
+          Sistema AtoNexo
+          <small>Gestão de intimações</small>
         </div>
       </div>
     </div>
   </header>
 
   <main>
-    <section class="login-card" aria-labelledby="tituloLogin">
-      <div class="login-topo">
-        <div class="simbolo">
-          <i class="bi bi-shield-lock" aria-hidden="true"></i>
-        </div>
-        <h2 id="tituloLogin">Acesso ao sistema</h2>
-        <p>Entre com seu e-mail e sua senha cadastrados.</p>
+    <section class="login-card" aria-labelledby="titulo-login">
+      <div class="login-icon" aria-hidden="true">
+        <i class="bi bi-shield-lock"></i>
       </div>
 
-      <div class="login-corpo">
-        <form id="formLogin" novalidate>
-          <div class="mb-3">
-            <label for="loginEmail" class="form-label">E-mail institucional</label>
+      <h1 id="titulo-login">Acesse sua conta</h1>
+      <p class="subtitle">
+        Entre com seu e-mail e sua senha para acessar o sistema.
+      </p>
+
+      <div
+        id="loginMessage"
+        class="alert d-none"
+        role="alert"
+        aria-live="polite"
+      ></div>
+
+      <form id="loginForm" method="post" novalidate>
+        <div class="mb-3">
+          <label for="loginEmail" class="form-label">E-mail</label>
+          <input
+            type="email"
+            class="form-control"
+            id="loginEmail"
+            name="email"
+            autocomplete="username"
+            placeholder="seu@email.com"
+            required
+          >
+        </div>
+
+        <div class="mb-3">
+          <label for="loginPassword" class="form-label">Senha</label>
+          <div class="input-group">
             <input
-              id="loginEmail"
-              name="email"
+              type="password"
               class="form-control"
-              type="email"
-              autocomplete="username"
-              placeholder="voce@exemplo.com.br"
+              id="loginPassword"
+              name="password"
+              autocomplete="current-password"
+              placeholder="Digite sua senha"
               required
             >
+            <button
+              class="btn btn-outline-secondary"
+              type="button"
+              id="toggleLoginPassword"
+              aria-label="Mostrar senha"
+              title="Mostrar senha"
+            >
+              <i class="bi bi-eye"></i>
+            </button>
           </div>
+        </div>
 
-          <div class="mb-3">
-            <div class="d-flex justify-content-between align-items-center">
-              <label for="loginSenha" class="form-label">Senha</label>
-              <a href="#" id="linkRecuperarSenha" class="link-atonexo mb-2">
-                Esqueci minha senha
-              </a>
-            </div>
-
-            <div class="input-group">
-              <input
-                id="loginSenha"
-                name="password"
-                class="form-control"
-                type="password"
-                autocomplete="current-password"
-                placeholder="Digite sua senha"
-                required
-              >
-              <button
-                class="btn btn-outline-secondary"
-                type="button"
-                id="toggleSenha"
-                aria-label="Mostrar senha"
-              >
-                <i class="bi bi-eye" aria-hidden="true"></i>
-              </button>
-            </div>
-          </div>
-
-          <div id="mensagemLogin" class="alert d-none py-2 small" role="alert"></div>
-
-          <button id="btnEntrar" class="btn btn-atonexo w-100" type="submit">
-            <i class="bi bi-box-arrow-in-right me-2" aria-hidden="true"></i>
-            Entrar no sistema
-          </button>
-        </form>
-
-        <div class="separador">Acesso institucional</div>
-
-        <div class="text-center mb-4">
-          <span class="small-help">Ainda não tem acesso?</span><br>
+        <div class="d-flex justify-content-end mb-4">
           <button
+            class="text-link"
             type="button"
-            class="btn btn-link link-atonexo p-0 mt-1"
-            data-bs-toggle="modal"
-            data-bs-target="#modalCadastro"
+            id="forgotPasswordButton"
           >
-            Solicitar cadastro
+            Esqueci minha senha
           </button>
         </div>
 
-        <div class="nota-seguranca">
-          <i class="bi bi-shield-check fs-5" aria-hidden="true"></i>
-          <span>O acesso depende da aprovação do cadastro e das permissões atribuídas pelo responsável pelo sistema.</span>
+        <button
+          class="btn btn-primary-custom w-100"
+          type="submit"
+          id="loginButton"
+        >
+          <span id="loginButtonText">Entrar no sistema</span>
+          <span
+            id="loginSpinner"
+            class="spinner-border spinner-border-sm ms-2 d-none"
+            aria-hidden="true"
+          ></span>
+        </button>
+      </form>
+
+      <div class="text-center mt-4">
+        <span class="text-secondary" style="font-size:13px">
+          Ainda não tem acesso?
+        </span>
+        <button
+          class="text-link ms-1"
+          type="button"
+          data-bs-toggle="modal"
+          data-bs-target="#signupModal"
+        >
+          Solicitar cadastro
+        </button>
+      </div>
+
+      <div class="security-note">
+        <i class="bi bi-shield-check fs-5"></i>
+        <div>
+          <strong>Acesso protegido</strong><br>
+          O acesso depende da autenticação e da aprovação do cadastro.
         </div>
+      </div>
+
+      <div class="text-center mt-4">
+        <span class="online-status">
+          <span class="online-dot"></span>
+          Sistema de autenticação
+        </span>
       </div>
     </section>
   </main>
 
-  <footer class="rodape">
-    <div class="container">
-      <div class="row align-items-center">
-        <div class="col-md-6">
-          <p class="rodape-texto">
-            &copy; <span id="anoAtual"></span>
-            <span class="marca-atonexo">AtoNexo</span>. Todos os direitos reservados.
-          </p>
-        </div>
-        <div class="col-md-6 text-md-end">
-          <p class="rodape-texto">Tecnologia a serviço da organização e da eficiência.</p>
-        </div>
-      </div>
-    </div>
+  <footer>
+    <strong>2º Tabelionato de Protestos de Porto Alegre</strong><br>
+    Rua dos Andradas, 1234 • 4º Andar • Centro Histórico • Porto Alegre/RS<br>
+    CEP 90020-008 • (51) 3027-3500<br>
+    © <span id="currentYear"></span> AtoNexo
   </footer>
 
+  <!-- Modal de cadastro -->
   <div
     class="modal fade"
-    id="modalCadastro"
+    id="signupModal"
     tabindex="-1"
-    aria-labelledby="tituloCadastro"
+    aria-labelledby="signupModalTitle"
     aria-hidden="true"
   >
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h2 class="modal-title fs-5" id="tituloCadastro">Solicitar acesso</h2>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          <div>
+            <h2 class="modal-title fs-5" id="signupModalTitle">
+              Solicitar cadastro
+            </h2>
+            <p class="text-secondary small mb-0 mt-1">
+              O acesso será liberado após a aprovação.
+            </p>
+          </div>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Fechar"
+          ></button>
         </div>
 
-        <div class="modal-body p-4">
-          <p class="small-help mb-3">
-            O cadastro será enviado para aprovação. Ele não concede automaticamente acesso ao sistema.
-          </p>
+        <div class="modal-body">
+          <div
+            id="signupMessage"
+            class="alert d-none"
+            role="alert"
+            aria-live="polite"
+          ></div>
 
-          <form id="formCadastro" novalidate>
+          <form id="signupForm" method="post" novalidate>
             <div class="mb-3">
-              <label class="form-label" for="cadastroNome">Nome completo</label>
-              <input class="form-control" id="cadastroNome" autocomplete="name" required maxlength="160">
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label" for="cadastroEmail">E-mail</label>
-              <input class="form-control" id="cadastroEmail" type="email" autocomplete="email" required>
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label" for="cadastroSenha">Criar senha</label>
+              <label for="signupName" class="form-label">
+                Nome completo
+              </label>
               <input
+                type="text"
                 class="form-control"
-                id="cadastroSenha"
-                type="password"
-                autocomplete="new-password"
-                minlength="6"
-                required
-              >
-              <div class="form-text">Use pelo menos 6 caracteres.</div>
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label" for="cadastroConfirmacao">Confirmar senha</label>
-              <input
-                class="form-control"
-                id="cadastroConfirmacao"
-                type="password"
-                autocomplete="new-password"
-                minlength="6"
+                id="signupName"
+                name="nome_completo"
+                autocomplete="name"
+                minlength="3"
                 required
               >
             </div>
 
-            <div class="form-check mb-3">
-              <input class="form-check-input" id="aceiteEmail" type="checkbox">
-              <label class="form-check-label small" for="aceiteEmail">
-                Aceito receber comunicações institucionais por e-mail.
+            <div class="mb-3">
+              <label for="signupEmail" class="form-label">E-mail</label>
+              <input
+                type="email"
+                class="form-control"
+                id="signupEmail"
+                name="email"
+                autocomplete="email"
+                required
+              >
+            </div>
+
+            <div class="mb-3">
+              <label for="signupPassword" class="form-label">Senha</label>
+              <input
+                type="password"
+                class="form-control"
+                id="signupPassword"
+                name="password"
+                autocomplete="new-password"
+                minlength="8"
+                required
+              >
+              <div class="form-text">Utilize pelo menos 8 caracteres.</div>
+            </div>
+
+            <div class="mb-3">
+              <label for="signupPasswordConfirm" class="form-label">
+                Confirmar senha
+              </label>
+              <input
+                type="password"
+                class="form-control"
+                id="signupPasswordConfirm"
+                name="password_confirm"
+                autocomplete="new-password"
+                minlength="8"
+                required
+              >
+            </div>
+
+            <div class="form-check mb-4">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="signupConsent"
+                required
+              >
+              <label class="form-check-label small" for="signupConsent">
+                Confirmo que as informações fornecidas são verdadeiras e
+                solicito a criação da minha conta.
               </label>
             </div>
 
-            <div id="mensagemCadastro" class="alert d-none py-2 small" role="alert"></div>
-
-            <button id="btnCadastrar" type="submit" class="btn btn-atonexo w-100">
-              Enviar solicitação
+            <button
+              class="btn btn-primary-custom w-100"
+              type="submit"
+              id="signupButton"
+            >
+              Criar solicitação
             </button>
           </form>
         </div>
@@ -535,263 +525,403 @@
     </div>
   </div>
 
+  <!-- Bootstrap JavaScript -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
-    'use strict';
+    (() => {
+      "use strict";
 
-    const SUPABASE_URL = 'https://dlxqahkjhuocsssosqyj.supabase.co';
-    const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_IJ704qHttTZHtI_q8E7CCw_siVAy7Ex';
-    const PAINEL_TI = 'https://tabpoa.github.io/tabelionatopoa/cadastro-intimacoes.html';
+      /*
+       * CONFIGURAÇÃO DO PROJETO ATONEXO
+       *
+       * Não substitua estes dados pelos do projeto Supabase antigo.
+       * A chave publishable é destinada ao uso no navegador.
+       */
+      const SUPABASE_URL =
+        "https://dlxqahkjhuocsssosqyj.supabase.co";
 
-    const supabase = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_PUBLISHABLE_KEY
-    );
+      const SUPABASE_PUBLISHABLE_KEY =
+        "sb_publishable_IJ704qHttTZHtI_q8E7CCw_siVAy7Ex";
 
-    const $ = (id) => document.getElementById(id);
+      const DESTINO_TI =
+        "https://tabpoa.github.io/tabelionatopoa/cadastro-intimacoes.html";
 
-    $('anoAtual').textContent = new Date().getFullYear();
+      /*
+       * O escopo desta função evita declarações const/let globais
+       * que possam conflitar com outros scripts da página.
+       */
+      const loginForm = document.getElementById("loginForm");
+      const signupForm = document.getElementById("signupForm");
 
-    function mostrarMensagem(id, texto, tipo = 'danger') {
-      const elemento = $(id);
-      elemento.className = `alert alert-${tipo} py-2 small`;
-      elemento.textContent = texto;
-      elemento.classList.remove('d-none');
-    }
+      const loginMessage = document.getElementById("loginMessage");
+      const signupMessage = document.getElementById("signupMessage");
 
-    function limparMensagem(id) {
-      const elemento = $(id);
-      elemento.classList.add('d-none');
-      elemento.textContent = '';
-    }
+      const loginButton = document.getElementById("loginButton");
+      const loginButtonText = document.getElementById("loginButtonText");
+      const loginSpinner = document.getElementById("loginSpinner");
+      const signupButton = document.getElementById("signupButton");
 
-    function mensagemErro(error) {
-      const msg = String(error?.message || 'Erro inesperado.');
+      document.getElementById("currentYear").textContent =
+        new Date().getFullYear();
 
-      if (/Invalid login credentials/i.test(msg)) {
-        return 'E-mail ou senha inválidos. Confira também se o provedor E-mail está habilitado em Supabase > Authentication > Sign In / Providers.';
+      function showMessage(element, message, type = "danger") {
+        element.textContent = message;
+        element.className = `alert alert-${type}`;
+        element.classList.remove("d-none");
       }
 
-      if (/Email provider is disabled|email provider.*disabled|Signups not allowed/i.test(msg)) {
-        return 'O provedor de acesso por e-mail está desabilitado no Supabase. Ative Authentication > Sign In / Providers > Email no painel do projeto.';
+      function clearMessage(element) {
+        element.textContent = "";
+        element.classList.add("d-none");
       }
 
-      if (/row-level security|permission denied|42501/i.test(msg)) {
-        return 'O Supabase bloqueou a operação por permissão do banco. Execute o SQL de configuração apresentado abaixo.';
+      function setLoginLoading(loading) {
+        loginButton.disabled = loading;
+        loginButtonText.textContent = loading
+          ? "Verificando acesso..."
+          : "Entrar no sistema";
+        loginSpinner.classList.toggle("d-none", !loading);
       }
 
-      if (/Email not confirmed/i.test(msg)) {
-        return 'Confirme seu e-mail antes de entrar.';
+      function setSignupLoading(loading) {
+        signupButton.disabled = loading;
+        signupButton.textContent = loading
+          ? "Enviando solicitação..."
+          : "Criar solicitação";
       }
 
-      if (/Failed to fetch|NetworkError/i.test(msg)) {
-        return 'Não foi possível conectar ao Supabase. Verifique sua conexão.';
+      function readableError(error) {
+        const message = String(error?.message || "");
+
+        if (/invalid login credentials/i.test(message)) {
+          return "E-mail ou senha inválidos.";
+        }
+
+        if (/email not confirmed/i.test(message)) {
+          return "Confirme seu e-mail antes de entrar no sistema.";
+        }
+
+        if (/user already registered/i.test(message)) {
+          return "Já existe uma conta cadastrada com esse e-mail.";
+        }
+
+        if (/password should be at least/i.test(message)) {
+          return "A senha não atende ao tamanho mínimo exigido.";
+        }
+
+        if (/failed to fetch|networkerror|load failed/i.test(message)) {
+          return "Não foi possível conectar ao Supabase. Verifique a conexão e tente novamente.";
+        }
+
+        return message || "Ocorreu um erro inesperado. Tente novamente.";
       }
 
-      return msg;
-    }
+      /*
+       * Inicializa o cliente sem declarar uma variável global chamada
+       * "supabase", evitando conflito com a biblioteca carregada acima.
+       */
+      if (!window.supabase || typeof window.supabase.createClient !== "function") {
+        showMessage(
+          loginMessage,
+          "A biblioteca de autenticação não carregou. Recarregue a página e tente novamente."
+        );
+        return;
+      }
 
-    $('toggleSenha').addEventListener('click', () => {
-      const campo = $('loginSenha');
-      const mostrar = campo.type === 'password';
-
-      campo.type = mostrar ? 'text' : 'password';
-
-      $('toggleSenha').innerHTML = mostrar
-        ? '<i class="bi bi-eye-slash" aria-hidden="true"></i>'
-        : '<i class="bi bi-eye" aria-hidden="true"></i>';
-
-      $('toggleSenha').setAttribute(
-        'aria-label',
-        mostrar ? 'Ocultar senha' : 'Mostrar senha'
+      const supabaseClient = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
       );
-    });
 
-    $('formLogin').addEventListener('submit', async (event) => {
-      event.preventDefault();
-      limparMensagem('mensagemLogin');
+      /*
+       * Mostrar/ocultar a senha.
+       */
+      document
+        .getElementById("toggleLoginPassword")
+        .addEventListener("click", function () {
+          const passwordInput = document.getElementById("loginPassword");
+          const icon = this.querySelector("i");
+          const isPassword = passwordInput.type === "password";
 
-      const email = $('loginEmail').value.trim();
-      const password = $('loginSenha').value;
-
-      if (!email || !password) {
-        mostrarMensagem('mensagemLogin', 'Informe seu e-mail e sua senha.');
-        return;
-      }
-
-      const botao = $('btnEntrar');
-      botao.disabled = true;
-      botao.innerHTML =
-        '<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Verificando acesso...';
-
-      let autenticado = false;
-
-      try {
-        const { data: authData, error: authError } =
-          await supabase.auth.signInWithPassword({ email, password });
-
-        if (authError) throw authError;
-
-        autenticado = true;
-
-        const { data: perfil, error: perfilError } = await supabase
-          .from('perfis_usuarios')
-          .select('nome_completo, status_cadastro, papel')
-          .eq('id', authData.user.id)
-          .maybeSingle();
-
-        if (perfilError) {
-          throw new Error(
-            'Não foi possível consultar seu perfil no banco. Verifique as políticas de acesso da tabela perfis_usuarios.'
+          passwordInput.type = isPassword ? "text" : "password";
+          icon.className = isPassword ? "bi bi-eye-slash" : "bi bi-eye";
+          this.setAttribute(
+            "aria-label",
+            isPassword ? "Ocultar senha" : "Mostrar senha"
           );
-        }
-
-        if (!perfil) {
-          throw new Error(
-            'Seu perfil não foi encontrado. Solicite ao administrador a regularização do cadastro.'
-          );
-        }
-
-        if (perfil.status_cadastro !== 'aprovado') {
-          throw new Error(
-            'Seu cadastro ainda não está aprovado. Entre em contato com o administrador.'
-          );
-        }
-
-        if (perfil.papel !== 'ti') {
-          throw new Error(
-            'Este acesso ainda não está vinculado ao seu perfil.'
-          );
-        }
-
-        window.location.assign(PAINEL_TI);
-      } catch (error) {
-        if (autenticado) {
-          try {
-            await supabase.auth.signOut();
-          } catch (_) {
-            // Mantém a mensagem principal.
-          }
-        }
-
-        mostrarMensagem('mensagemLogin', mensagemErro(error));
-      } finally {
-        botao.disabled = false;
-        botao.innerHTML =
-          '<i class="bi bi-box-arrow-in-right me-2" aria-hidden="true"></i>Entrar no sistema';
-      }
-    });
-
-    $('linkRecuperarSenha').addEventListener('click', async (event) => {
-      event.preventDefault();
-      limparMensagem('mensagemLogin');
-
-      const email = $('loginEmail').value.trim();
-
-      if (!email) {
-        mostrarMensagem(
-          'mensagemLogin',
-          'Digite seu e-mail no campo acima e clique novamente em “Esqueci minha senha”.',
-          'warning'
-        );
-        $('loginEmail').focus();
-        return;
-      }
-
-      try {
-        const { error } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: window.location.origin + window.location.pathname
         });
 
-        if (error) throw error;
+      /*
+       * LOGIN
+       *
+       * 1. Autentica o usuário no Supabase Auth.
+       * 2. Consulta o perfil em public.perfis_usuarios.
+       * 3. Verifica a aprovação e o papel.
+       * 4. Redireciona o usuário TI.
+       */
+      loginForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        clearMessage(loginMessage);
 
-        mostrarMensagem(
-          'mensagemLogin',
-          'Se o e-mail estiver cadastrado, as instruções de recuperação serão enviadas. Confira também a caixa de spam.',
-          'success'
-        );
-      } catch (error) {
-        mostrarMensagem(
-          'mensagemLogin',
-          'Não foi possível solicitar a recuperação: ' + mensagemErro(error)
-        );
-      }
-    });
+        if (!loginForm.checkValidity()) {
+          loginForm.reportValidity();
+          return;
+        }
 
-    $('formCadastro').addEventListener('submit', async (event) => {
-      event.preventDefault();
-      limparMensagem('mensagemCadastro');
+        const email = document
+          .getElementById("loginEmail")
+          .value.trim();
 
-      const nome = $('cadastroNome').value.trim();
-      const email = $('cadastroEmail').value.trim();
-      const password = $('cadastroSenha').value;
-      const confirmacao = $('cadastroConfirmacao').value;
-      const consentimento = $('aceiteEmail').checked;
+        const password = document
+          .getElementById("loginPassword")
+          .value;
 
-      if (!nome || !email || !password || !confirmacao) {
-        mostrarMensagem(
-          'mensagemCadastro',
-          'Preencha todos os campos obrigatórios.'
-        );
-        return;
-      }
+        setLoginLoading(true);
 
-      if (password.length < 6) {
-        mostrarMensagem(
-          'mensagemCadastro',
-          'A senha precisa ter pelo menos 6 caracteres.'
-        );
-        return;
-      }
+        try {
+          const { data: authData, error: authError } =
+            await supabaseClient.auth.signInWithPassword({
+              email,
+              password
+            });
 
-      if (password !== confirmacao) {
-        mostrarMensagem(
-          'mensagemCadastro',
-          'As senhas não são iguais.'
-        );
-        return;
-      }
+          if (authError) {
+            throw authError;
+          }
 
-      const botao = $('btnCadastrar');
-      botao.disabled = true;
-      botao.textContent = 'Enviando solicitação...';
+          if (!authData?.user) {
+            throw new Error("O Supabase não retornou um usuário autenticado.");
+          }
 
-      try {
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              nome_completo: nome,
-              consentimento_email: consentimento
+          /*
+           * A consulta usa o ID do usuário autenticado.
+           * A política RLS precisa permitir que o usuário leia
+           * o próprio perfil.
+           */
+          const { data: perfil, error: perfilError } =
+            await supabaseClient
+              .from("perfis_usuarios")
+              .select("nome_completo, status_cadastro, papel")
+              .eq("id", authData.user.id)
+              .maybeSingle();
+
+          if (perfilError) {
+            throw new Error(
+              "A autenticação ocorreu, mas não foi possível consultar o perfil: " +
+              perfilError.message
+            );
+          }
+
+          if (!perfil) {
+            await supabaseClient.auth.signOut();
+
+            throw new Error(
+              "A conta foi autenticada, mas não foi encontrado um perfil na tabela perfis_usuarios para este usuário."
+            );
+          }
+
+          if (perfil.status_cadastro !== "aprovado") {
+            await supabaseClient.auth.signOut();
+
+            throw new Error(
+              "Seu cadastro ainda não foi aprovado. Entre em contato com o administrador do sistema."
+            );
+          }
+
+          if (perfil.papel !== "ti") {
+            await supabaseClient.auth.signOut();
+
+            throw new Error(
+              "Seu cadastro está aprovado, mas seu perfil não possui acesso a esta página."
+            );
+          }
+
+          /*
+           * Redirecionamento do perfil TI.
+           */
+          window.location.replace(DESTINO_TI);
+
+        } catch (error) {
+          showMessage(loginMessage, readableError(error));
+        } finally {
+          setLoginLoading(false);
+        }
+      });
+
+      /*
+       * CADASTRO
+       *
+       * O cadastro cria a conta no Supabase Auth.
+       * O perfil pendente deve ser criado pela configuração do banco
+       * (por exemplo, pelo trigger já configurado no projeto).
+       *
+       * Não se atribui papel administrativo pelo formulário público.
+       */
+      signupForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        clearMessage(signupMessage);
+
+        if (!signupForm.checkValidity()) {
+          signupForm.reportValidity();
+          return;
+        }
+
+        const nome = document
+          .getElementById("signupName")
+          .value.trim();
+
+        const email = document
+          .getElementById("signupEmail")
+          .value.trim();
+
+        const password = document
+          .getElementById("signupPassword")
+          .value;
+
+        const passwordConfirm = document
+          .getElementById("signupPasswordConfirm")
+          .value;
+
+        if (nome.length < 3) {
+          showMessage(
+            signupMessage,
+            "Informe seu nome completo.",
+            "warning"
+          );
+          return;
+        }
+
+        if (password !== passwordConfirm) {
+          showMessage(
+            signupMessage,
+            "As senhas informadas não coincidem.",
+            "warning"
+          );
+          return;
+        }
+
+        if (!document.getElementById("signupConsent").checked) {
+          showMessage(
+            signupMessage,
+            "É necessário confirmar as informações para continuar.",
+            "warning"
+          );
+          return;
+        }
+
+        setSignupLoading(true);
+
+        try {
+          const { data, error } = await supabaseClient.auth.signUp({
+            email,
+            password,
+            options: {
+              emailRedirectTo: window.location.origin +
+                window.location.pathname,
+              data: {
+                nome_completo: nome
+              }
             }
+          });
+
+          if (error) {
+            throw error;
+          }
+
+          /*
+           * Se a confirmação por e-mail estiver habilitada,
+           * normalmente será necessário confirmar o endereço.
+           */
+          const confirmationRequired =
+            data.user && !data.session;
+
+          if (confirmationRequired) {
+            showMessage(
+              signupMessage,
+              "Solicitação recebida. Verifique seu e-mail para confirmar a conta. Depois, aguarde a aprovação do administrador.",
+              "success"
+            );
+
+            signupForm.reset();
+          } else if (data.user) {
+            showMessage(
+              signupMessage,
+              "Conta criada. O acesso depende da aprovação do administrador.",
+              "success"
+            );
+
+            signupForm.reset();
+          } else {
+            showMessage(
+              signupMessage,
+              "O cadastro foi processado. Confira seu e-mail e aguarde a aprovação.",
+              "success"
+            );
+          }
+
+        } catch (error) {
+          showMessage(signupMessage, readableError(error));
+        } finally {
+          setSignupLoading(false);
+        }
+      });
+
+      /*
+       * RECUPERAÇÃO DE SENHA
+       */
+      document
+        .getElementById("forgotPasswordButton")
+        .addEventListener("click", async () => {
+          clearMessage(loginMessage);
+
+          const email = document
+            .getElementById("loginEmail")
+            .value.trim();
+
+          if (!email) {
+            showMessage(
+              loginMessage,
+              "Digite seu e-mail no campo acima para solicitar a recuperação de senha.",
+              "warning"
+            );
+
+            document.getElementById("loginEmail").focus();
+            return;
+          }
+
+          const button = document.getElementById("forgotPasswordButton");
+          button.disabled = true;
+          button.textContent = "Enviando...";
+
+          try {
+            const redirectTo =
+              window.location.origin + window.location.pathname;
+
+            const { error } =
+              await supabaseClient.auth.resetPasswordForEmail(email, {
+                redirectTo
+              });
+
+            if (error) {
+              throw error;
+            }
+
+            showMessage(
+              loginMessage,
+              "Se o endereço estiver cadastrado, você receberá as instruções de recuperação. Verifique também a caixa de spam.",
+              "success"
+            );
+
+          } catch (error) {
+            showMessage(loginMessage, readableError(error));
+          } finally {
+            button.disabled = false;
+            button.textContent = "Esqueci minha senha";
           }
         });
 
-        if (error) throw error;
-
-        if (!data.user) {
-          throw new Error('Não foi possível confirmar a criação da conta.');
-        }
-
-        mostrarMensagem(
-          'mensagemCadastro',
-          data.session
-            ? 'Conta criada. A solicitação ficará pendente até a aprovação do administrador.'
-            : 'Solicitação enviada. Se o Supabase exigir confirmação de e-mail, confirme a mensagem recebida. O perfil será criado como pendente e precisará ser aprovado.',
-          'success'
-        );
-
-        $('formCadastro').reset();
-      } catch (error) {
-        mostrarMensagem('mensagemCadastro', mensagemErro(error));
-      } finally {
-        botao.disabled = false;
-        botao.textContent = 'Enviar solicitação';
-      }
-    });
+    })();
   </script>
 </body>
 </html>
