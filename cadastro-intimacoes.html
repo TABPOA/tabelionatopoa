@@ -2272,8 +2272,9 @@ main#conteudo-principal {
 
 <script>
 /* =========================================================
-   ATONEXO — INTEGRAÇÃO REAL COM SUPABASE
-   Substitui o JavaScript antigo de demonstração.
+   ATONEXO — INTEGRAÇÃO SUPABASE
+   MODO TEMPORÁRIO: MANUSEIO PARA QUALQUER USUÁRIO AUTENTICADO
+   A autorização efetiva também depende das políticas RLS.
    ========================================================= */
 (async function () {
     "use strict";
@@ -2292,38 +2293,26 @@ main#conteudo-principal {
     };
 
     const CAMPOS = [
-        "categoria",
-        "cartorio",
-        "protocolo",
-        "referencia",
-        "devedor",
-        "cpf_cnpj",
-        "logradouro",
-        "numero",
-        "complemento",
-        "bairro",
-        "cep",
-        "cidade",
-        "uf",
-        "apresentante",
-        "tipo_titulo",
-        "data_apresentacao",
-        "data_vencimento",
-        "valor_titulo",
-        "observacoes"
+        "categoria", "cartorio", "protocolo", "referencia",
+        "devedor", "cpf_cnpj", "logradouro", "numero",
+        "complemento", "bairro", "cep", "cidade", "uf",
+        "apresentante", "tipo_titulo", "data_apresentacao",
+        "data_vencimento", "valor_titulo", "observacoes"
     ];
 
     const $ = id => document.getElementById(id);
-    let supabase;
+
+    let supabase = null;
     let registros = [];
     let registrosImportacao = [];
-    let registroEmEdicao = null;
-    let registroParaExcluir = null;
     let usuarioAtual = null;
+    let registroParaExcluir = null;
+    let autorizacaoAtiva = false;
 
-    /* ---------------------------------------------------------
-       MENSAGENS
-       --------------------------------------------------------- */
+    /* =====================================================
+       MENSAGENS E FUNÇÕES AUXILIARES
+       ===================================================== */
+
     function notificar(mensagem, tipo = "info") {
         const container = $("atonexo-notificacoes");
 
@@ -2364,14 +2353,75 @@ main#conteudo-principal {
         })[caractere]);
     }
 
+    function normalizarTexto(valor) {
+        return String(valor ?? "").trim();
+    }
+
     function formatarData(valor) {
         if (!valor) return "—";
 
-        const data = new Date(`${valor}T00:00:00`);
+        const texto = String(valor).slice(0, 10);
+        const partes = texto.split("-");
 
-        return Number.isNaN(data.getTime())
-            ? valor
-            : data.toLocaleDateString("pt-BR");
+        if (partes.length === 3) {
+            const [ano, mes, dia] = partes.map(Number);
+            const data = new Date(Date.UTC(ano, mes - 1, dia));
+
+            if (
+                data.getUTCFullYear() === ano &&
+                data.getUTCMonth() === mes - 1 &&
+                data.getUTCDate() === dia
+            ) {
+                return data.toLocaleDateString("pt-BR", {
+                    timeZone: "UTC"
+                });
+            }
+        }
+
+        return texto;
+    }
+
+    function converterDataISO(valor) {
+        const texto = normalizarTexto(valor);
+        if (!texto) return null;
+
+        let iso = texto;
+
+        const brasileira = texto.match(
+            /^(\d{1,2})[/.](\d{1,2})[/.](\d{4})$/
+        );
+
+        if (brasileira) {
+            iso =
+                `${brasileira[3]}-` +
+                `${brasileira[2].padStart(2, "0")}-` +
+                `${brasileira[1].padStart(2, "0")}`;
+        }
+
+        const correspondencia = iso.match(
+            /^(\d{4})-(\d{2})-(\d{2})$/
+        );
+
+        if (!correspondencia) {
+            throw new Error(
+                `Data inválida: ${texto}. Use AAAA-MM-DD ou DD/MM/AAAA.`
+            );
+        }
+
+        const ano = Number(correspondencia[1]);
+        const mes = Number(correspondencia[2]);
+        const dia = Number(correspondencia[3]);
+        const data = new Date(Date.UTC(ano, mes - 1, dia));
+
+        if (
+            data.getUTCFullYear() !== ano ||
+            data.getUTCMonth() !== mes - 1 ||
+            data.getUTCDate() !== dia
+        ) {
+            throw new Error(`Data inexistente: ${texto}.`);
+        }
+
+        return iso;
     }
 
     function formatarValor(valor) {
@@ -2389,34 +2439,85 @@ main#conteudo-principal {
             : String(valor);
     }
 
+    function valorNumerico(valor) {
+        if (
+            valor === null ||
+            valor === undefined ||
+            normalizarTexto(valor) === ""
+        ) {
+            return null;
+        }
+
+        if (typeof valor === "number") {
+            if (!Number.isFinite(valor)) {
+                throw new Error("Valor monetário inválido.");
+            }
+            return valor;
+        }
+
+        let texto = String(valor)
+            .trim()
+            .replace(/\s/g, "")
+            .replace(/^R\$/i, "");
+
+        if (texto.includes(",") && texto.includes(".")) {
+            texto = texto.replace(/\./g, "").replace(",", ".");
+        } else if (texto.includes(",")) {
+            texto = texto.replace(",", ".");
+        }
+
+        const numero = Number(texto);
+
+        if (!Number.isFinite(numero)) {
+            throw new Error(`Valor monetário inválido: ${valor}`);
+        }
+
+        return numero;
+    }
+
     function nomeCartorio(codigo) {
         return CARTORIOS[codigo] || codigo || "Não informado";
     }
 
-    function normalizarTexto(valor) {
-        return String(valor ?? "").trim();
-    }
-
-    function valorNumerico(valor) {
-        if (valor === null || valor === undefined || valor === "") {
-            return null;
+    function exigirAcesso() {
+        if (!autorizacaoAtiva || !usuarioAtual) {
+            notificar(
+                "Sua sessão não está autorizada. Entre novamente pelo login do AtoNexo.",
+                "warning"
+            );
+            return false;
         }
 
-        if (typeof valor === "number") return valor;
-
-        let texto = String(valor).trim().replace(/[R$\s]/g, "");
-
-        if (texto.includes(",")) {
-            texto = texto.replace(/\./g, "").replace(",", ".");
-        }
-
-        const numero = Number(texto);
-        return Number.isFinite(numero) ? numero : null;
+        return true;
     }
 
-    /* ---------------------------------------------------------
-       CARREGAMENTO DA BIBLIOTECA E AUTENTICAÇÃO
-       --------------------------------------------------------- */
+    function abrirModal(id) {
+        const elemento = $(id);
+
+        if (!elemento || !window.bootstrap?.Modal) {
+            notificar(
+                `Não foi possível abrir a janela ${id}.`,
+                "danger"
+            );
+            return;
+        }
+
+        window.bootstrap.Modal.getOrCreateInstance(elemento).show();
+    }
+
+    function fecharModal(id) {
+        const elemento = $(id);
+
+        if (elemento && window.bootstrap?.Modal) {
+            window.bootstrap.Modal.getOrCreateInstance(elemento).hide();
+        }
+    }
+
+    /* =====================================================
+       BIBLIOTECA SUPABASE E AUTENTICAÇÃO
+       REMOVIDA A RESTRIÇÃO EXCLUSIVA AO PERFIL TI.
+       ===================================================== */
+
     function carregarBibliotecaSupabase() {
         if (window.supabase?.createClient) {
             return Promise.resolve();
@@ -2424,6 +2525,7 @@ main#conteudo-principal {
 
         return new Promise((resolve, reject) => {
             const script = document.createElement("script");
+
             script.src =
                 "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
 
@@ -2444,45 +2546,32 @@ main#conteudo-principal {
             SUPABASE_KEY
         );
 
-        const { data: sessaoData, error: erroSessao } =
-            await supabase.auth.getSession();
+        const { data, error } = await supabase.auth.getSession();
 
-        if (erroSessao) throw erroSessao;
+        if (error) throw error;
 
-        const sessao = sessaoData?.session;
-
-        if (!sessao?.user) {
+        if (!data?.session?.user) {
             bloquearSistema(
                 "Sessão não encontrada. Entre pelo login do AtoNexo."
             );
             return false;
         }
 
-        usuarioAtual = sessao.user;
+        usuarioAtual = data.session.user;
+        autorizacaoAtiva = true;
 
-        const { data: perfil, error: erroPerfil } = await supabase
-            .from(TABELA_PERFIS)
-            .select("id, nome_completo, status_cadastro, papel")
-            .eq("id", usuarioAtual.id)
-            .maybeSingle();
-
-        if (erroPerfil) throw erroPerfil;
-
-        if (
-            !perfil ||
-            perfil.status_cadastro !== "aprovado" ||
-            perfil.papel !== "ti"
-        ) {
-            bloquearSistema(
-                "Acesso restrito a usuários de TI aprovados."
-            );
-            return false;
-        }
+        notificar(
+            `Sessão autenticada: ${usuarioAtual.email || usuarioAtual.id}.`,
+            "success"
+        );
 
         return true;
     }
 
     function bloquearSistema(mensagem) {
+        autorizacaoAtiva = false;
+        usuarioAtual = null;
+
         notificar(mensagem, "danger");
 
         document.querySelectorAll(
@@ -2492,15 +2581,17 @@ main#conteudo-principal {
             "#form-filtros button, " +
             "#btn-analisar-arquivo, " +
             "#btn-confirmar-importacao, " +
-            "#btn-exportar-json"
+            "#btn-exportar-json, " +
+            "#btn-exportar-csv"
         ).forEach(botao => {
             botao.disabled = true;
         });
     }
 
-    /* ---------------------------------------------------------
-       LEITURA PAGINADA — NÃO LIMITA A CONSULTA A 1.000 REGISTROS
-       --------------------------------------------------------- */
+    /* =====================================================
+       LEITURA PAGINADA
+       ===================================================== */
+
     async function buscarTodosRegistros() {
         const todos = [];
         let inicio = 0;
@@ -2527,6 +2618,8 @@ main#conteudo-principal {
     }
 
     async function carregarRegistros() {
+        if (!exigirAcesso()) return;
+
         const corpo = $("lista-intimacoes");
 
         if (corpo) {
@@ -2538,6 +2631,7 @@ main#conteudo-principal {
 
         try {
             registros = await buscarTodosRegistros();
+
             atualizarIndicadores();
             aplicarFiltros();
         } catch (erro) {
@@ -2545,22 +2639,22 @@ main#conteudo-principal {
 
             if (corpo) {
                 corpo.innerHTML =
-                    '<tr><td colspan="20" class="text-danger text-center py-4">' +
-                    "Não foi possível consultar os registros: " +
-                    escapar(erroLegivel(erro)) +
-                    "</td></tr>";
+                    `<tr><td colspan="20" class="text-danger text-center py-4">` +
+                    `Não foi possível consultar os registros: ` +
+                    `${escapar(erroLegivel(erro))}</td></tr>`;
             }
 
             notificar(
-                "Falha ao carregar os registros: " + erroLegivel(erro),
+                "Falha ao carregar registros: " + erroLegivel(erro),
                 "danger"
             );
         }
     }
 
-    /* ---------------------------------------------------------
-       INDICADORES
-       --------------------------------------------------------- */
+    /* =====================================================
+       INDICADORES E FILTROS
+       ===================================================== */
+
     function atualizarIndicadores(lista = registros) {
         if ($("total-intimacoes")) {
             $("total-intimacoes").textContent = lista.length;
@@ -2582,9 +2676,6 @@ main#conteudo-principal {
         }
     }
 
-    /* ---------------------------------------------------------
-       CONSULTA E FILTROS
-       --------------------------------------------------------- */
     function aplicarFiltros() {
         const busca = normalizarTexto($("filtro-busca")?.value)
             .toLocaleLowerCase("pt-BR");
@@ -2629,8 +2720,7 @@ main#conteudo-principal {
         if (!lista.length) {
             corpo.innerHTML =
                 '<tr><td colspan="20" class="text-center text-secondary py-4">' +
-                "Nenhum registro encontrado." +
-                "</td></tr>";
+                "Nenhum registro encontrado.</td></tr>";
             return;
         }
 
@@ -2654,44 +2744,70 @@ main#conteudo-principal {
                     <td>
                         <div class="acoes-intimacao">
                             <button type="button"
-                                    class="btn btn-sm btn-outline-primary"
-                                    data-acao="editar"
-                                    data-id="${escapar(registro.id)}"
-                                    title="Editar registro">
+                                class="btn btn-sm btn-outline-primary"
+                                data-acao="editar"
+                                data-id="${escapar(registro.id)}"
+                                title="Editar">
                                 <i class="bi bi-pencil"></i>
                             </button>
                             <button type="button"
-                                    class="btn btn-sm btn-outline-secondary"
-                                    data-acao="historico"
-                                    data-id="${escapar(registro.id)}"
-                                    title="Consultar histórico">
+                                class="btn btn-sm btn-outline-secondary"
+                                data-acao="transferir"
+                                data-id="${escapar(registro.id)}"
+                                title="Transferir">
+                                <i class="bi bi-arrow-left-right"></i>
+                            </button>
+                            <button type="button"
+                                class="btn btn-sm btn-outline-info"
+                                data-acao="historico"
+                                data-id="${escapar(registro.id)}"
+                                title="Histórico">
                                 <i class="bi bi-clock-history"></i>
                             </button>
                             <button type="button"
-                                    class="btn btn-sm btn-outline-danger"
-                                    data-acao="excluir"
-                                    data-id="${escapar(registro.id)}"
-                                    title="Excluir registro">
+                                class="btn btn-sm btn-outline-danger"
+                                data-acao="excluir"
+                                data-id="${escapar(registro.id)}"
+                                title="Excluir">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </div>
                     </td>
-                </tr>
-            `;
+                </tr>`;
         }).join("");
     }
 
-    /* ---------------------------------------------------------
-       FORMULÁRIO — CADASTRO
-       --------------------------------------------------------- */
+    /* =====================================================
+       LEITURA E VALIDAÇÃO DOS FORMULÁRIOS
+       ===================================================== */
+
+    const CAMPOS_EDICAO = {
+        categoria: "editar-categoria",
+        cartorio: "editar-cartorio",
+        protocolo: "editar-protocolo",
+        referencia: "editar-referencia",
+        devedor: "editar-devedor",
+        cpf_cnpj: "editar-cpf-cnpj",
+        logradouro: "editar-logradouro",
+        numero: "editar-numero",
+        complemento: "editar-complemento",
+        bairro: "editar-bairro",
+        cep: "editar-cep",
+        cidade: "editar-cidade",
+        uf: "editar-uf",
+        apresentante: "editar-apresentante",
+        tipo_titulo: "editar-tipo-titulo",
+        data_apresentacao: "editar-data-apresentacao",
+        data_vencimento: "editar-data-vencimento",
+        valor_titulo: "editar-valor",
+        observacoes: "editar-observacoes"
+    };
+
     function lerFormulario(formulario, prefixo = "") {
         const dados = {};
 
         CAMPOS.forEach(campo => {
-            const id = prefixo
-                ? `${prefixo}${campo}`
-                : campo;
-
+            const id = prefixo ? `${prefixo}${campo}` : campo;
             let elemento = $(id);
 
             if (!elemento && formulario) {
@@ -2700,14 +2816,17 @@ main#conteudo-principal {
 
             if (!elemento) return;
 
-            let valor = normalizarTexto(elemento.value);
+            const valor = normalizarTexto(elemento.value);
 
-            if (valor === "") {
-                dados[campo] = null;
-            } else if (campo === "valor_titulo") {
+            if (campo === "valor_titulo") {
                 dados[campo] = valorNumerico(valor);
+            } else if (
+                campo === "data_apresentacao" ||
+                campo === "data_vencimento"
+            ) {
+                dados[campo] = converterDataISO(valor);
             } else {
-                dados[campo] = valor;
+                dados[campo] = valor || null;
             }
         });
 
@@ -2715,30 +2834,26 @@ main#conteudo-principal {
     }
 
     function validarRegistro(dados) {
-        if (!dados.categoria || !["prioritario", "comum"].includes(dados.categoria)) {
+        if (!["prioritario", "comum"].includes(dados.categoria)) {
             throw new Error("Selecione uma categoria válida.");
         }
 
-        if (!dados.cartorio || !Object.hasOwn(CARTORIOS, dados.cartorio)) {
+        if (!Object.hasOwn(CARTORIOS, dados.cartorio)) {
             throw new Error("Selecione um dos cartórios cadastrados.");
         }
 
-        if (!dados.devedor) {
+        if (!normalizarTexto(dados.protocolo)) {
+            throw new Error("Informe o número do protocolo.");
+        }
+
+        if (!normalizarTexto(dados.devedor)) {
             throw new Error("Informe o nome ou a razão social do devedor.");
         }
 
-        if (
-            dados.data_apresentacao &&
-            !/^\d{4}-\d{2}-\d{2}$/.test(dados.data_apresentacao)
-        ) {
-            throw new Error("A data de apresentação é inválida.");
-        }
-
-        if (
-            dados.data_vencimento &&
-            !/^\d{4}-\d{2}-\d{2}$/.test(dados.data_vencimento)
-        ) {
-            throw new Error("A data de vencimento é inválida.");
+        for (const campo of ["data_apresentacao", "data_vencimento"]) {
+            if (dados[campo]) {
+                dados[campo] = converterDataISO(dados[campo]);
+            }
         }
 
         if (
@@ -2749,8 +2864,13 @@ main#conteudo-principal {
         }
     }
 
+    /* =====================================================
+       CADASTRO
+       ===================================================== */
+
     async function salvarNovoRegistro(evento) {
         evento.preventDefault();
+        if (!exigirAcesso()) return;
 
         const formulario = $("form-intimacao");
         if (!formulario) return;
@@ -2774,92 +2894,41 @@ main#conteudo-principal {
 
             if (error) throw error;
 
-            notificar("Intimação cadastrada no Supabase.", "success");
-
             formulario.reset();
             formulario.classList.remove("was-validated");
 
+            notificar("Intimação cadastrada no Supabase.", "success");
             await carregarRegistros();
         } catch (erro) {
             console.error(erro);
             notificar(
-                "Não foi possível salvar: " + erroLegivel(erro),
+                "Não foi possível cadastrar: " + erroLegivel(erro),
                 "danger"
             );
         }
     }
 
-    /* ---------------------------------------------------------
+    /* =====================================================
        EDIÇÃO
-       IDs previstos: editar-categoria, editar-cartorio,
-       editar-protocolo, editar-referencia, editar-devedor,
-       editar-cpf-cnpj, editar-logradouro, editar-numero,
-       editar-complemento, editar-bairro, editar-cep,
-       editar-cidade, editar-uf, editar-apresentante,
-       editar-tipo-titulo, editar-data-apresentacao,
-       editar-data-vencimento, editar-valor,
-       editar-observacoes.
-       --------------------------------------------------------- */
-    const CAMPOS_EDICAO = {
-        categoria: "editar-categoria",
-        cartorio: "editar-cartorio",
-        protocolo: "editar-protocolo",
-        referencia: "editar-referencia",
-        devedor: "editar-devedor",
-        cpf_cnpj: "editar-cpf-cnpj",
-        logradouro: "editar-logradouro",
-        numero: "editar-numero",
-        complemento: "editar-complemento",
-        bairro: "editar-bairro",
-        cep: "editar-cep",
-        cidade: "editar-cidade",
-        uf: "editar-uf",
-        apresentante: "editar-apresentante",
-        tipo_titulo: "editar-tipo-titulo",
-        data_apresentacao: "editar-data-apresentacao",
-        data_vencimento: "editar-data-vencimento",
-        valor_titulo: "editar-valor",
-        observacoes: "editar-observacoes"
-    };
-
-    function abrirModal(id) {
-        const elemento = $(id);
-
-        if (!elemento || !window.bootstrap?.Modal) {
-            notificar("Não foi possível abrir a janela solicitada.", "danger");
-            return;
-        }
-
-        window.bootstrap.Modal.getOrCreateInstance(elemento).show();
-    }
-
-    function fecharModal(id) {
-        const elemento = $(id);
-
-        if (elemento && window.bootstrap?.Modal) {
-            window.bootstrap.Modal.getOrCreateInstance(elemento).hide();
-        }
-    }
+       ===================================================== */
 
     function prepararEdicao(id) {
-        const registro = registros.find(r => String(r.id) === String(id));
+        if (!exigirAcesso()) return;
+
+        const registro = registros.find(
+            r => String(r.id) === String(id)
+        );
 
         if (!registro) {
             notificar("Registro não encontrado.", "warning");
             return;
         }
 
-        registroEmEdicao = registro;
-
-        if ($("editar-id")) {
-            $("editar-id").value = registro.id;
-        }
+        if ($("editar-id")) $("editar-id").value = registro.id;
 
         Object.entries(CAMPOS_EDICAO).forEach(([campo, idCampo]) => {
             const elemento = $(idCampo);
-            if (!elemento) return;
-
-            elemento.value = registro[campo] ?? "";
+            if (elemento) elemento.value = registro[campo] ?? "";
         });
 
         abrirModal("modal-editar-intimacao");
@@ -2867,9 +2936,15 @@ main#conteudo-principal {
 
     async function salvarEdicao(evento) {
         evento.preventDefault();
+        if (!exigirAcesso()) return;
 
         const formulario = $("form-editar-intimacao");
-        if (!formulario) return;
+        const id = $("editar-id")?.value;
+
+        if (!formulario || !id) {
+            notificar("Não foi possível identificar o registro.", "warning");
+            return;
+        }
 
         if (!formulario.checkValidity()) {
             formulario.classList.add("was-validated");
@@ -2878,26 +2953,41 @@ main#conteudo-principal {
         }
 
         try {
-            const id = $("editar-id")?.value;
-
-            if (!id) throw new Error("Identificador do registro não encontrado.");
-
             const dados = {};
+            const registroOriginal = registros.find(
+                r => String(r.id) === String(id)
+            );
 
+            if (!registroOriginal) {
+                throw new Error("Registro não encontrado na lista carregada.");
+            }
+
+            /*
+             * Só altera os campos que existem no formulário de edição.
+             * Campos não exibidos permanecem intactos no banco.
+             */
             Object.entries(CAMPOS_EDICAO).forEach(([campo, idCampo]) => {
                 const elemento = $(idCampo);
                 if (!elemento) return;
 
                 const valor = normalizarTexto(elemento.value);
 
-                dados[campo] = valor === ""
-                    ? null
-                    : campo === "valor_titulo"
-                        ? valorNumerico(valor)
-                        : valor;
+                if (campo === "valor_titulo") {
+                    dados[campo] = valorNumerico(valor);
+                } else if (
+                    campo === "data_apresentacao" ||
+                    campo === "data_vencimento"
+                ) {
+                    dados[campo] = converterDataISO(valor);
+                } else {
+                    dados[campo] = valor || null;
+                }
             });
 
-            validarRegistro(dados);
+            validarRegistro({
+                ...registroOriginal,
+                ...dados
+            });
 
             const { error } = await supabase
                 .from(TABELA)
@@ -2907,22 +2997,26 @@ main#conteudo-principal {
             if (error) throw error;
 
             fecharModal("modal-editar-intimacao");
-            notificar("Registro atualizado no Supabase.", "success");
+            formulario.classList.remove("was-validated");
 
+            notificar("Registro atualizado.", "success");
             await carregarRegistros();
         } catch (erro) {
             console.error(erro);
             notificar(
-                "Não foi possível atualizar: " + erroLegivel(erro),
+                "Não foi possível editar: " + erroLegivel(erro),
                 "danger"
             );
         }
     }
 
-    /* ---------------------------------------------------------
+    /* =====================================================
        EXCLUSÃO
-       --------------------------------------------------------- */
+       ===================================================== */
+
     function prepararExclusao(id) {
+        if (!exigirAcesso()) return;
+
         registroParaExcluir = registros.find(
             r => String(r.id) === String(id)
         );
@@ -2940,12 +3034,12 @@ main#conteudo-principal {
     }
 
     async function confirmarExclusao() {
-        const id = $("excluir-id")?.value || registroParaExcluir?.id;
+        if (!exigirAcesso()) return;
 
-        if (!id) {
-            notificar("Nenhum registro foi selecionado.", "warning");
-            return;
-        }
+        const id = $("excluir-id")?.value || registroParaExcluir?.id;
+        if (!id) return;
+
+        if (!window.confirm("Confirma a exclusão desta intimação?")) return;
 
         try {
             const { error } = await supabase
@@ -2956,9 +3050,9 @@ main#conteudo-principal {
             if (error) throw error;
 
             fecharModal("modal-excluir-intimacao");
-            notificar("Registro excluído do Supabase.", "success");
-
             registroParaExcluir = null;
+
+            notificar("Registro excluído.", "success");
             await carregarRegistros();
         } catch (erro) {
             console.error(erro);
@@ -2969,13 +3063,16 @@ main#conteudo-principal {
         }
     }
 
-    /* ---------------------------------------------------------
+    /* =====================================================
        TRANSFERÊNCIA ENTRE CARTÓRIOS
-       A justificativa fica registrada em observacoes, sem
-       exigir uma nova coluna no banco.
-       --------------------------------------------------------- */
+       ===================================================== */
+
     function prepararTransferencia(id) {
-        const registro = registros.find(r => String(r.id) === String(id));
+        if (!exigirAcesso()) return;
+
+        const registro = registros.find(
+            r => String(r.id) === String(id)
+        );
 
         if (!registro) {
             notificar("Registro não encontrado.", "warning");
@@ -3002,12 +3099,15 @@ main#conteudo-principal {
 
     async function confirmarTransferencia(evento) {
         evento.preventDefault();
+        if (!exigirAcesso()) return;
 
         const id = $("transferir-id")?.value;
         const destino = $("transferir-destino")?.value;
         const motivo = normalizarTexto($("transferir-motivo")?.value);
 
-        const registro = registros.find(r => String(r.id) === String(id));
+        const registro = registros.find(
+            r => String(r.id) === String(id)
+        );
 
         if (!registro) {
             notificar("Registro não encontrado.", "warning");
@@ -3015,7 +3115,7 @@ main#conteudo-principal {
         }
 
         if (!Object.hasOwn(CARTORIOS, destino)) {
-            notificar("Selecione um cartório de destino válido.", "warning");
+            notificar("Selecione um cartório válido.", "warning");
             return;
         }
 
@@ -3025,16 +3125,15 @@ main#conteudo-principal {
         }
 
         try {
-            const observacoesAnteriores = registro.observacoes || "";
             const nota = [
-                `[Transferência de ${nomeCartorio(registro.cartorio)} para ${nomeCartorio(destino)}]`,
+                `[Transferência: ${nomeCartorio(registro.cartorio)} → ${nomeCartorio(destino)}]`,
                 `Responsável: ${usuarioAtual.email || usuarioAtual.id}`,
                 `Data: ${new Date().toLocaleString("pt-BR")}`,
                 motivo ? `Justificativa: ${motivo}` : ""
             ].filter(Boolean).join("\n");
 
             const observacoes = [
-                observacoesAnteriores,
+                registro.observacoes,
                 nota
             ].filter(Boolean).join("\n\n");
 
@@ -3049,8 +3148,8 @@ main#conteudo-principal {
             if (error) throw error;
 
             fecharModal("modal-transferir-intimacao");
-            notificar("Registro transferido.", "success");
 
+            notificar("Transferência concluída.", "success");
             await carregarRegistros();
         } catch (erro) {
             console.error(erro);
@@ -3061,20 +3160,21 @@ main#conteudo-principal {
         }
     }
 
-    /* ---------------------------------------------------------
-       HISTÓRICO — USA A TABELA DE AUDITORIA EXISTENTE
-       --------------------------------------------------------- */
-    async function consultarHistorico(id) {
-        const conteudo = $("historico-conteudo");
-        const identificador = $("historico-identificador");
+    /* =====================================================
+       HISTÓRICO
+       ===================================================== */
 
-        if (identificador) {
-            identificador.textContent = `Registro #${id}`;
+    async function consultarHistorico(id) {
+        if (!exigirAcesso()) return;
+
+        if ($("historico-identificador")) {
+            $("historico-identificador").textContent = `Registro #${id}`;
         }
 
+        const conteudo = $("historico-conteudo");
+
         if (conteudo) {
-            conteudo.innerHTML =
-                '<p class="text-secondary">Consultando histórico...</p>';
+            conteudo.textContent = "Consultando histórico...";
         }
 
         abrirModal("modal-historico-intimacao");
@@ -3087,18 +3187,19 @@ main#conteudo-principal {
                 .order("criado_em", { ascending: false });
 
             if (error) throw error;
-
             if (!conteudo) return;
 
             if (!data?.length) {
-                conteudo.innerHTML =
-                    '<p class="text-secondary">Nenhum evento de histórico encontrado.</p>';
+                conteudo.textContent =
+                    "Nenhum evento de histórico encontrado.";
                 return;
             }
 
             conteudo.innerHTML = data.map(item => `
                 <div class="historico-evento mb-3">
-                    <div class="fw-semibold">${escapar(item.operacao || "Alteração")}</div>
+                    <div class="fw-semibold">
+                        ${escapar(item.operacao || "Alteração")}
+                    </div>
                     <div class="small text-secondary">
                         ${escapar(item.criado_em
                             ? new Date(item.criado_em).toLocaleString("pt-BR")
@@ -3111,12 +3212,16 @@ main#conteudo-principal {
                     ${item.dados_anteriores ? `
                         <details class="mt-2">
                             <summary>Dados anteriores</summary>
-                            <pre class="small text-wrap">${escapar(JSON.stringify(item.dados_anteriores, null, 2))}</pre>
+                            <pre class="small text-wrap">${escapar(
+                                JSON.stringify(item.dados_anteriores, null, 2)
+                            )}</pre>
                         </details>` : ""}
                     ${item.dados_novos ? `
                         <details class="mt-2">
                             <summary>Dados novos</summary>
-                            <pre class="small text-wrap">${escapar(JSON.stringify(item.dados_novos, null, 2))}</pre>
+                            <pre class="small text-wrap">${escapar(
+                                JSON.stringify(item.dados_novos, null, 2)
+                            )}</pre>
                         </details>` : ""}
                 </div>
             `).join("");
@@ -3124,17 +3229,22 @@ main#conteudo-principal {
             console.error(erro);
 
             if (conteudo) {
-                conteudo.innerHTML =
-                    `<p class="text-danger">Não foi possível consultar o histórico: ${escapar(erroLegivel(erro))}</p>`;
+                conteudo.textContent =
+                    "Não foi possível consultar o histórico: " +
+                    erroLegivel(erro);
             }
+
+            notificar(
+                "Falha na consulta do histórico: " + erroLegivel(erro),
+                "danger"
+            );
         }
     }
 
-    /* ---------------------------------------------------------
+    /* =====================================================
        IMPORTAÇÃO CSV E JSON
-       O arquivo é analisado primeiro. A gravação ocorre somente
-       após clicar em "Confirmar importação".
-       --------------------------------------------------------- */
+       ===================================================== */
+
     function normalizarCabecalho(texto) {
         return String(texto ?? "")
             .replace(/^\uFEFF/, "")
@@ -3170,12 +3280,12 @@ main#conteudo-principal {
         const resultado = {};
 
         Object.entries(linha).forEach(([chaveOriginal, valor]) => {
-            const chaveNormalizada = normalizarCabecalho(chaveOriginal);
+            const chave = normalizarCabecalho(chaveOriginal);
 
             for (const [campo, aliases] of Object.entries(ALIASES_IMPORTACAO)) {
                 if (
-                    chaveNormalizada === normalizarCabecalho(campo) ||
-                    aliases.includes(chaveNormalizada)
+                    chave === normalizarCabecalho(campo) ||
+                    aliases.includes(chave)
                 ) {
                     resultado[campo] = valor;
                     break;
@@ -3187,55 +3297,56 @@ main#conteudo-principal {
     }
 
     function lerCSV(texto) {
+        texto = texto.replace(/^\uFEFF/, "");
+
+        const primeiraLinha = texto.split(/\r?\n/, 1)[0] || "";
+        const delimitador =
+            (primeiraLinha.match(/;/g) || []).length >
+            (primeiraLinha.match(/,/g) || []).length
+                ? ";"
+                : ",";
+
         const linhas = [];
         let linha = [];
         let campo = "";
         let aspas = false;
 
-        texto = texto.replace(/^\uFEFF/, "");
-
         for (let i = 0; i < texto.length; i++) {
-            const caractere = texto[i];
+            const c = texto[i];
             const proximo = texto[i + 1];
 
-            if (caractere === '"' && aspas && proximo === '"') {
+            if (c === '"' && aspas && proximo === '"') {
                 campo += '"';
                 i++;
-            } else if (caractere === '"') {
+            } else if (c === '"') {
                 aspas = !aspas;
-            } else if (caractere === ";" && !aspas) {
-                linha.push(campo);
+            } else if (c === delimitador && !aspas) {
+                linha.push(campo.trim());
                 campo = "";
-            } else if (caractere === "," && !aspas) {
-                linha.push(campo);
-                campo = "";
-            } else if ((caractere === "\n" || caractere === "\r") && !aspas) {
-                if (caractere === "\r" && proximo === "\n") i++;
+            } else if ((c === "\n" || c === "\r") && !aspas) {
+                if (c === "\r" && proximo === "\n") i++;
 
-                linha.push(campo);
+                linha.push(campo.trim());
 
-                if (linha.some(valor => String(valor).trim() !== "")) {
-                    linhas.push(linha);
-                }
+                if (linha.some(v => v !== "")) linhas.push(linha);
 
                 linha = [];
                 campo = "";
             } else {
-                campo += caractere;
+                campo += c;
             }
         }
 
-        linha.push(campo);
-
-        if (linha.some(valor => String(valor).trim() !== "")) {
-            linhas.push(linha);
-        }
+        linha.push(campo.trim());
+        if (linha.some(v => v !== "")) linhas.push(linha);
 
         if (linhas.length < 2) {
-            throw new Error("O CSV não contém cabeçalho e registros.");
+            throw new Error(
+                "O CSV precisa conter cabeçalhos e registros."
+            );
         }
 
-        const cabecalhos = linhas[0].map(v => String(v).trim());
+        const cabecalhos = linhas[0];
 
         return linhas.slice(1).map(valores => {
             const objeto = {};
@@ -3253,34 +3364,43 @@ main#conteudo-principal {
         const registro = {};
 
         CAMPOS.forEach(campo => {
-            let valor = normalizarTexto(convertido[campo]);
+            const valor = normalizarTexto(convertido[campo]);
 
             if (campo === "cartorio") {
-                const cartorioNormalizado = normalizarCabecalho(valor);
+                const codigo = normalizarCabecalho(valor);
 
-                if (["1", "cartorio1", "primeiro", "1tabelionato",
-                     "1tabelionatodeprotestosdeportoalegre"].includes(cartorioNormalizado)) {
-                    valor = "cartorio_1";
-                } else if (["2", "cartorio2", "segundo", "2tabelionato",
-                            "2tabelionatodeprotestosdeportoalegre"].includes(cartorioNormalizado)) {
-                    valor = "cartorio_2";
+                if ([
+                    "1", "cartorio1", "primeiro", "1tabelionato",
+                    "1tabelionatodeprotestosdeportoalegre"
+                ].includes(codigo)) {
+                    registro[campo] = "cartorio_1";
+                } else if ([
+                    "2", "cartorio2", "segundo", "2tabelionato",
+                    "2tabelionatodeprotestosdeportoalegre"
+                ].includes(codigo)) {
+                    registro[campo] = "cartorio_2";
+                } else {
+                    registro[campo] = valor || null;
                 }
-            }
+            } else if (campo === "categoria") {
+                const categoria = normalizarCabecalho(valor);
 
-            if (campo === "categoria") {
-                const categoriaNormalizada = normalizarCabecalho(valor);
-
-                if (["prioritaria", "prioritario", "urgente"].includes(categoriaNormalizada)) {
-                    valor = "prioritario";
-                } else if (["comum", "normal"].includes(categoriaNormalizada)) {
-                    valor = "comum";
+                if (["prioritaria", "prioritario", "urgente"].includes(categoria)) {
+                    registro[campo] = "prioritario";
+                } else if (["comum", "normal"].includes(categoria)) {
+                    registro[campo] = "comum";
+                } else {
+                    registro[campo] = valor || null;
                 }
-            }
-
-            if (campo === "valor_titulo") {
+            } else if (campo === "valor_titulo") {
                 registro[campo] = valorNumerico(valor);
+            } else if (
+                campo === "data_apresentacao" ||
+                campo === "data_vencimento"
+            ) {
+                registro[campo] = converterDataISO(valor);
             } else {
-                registro[campo] = valor === "" ? null : valor;
+                registro[campo] = valor || null;
             }
         });
 
@@ -3290,16 +3410,23 @@ main#conteudo-principal {
     function chaveDuplicidade(registro) {
         return [
             registro.cartorio || "",
-            normalizarTexto(registro.protocolo).toLocaleLowerCase("pt-BR")
+            normalizarTexto(registro.protocolo)
+                .toLocaleLowerCase("pt-BR")
         ].join("::");
     }
 
     async function analisarArquivo() {
-        const entrada = $("arquivo-importacao");
-        const arquivo = entrada?.files?.[0];
+        if (!exigirAcesso()) return;
+
+        const arquivo = $("arquivo-importacao")?.files?.[0];
 
         if (!arquivo) {
             notificar("Selecione um arquivo CSV ou JSON.", "warning");
+            return;
+        }
+
+        if (arquivo.size > 10 * 1024 * 1024) {
+            notificar("O arquivo ultrapassa o limite de 10 MB.", "warning");
             return;
         }
 
@@ -3311,50 +3438,50 @@ main#conteudo-principal {
 
             if (extensao === "json") {
                 const json = JSON.parse(texto);
-                linhas = Array.isArray(json) ? json : json.registros;
-
-                if (!Array.isArray(linhas)) {
-                    throw new Error(
-                        "O JSON deve conter uma lista de registros ou uma propriedade 'registros'."
-                    );
-                }
+                linhas = Array.isArray(json)
+                    ? json
+                    : json.registros ?? json.intimacoes ?? json.data;
             } else if (extensao === "csv") {
                 linhas = lerCSV(texto);
             } else {
-                throw new Error("Formato não suportado. Selecione CSV ou JSON.");
+                throw new Error("Formato não suportado. Use CSV ou JSON.");
             }
 
-            if (!linhas.length) {
-                throw new Error("O arquivo não contém registros.");
+            if (!Array.isArray(linhas) || !linhas.length) {
+                throw new Error("O arquivo não contém registros válidos.");
+            }
+
+            if (linhas.length > 10000) {
+                throw new Error("O limite é de 10.000 registros por arquivo.");
             }
 
             const vistos = new Set();
             const existentes = new Set(
-                registros
-                    .filter(r => r.protocolo)
-                    .map(chaveDuplicidade)
+                registros.filter(r => r.protocolo).map(chaveDuplicidade)
             );
 
             registrosImportacao = linhas.map((linha, indice) => {
-                const dados = prepararRegistroImportado(linha);
+                let dados;
                 let erro = "";
 
                 try {
+                    dados = prepararRegistroImportado(linha);
                     validarRegistro(dados);
 
                     const chave = chaveDuplicidade(dados);
 
-                    if (dados.protocolo && vistos.has(chave)) {
+                    if (vistos.has(chave)) {
                         throw new Error("Duplicado dentro do arquivo.");
                     }
 
-                    if (dados.protocolo && existentes.has(chave)) {
+                    if (existentes.has(chave)) {
                         throw new Error("Protocolo já existe no banco.");
                     }
 
-                    if (dados.protocolo) vistos.add(chave);
+                    vistos.add(chave);
                 } catch (ex) {
                     erro = erroLegivel(ex);
+                    dados = dados || {};
                 }
 
                 return {
@@ -3384,27 +3511,24 @@ main#conteudo-principal {
             if ($("importacao-duplicados")) {
                 $("importacao-duplicados").textContent =
                     registrosImportacao.filter(r =>
-                        r.erro.toLowerCase().includes("duplicado") ||
-                        r.erro.toLowerCase().includes("já existe")
+                        /duplicado|já existe/i.test(r.erro)
                     ).length;
             }
 
-            if ($("resultado-importacao")) {
-                $("resultado-importacao").classList.remove("d-none");
-            }
+            $("resultado-importacao")?.classList.remove("d-none");
 
             if ($("btn-confirmar-importacao")) {
                 $("btn-confirmar-importacao").disabled = validos === 0;
             }
 
             notificar(
-                `Arquivo analisado: ${validos} válido(s) e ${invalidos} com problema(s).`,
+                `Arquivo analisado: ${validos} válido(s), ${invalidos} com problemas.`,
                 invalidos ? "warning" : "success"
             );
         } catch (erro) {
             console.error(erro);
             notificar(
-                "Não foi possível analisar o arquivo: " + erroLegivel(erro),
+                "Falha ao analisar o arquivo: " + erroLegivel(erro),
                 "danger"
             );
         }
@@ -3428,38 +3552,41 @@ main#conteudo-principal {
     }
 
     async function confirmarImportacao() {
-        const validos = registrosImportacao.filter(item => !item.erro);
+        if (!exigirAcesso()) return;
+
+        const botao = $("btn-confirmar-importacao");
+        const validos = registrosImportacao.filter(r => !r.erro);
 
         if (!validos.length) {
-            notificar("Não existem registros válidos para importar.", "warning");
+            notificar("Não há registros válidos para importar.", "warning");
             return;
         }
 
-        const botao = $("btn-confirmar-importacao");
+        if (!confirm(`Confirmar a importação de ${validos.length} registro(s)?`)) {
+            return;
+        }
+
         if (botao) botao.disabled = true;
 
         try {
             /*
-             * Reconsulta o banco antes da gravação para evitar duplicados
-             * que tenham sido cadastrados após a análise do arquivo.
+             * Reconsulta o banco para conferir duplicados recentes.
              */
             const atuais = await buscarTodosRegistros();
 
             const existentes = new Set(
-                atuais
-                    .filter(r => r.protocolo)
-                    .map(chaveDuplicidade)
+                atuais.filter(r => r.protocolo).map(chaveDuplicidade)
             );
 
             const novos = [];
-            let duplicadosRecentes = 0;
+            let duplicados = 0;
 
             for (const item of validos) {
                 const dados = item.dados;
                 const chave = chaveDuplicidade(dados);
 
-                if (dados.protocolo && existentes.has(chave)) {
-                    duplicadosRecentes++;
+                if (existentes.has(chave)) {
+                    duplicados++;
                     continue;
                 }
 
@@ -3468,20 +3595,17 @@ main#conteudo-principal {
                     criado_por: usuarioAtual.id
                 });
 
-                if (dados.protocolo) existentes.add(chave);
+                existentes.add(chave);
             }
 
             if (!novos.length) {
                 notificar(
-                    "Nenhum registro novo: os protocolos já existem no banco.",
+                    "Nenhum registro novo para importar; os protocolos já existem.",
                     "warning"
                 );
                 return;
             }
 
-            /*
-             * Lotes menores reduzem o risco de uma requisição muito grande.
-             */
             let inseridos = 0;
 
             for (let inicio = 0; inicio < novos.length; inicio += 200) {
@@ -3493,7 +3617,8 @@ main#conteudo-principal {
 
                 if (error) {
                     throw new Error(
-                        `Falha ao gravar o lote iniciado no registro ${inicio + 1}: ${erroLegivel(error)}`
+                        `Erro no lote iniciado no registro ${inicio + 1}: ` +
+                        erroLegivel(error)
                     );
                 }
 
@@ -3501,35 +3626,38 @@ main#conteudo-principal {
             }
 
             notificar(
-                `${inseridos} registro(s) importado(s). ` +
-                `${duplicadosRecentes} duplicado(s) ignorado(s).`,
+                `Importação concluída: ${inseridos} inserido(s), ` +
+                `${duplicados} duplicado(s) ignorado(s).`,
                 "success"
             );
 
             registrosImportacao = [];
-            if ($("arquivo-importacao")) $("arquivo-importacao").value = "";
-            if ($("resultado-importacao")) {
-                $("resultado-importacao").classList.add("d-none");
+
+            if ($("arquivo-importacao")) {
+                $("arquivo-importacao").value = "";
             }
+
+            $("resultado-importacao")?.classList.add("d-none");
 
             await carregarRegistros();
         } catch (erro) {
             console.error(erro);
             notificar(
-                "A importação não foi concluída: " + erroLegivel(erro),
+                "Falha na importação: " + erroLegivel(erro),
                 "danger"
             );
         } finally {
             if (botao) {
                 botao.disabled =
-                    !registrosImportacao.some(item => !item.erro);
+                    !registrosImportacao.some(r => !r.erro);
             }
         }
     }
 
-    /* ---------------------------------------------------------
-       MODELOS CSV E JSON
-       --------------------------------------------------------- */
+    /* =====================================================
+       MODELOS E EXPORTAÇÃO
+       ===================================================== */
+
     function baixarArquivo(nome, conteudo, tipo) {
         const blob = new Blob([conteudo], { type: tipo });
         const url = URL.createObjectURL(blob);
@@ -3541,37 +3669,40 @@ main#conteudo-principal {
         link.click();
         link.remove();
 
-        URL.revokeObjectURL(url);
+        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
 
     function baixarModeloCSV() {
-        const cabecalho = CAMPOS.join(";");
+        const exemplo = {
+            categoria: "comum",
+            cartorio: "cartorio_2",
+            protocolo: "EXEMPLO-001",
+            referencia: "REF-001",
+            devedor: "Nome do devedor",
+            cpf_cnpj: "",
+            logradouro: "Rua Exemplo",
+            numero: "100",
+            complemento: "",
+            bairro: "Centro",
+            cep: "90000000",
+            cidade: "Porto Alegre",
+            uf: "RS",
+            apresentante: "",
+            tipo_titulo: "Duplicata",
+            data_apresentacao: "2026-10-27",
+            data_vencimento: "2026-11-27",
+            valor_titulo: "150,00",
+            observacoes: ""
+        };
 
-        const exemplo = [
-            "comum",
-            "cartorio_2",
-            "EXEMPLO-001",
-            "REF-001",
-            "Nome do devedor",
-            "",
-            "Rua Exemplo",
-            "100",
-            "",
-            "Centro",
-            "90000000",
-            "Porto Alegre",
-            "RS",
-            "Apresentante",
-            "Duplicata",
-            "2026-10-27",
-            "2026-11-27",
-            "150.00",
-            "Observações"
-        ].join(";");
+        const delimitar = valor =>
+            `"${String(valor ?? "").replace(/"/g, '""')}"`;
 
         baixarArquivo(
             "modelo-intimacoes.csv",
-            "\uFEFF" + cabecalho + "\n" + exemplo,
+            "\uFEFF" +
+            CAMPOS.map(delimitar).join(";") + "\r\n" +
+            CAMPOS.map(campo => delimitar(exemplo[campo])).join(";"),
             "text/csv;charset=utf-8"
         );
     }
@@ -3589,7 +3720,7 @@ main#conteudo-principal {
         exemplo.devedor = "Nome do devedor";
         exemplo.cidade = "Porto Alegre";
         exemplo.uf = "RS";
-        exemplo.valor_titulo = 150.00;
+        exemplo.valor_titulo = 150;
 
         baixarArquivo(
             "modelo-intimacoes.json",
@@ -3598,28 +3729,48 @@ main#conteudo-principal {
         );
     }
 
-    /* ---------------------------------------------------------
-       EXPORTAÇÃO DOS REGISTROS CONSULTADOS
-       --------------------------------------------------------- */
     function exportarJSON() {
-        const dados = registros.map(registro => ({
-            ...registro,
-            cartorio_nome: nomeCartorio(registro.cartorio)
-        }));
+        if (!exigirAcesso()) return;
 
         baixarArquivo(
             "intimacoes-atonexo.json",
-            JSON.stringify(dados, null, 2),
+            JSON.stringify(registros, null, 2),
             "application/json;charset=utf-8"
         );
+
+        notificar("Exportação JSON concluída.", "success");
     }
 
-    /* ---------------------------------------------------------
-       EVENTOS DA INTERFACE
-       --------------------------------------------------------- */
+    function exportarCSV() {
+        if (!exigirAcesso()) return;
+
+        const delimitar = valor =>
+            `"${String(valor ?? "").replace(/"/g, '""')}"`;
+
+        const linhas = [
+            CAMPOS.map(delimitar).join(";"),
+            ...registros.map(registro =>
+                CAMPOS.map(campo => delimitar(registro[campo])).join(";")
+            )
+        ];
+
+        baixarArquivo(
+            "intimacoes-atonexo.csv",
+            "\uFEFF" + linhas.join("\r\n"),
+            "text/csv;charset=utf-8"
+        );
+
+        notificar("Exportação CSV concluída.", "success");
+    }
+
+    /* =====================================================
+       EVENTOS
+       ===================================================== */
+
     function conectarEventos() {
         $("form-intimacao")?.addEventListener("submit", salvarNovoRegistro);
         $("form-editar-intimacao")?.addEventListener("submit", salvarEdicao);
+
         $("form-transferir-intimacao")?.addEventListener(
             "submit",
             confirmarTransferencia
@@ -3639,6 +3790,7 @@ main#conteudo-principal {
         $("btn-baixar-modelo-csv")?.addEventListener("click", baixarModeloCSV);
         $("btn-baixar-modelo-json")?.addEventListener("click", baixarModeloJSON);
         $("btn-exportar-json")?.addEventListener("click", exportarJSON);
+        $("btn-exportar-csv")?.addEventListener("click", exportarCSV);
 
         $("form-filtros")?.addEventListener("submit", evento => {
             evento.preventDefault();
@@ -3661,22 +3813,18 @@ main#conteudo-principal {
         });
 
         $("lista-intimacoes")?.addEventListener("click", evento => {
-            const botao = evento.target.closest("[data-acao]");
+            const botao = evento.target.closest("button[data-acao]");
             if (!botao) return;
 
             const acao = botao.dataset.acao;
             const id = botao.dataset.id;
 
             if (acao === "editar") prepararEdicao(id);
-            if (acao === "excluir") prepararExclusao(id);
-            if (acao === "historico") consultarHistorico(id);
             if (acao === "transferir") prepararTransferencia(id);
+            if (acao === "historico") consultarHistorico(id);
+            if (acao === "excluir") prepararExclusao(id);
         });
 
-        /*
-         * Atualiza os nomes exibidos sem modificar os códigos salvos
-         * no banco de dados.
-         */
         [
             "cartorio",
             "filtro-cartorio",
@@ -3694,41 +3842,44 @@ main#conteudo-principal {
         });
     }
 
-    /* ---------------------------------------------------------
+    /* =====================================================
        INICIALIZAÇÃO
-       --------------------------------------------------------- */
+       ===================================================== */
+
     try {
         conectarEventos();
 
-        await iniciarSupabase();
+        const autorizado = await iniciarSupabase();
 
-        if (!supabase || !usuarioAtual) return;
+        if (!autorizado) return;
 
         await carregarRegistros();
 
-        /*
-         * Mantém a sessão acompanhada. Se expirar ou for encerrada,
-         * o sistema interrompe as operações desta página.
-         */
         supabase.auth.onAuthStateChange((evento, sessao) => {
             if (evento === "SIGNED_OUT" || !sessao?.user) {
                 bloquearSistema(
                     "Sua sessão terminou. Entre novamente pelo login do AtoNexo."
                 );
+            } else if (sessao.user.id !== usuarioAtual?.id) {
+                /*
+                 * Evita manter os dados de uma conta anterior na tela
+                 * após uma troca de sessão.
+                 */
+                window.location.reload();
             }
         });
 
     } catch (erro) {
         console.error("[AtoNexo]", erro);
 
-        notificar(
+        bloquearSistema(
             "Não foi possível iniciar a integração com o Supabase: " +
-            erroLegivel(erro),
-            "danger"
+            erroLegivel(erro)
         );
     }
 })();
 </script>
+    <!-- JS DO BOOTSTRAP-->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
