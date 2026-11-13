@@ -1,1053 +1,1560 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    <meta name="theme-color" content="#123C32">
+    <meta name="description" content="Sistema AtoNexo do 2º Tabelionato de Protestos de Porto Alegre.">
     <title>AtoNexo | Sistema Institucional</title>
 
-    <meta name="description"
-          content="Sistema AtoNexo do 2º Tabelionato de Protestos de Porto Alegre.">
-
-    <!-- =====================================================
-         BIBLIOTECAS EXTERNAS
-         Bootstrap 5.3.8
-         ===================================================== -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-          rel="stylesheet">
-
-    <!-- Ícones Bootstrap -->
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-
-    <!-- Fonte Inter -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-          rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
-        /* =====================================================
-           1. VARIÁVEIS VISUAIS
-           ===================================================== */
-        /* ATO:INICIO:CSS:VARIAVEIS */
-:root {
-            --verde-principal: #123C32;
-            --verde-escuro: #0B2B24;
-            --verde-destaque: #1C5948;
-            --verde-claro: #E8F1EC;
-            --fundo-pagina: #F3F6F4;
-            --texto-principal: #25352F;
-            --texto-secundario: #6B7972;
-            --borda: #DDE5E0;
-            --branco: #FFFFFF;
+        :root {
+            --verde-principal:#123C32;
+            --verde-escuro:#0B2B24;
+            --verde-destaque:#1C5948;
+            --verde-claro:#E8F1EC;
+            --fundo-pagina:#F3F6F4;
+            --texto-principal:#25352F;
+            --texto-secundario:#6B7972;
+            --borda:#DDE5E0;
+            --branco:#FFFFFF;
         }
-/* ATO:FIM:CSS:VARIAVEIS */
 
-        /* =====================================================
-           2. ESTILOS GERAIS
-           ===================================================== */
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing:border-box; }
 
         body {
-            min-height: 100vh;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            font-family: 'Inter', sans-serif;
-            background: var(--fundo-pagina);
-            color: var(--texto-principal);
+            min-height:100vh;
+            margin:0;
+            display:flex;
+            flex-direction:column;
+            font-family:'Inter',sans-serif;
+            background:var(--fundo-pagina);
+            color:var(--texto-principal);
         }
 
-        /* =====================================================
-           3. CABEÇALHO INSTITUCIONAL
-           ===================================================== */
         .cabecalho {
-            background: var(--verde-principal);
-            color: var(--branco);
-            position: relative;
-            overflow: hidden;
+            background:var(--verde-principal);
+            color:var(--branco);
+            position:relative;
+            overflow:hidden;
         }
 
         .cabecalho::after {
-            content: "";
-            position: absolute;
-            width: 320px;
-            height: 320px;
-            right: -100px;
-            top: -190px;
-            border: 1px solid rgba(255, 255, 255, .09);
-            border-radius: 50%;
-            pointer-events: none;
+            content:"";
+            position:absolute;
+            width:320px;
+            height:320px;
+            right:-100px;
+            top:-190px;
+            border:1px solid rgba(255,255,255,.09);
+            border-radius:50%;
+            pointer-events:none;
         }
 
         .cabecalho-conteudo {
-            position: relative;
-            z-index: 1;
-            padding-top: 28px;
-            padding-bottom: 28px;
+            position:relative;
+            z-index:1;
+            padding-top:28px;
+            padding-bottom:28px;
         }
 
         .marca-institucional {
-            display: flex;
-            align-items: center;
-            gap: 15px;
+            display:flex;
+            align-items:center;
+            gap:15px;
         }
 
-        /* LOGO ATONEXO */
         .logo-institucional {
-            width: 76px;
-            height: 76px;
-            flex-shrink: 0;
-            display: block;
-            object-fit: contain;
-            background: #FFFFFF;
-            border-radius: 10px;
-            padding: 3px;
+            width:76px;
+            height:76px;
+            flex-shrink:0;
+            display:block;
+            object-fit:contain;
+            background:#fff;
+            border-radius:10px;
+            padding:3px;
         }
 
         .nome-cartorio {
-            font-size: clamp(1.05rem, 2.5vw, 1.45rem);
-            font-weight: 700;
-            letter-spacing: -.045em;
-            line-height: 1.35;
-            margin: 0 0 5px;
+            font-size:clamp(1.05rem,2.5vw,1.45rem);
+            font-weight:700;
+            letter-spacing:-.045em;
+            line-height:1.35;
+            margin:0 0 5px;
         }
 
         .endereco-cartorio {
-            font-size: .83rem;
-            line-height: 1.8;
-            color: rgba(255, 255, 255, .77);
-            margin: 0;
+            font-size:.83rem;
+            line-height:1.8;
+            color:rgba(255,255,255,.77);
+            margin:0;
         }
 
         .identificacao-sistema {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 9px 13px;
-            border: 1px solid rgba(255, 255, 255, .17);
-            background: rgba(255, 255, 255, .07);
-            border-radius: 10px;
-            color: #E0EEE6;
-            font-size: .8rem;
-            font-weight: 500;
-            white-space: nowrap;
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+            padding:9px 13px;
+            border:1px solid rgba(255,255,255,.17);
+            background:rgba(255,255,255,.07);
+            border-radius:10px;
+            color:#E0EEE6;
+            font-size:.8rem;
+            font-weight:500;
+            white-space:nowrap;
         }
 
         .indicador-online {
-            width: 7px;
-            height: 7px;
-            background: #8BD4A6;
-            border-radius: 50%;
+            width:7px;
+            height:7px;
+            background:#8BD4A6;
+            border-radius:50%;
         }
 
-        /* =====================================================
-           4. ÁREA PRINCIPAL
-           Espaço reservado para os próximos componentes.
-           ===================================================== */
         main {
-            flex: 1;
-            min-width: 0;
-            padding: 54px 0;
+            flex:1;
+            min-width:0;
+            padding:54px 0;
         }
 
-        /* =====================================================
-           5. RODAPÉ
-           ===================================================== */
         .rodape {
-            padding: 20px 0;
-            border-top: 1px solid var(--borda);
-            background: #FFFFFF;
+            padding:20px 0;
+            border-top:1px solid var(--borda);
+            background:#fff;
         }
 
         .rodape-texto {
-            font-size: .78rem;
-            color: var(--texto-secundario);
-            margin: 0;
+            font-size:.78rem;
+            color:var(--texto-secundario);
+            margin:0;
         }
 
         .marca-atonexo {
-            color: var(--verde-principal);
-            font-weight: 800;
-            letter-spacing: -.035em;
+            color:var(--verde-principal);
+            font-weight:800;
+            letter-spacing:-.035em;
         }
 
-        /* =====================================================
-           6. RESPONSIVIDADE
-           ===================================================== */
-        @media (max-width: 767.98px) {
-            .cabecalho-conteudo {
-                padding-top: 22px;
-                padding-bottom: 22px;
-            }
+        #conteudo-principal { flex:1; width:100%; }
 
-            .marca-institucional {
-                align-items: flex-start;
-                gap: 12px;
-            }
-
-            .logo-institucional {
-                width: 64px;
-                height: 64px;
-            }
-
-            .identificacao-sistema {
-                margin-top: 18px;
-            }
-
-            main {
-                padding: 32px 12px;
-            }
-
-            .rodape .text-md-end {
-                text-align: left !important;
-                margin-top: 7px;
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            *,
-            *::before,
-            *::after {
-                transition-duration: .01ms !important;
-            }
-        }
-
-        /* =====================================================
-           ATO NEXO — ESTILOS COMPLEMENTARES DO DASHBOARD
-           Não altera as variáveis, o cabeçalho ou o rodapé-base.
-           ===================================================== */
-        #conteudo-principal {
-            flex: 1;
-            width: 100%;
-        }
         .atonexo-dashboard {
-            padding-top: clamp(1.25rem, 3vw, 2.25rem);
-            padding-bottom: clamp(2rem, 4vw, 3rem);
+            padding-top:clamp(1.25rem,3vw,2.25rem);
+            padding-bottom:clamp(2rem,4vw,3rem);
         }
+
         .dashboard-title {
-            color: var(--verde-principal);
-            letter-spacing: -.035em;
-            font-weight: 800;
+            color:var(--verde-principal);
+            letter-spacing:-.035em;
+            font-weight:800;
         }
+
         .dashboard-subtitle {
-            color: var(--texto-secundario);
-            max-width: 60rem;
+            color:var(--texto-secundario);
+            max-width:60rem;
         }
+
         .dashboard-topline {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 1rem;
-            flex-wrap: wrap;
+            display:flex;
+            align-items:flex-start;
+            justify-content:space-between;
+            gap:1rem;
+            flex-wrap:wrap;
         }
+
         .dashboard-status {
-            display: inline-flex;
-            align-items: center;
-            gap: .45rem;
-            border: 1px solid var(--borda);
-            border-radius: 999px;
-            background: var(--branco);
-            padding: .4rem .75rem;
-            color: var(--texto-secundario);
-            font-size: .8rem;
-            font-weight: 600;
+            display:inline-flex;
+            align-items:center;
+            gap:.45rem;
+            border:1px solid var(--borda);
+            border-radius:999px;
+            background:#fff;
+            padding:.4rem .75rem;
+            color:var(--texto-secundario);
+            font-size:.8rem;
+            font-weight:600;
         }
+
         .dashboard-status::before {
-            content: "";
-            width: .5rem;
-            height: .5rem;
-            border-radius: 50%;
-            background: #D99A28;
+            content:"";
+            width:.5rem;
+            height:.5rem;
+            border-radius:50%;
+            background:#279768;
         }
+
         .dashboard-stat {
-            height: 100%;
-            border: 1px solid var(--borda);
-            border-radius: 1rem;
-            background: var(--branco);
-            box-shadow: 0 4px 18px rgba(11, 43, 36, .035);
+            height:100%;
+            border:1px solid var(--borda);
+            border-radius:1rem;
+            background:#fff;
+            box-shadow:0 4px 18px rgba(11,43,36,.035);
         }
-        .dashboard-stat .card-body { padding: 1.1rem 1.2rem; }
+
+        .dashboard-stat .card-body { padding:1.1rem 1.2rem; }
+
         .dashboard-stat-label {
-            color: var(--texto-secundario);
-            font-size: .82rem;
-            font-weight: 600;
+            color:var(--texto-secundario);
+            font-size:.82rem;
+            font-weight:600;
         }
+
         .dashboard-stat-value {
-            color: var(--verde-principal);
-            font-size: clamp(1.65rem, 3vw, 2rem);
-            line-height: 1.15;
-            font-weight: 800;
+            color:var(--verde-principal);
+            font-size:clamp(1.65rem,3vw,2rem);
+            line-height:1.15;
+            font-weight:800;
         }
+
         .dashboard-stat-icon {
-            display: grid;
-            place-items: center;
-            width: 2.7rem;
-            height: 2.7rem;
-            border-radius: .85rem;
-            background: var(--verde-claro);
-            color: var(--verde-principal);
-            font-size: 1.2rem;
+            display:grid;
+            place-items:center;
+            width:2.7rem;
+            height:2.7rem;
+            border-radius:.85rem;
+            background:var(--verde-claro);
+            color:var(--verde-principal);
+            font-size:1.2rem;
         }
+
         #adminTabs {
-            gap: .35rem;
-            border-bottom: 1px solid var(--borda);
+            gap:.35rem;
+            border-bottom:1px solid var(--borda);
         }
+
         #adminTabs .nav-link {
-            color: var(--texto-secundario);
-            border: 1px solid transparent;
-            border-radius: .7rem .7rem 0 0;
-            padding: .8rem 1rem;
-            font-weight: 650;
+            color:var(--texto-secundario);
+            border:1px solid transparent;
+            border-radius:.7rem .7rem 0 0;
+            padding:.8rem 1rem;
+            font-weight:650;
         }
+
         #adminTabs .nav-link:hover {
-            color: var(--verde-principal);
-            background: rgba(232, 241, 236, .7);
+            color:var(--verde-principal);
+            background:rgba(232,241,236,.7);
         }
+
         #adminTabs .nav-link.active {
-            color: var(--verde-principal);
-            background: var(--branco);
-            border-color: var(--borda) var(--borda) var(--branco);
+            color:var(--verde-principal);
+            background:#fff;
+            border-color:var(--borda) var(--borda) #fff;
         }
+
         .atonexo-panel {
-            border: 1px solid var(--borda);
-            border-radius: 1rem;
-            background: var(--branco);
-            box-shadow: 0 6px 22px rgba(11, 43, 36, .045);
-            overflow: hidden;
+            border:1px solid var(--borda);
+            border-radius:1rem;
+            background:#fff;
+            box-shadow:0 6px 22px rgba(11,43,36,.045);
+            overflow:hidden;
         }
-        .atonexo-panel .card-body { padding: clamp(1rem, 2vw, 1.5rem); }
-        .atonexo-panel .card-title { color: var(--verde-principal); font-weight: 750; }
+
+        .atonexo-panel .card-body { padding:clamp(1rem,2vw,1.5rem); }
+        .atonexo-panel .card-title { color:var(--verde-principal);font-weight:750; }
+
         .atonexo-dashboard .form-control,
         .atonexo-dashboard .form-select,
         .modal .form-control,
         .modal .form-select {
-            border-color: var(--borda);
-            min-height: 2.65rem;
+            border-color:var(--borda);
+            min-height:2.65rem;
         }
+
         .atonexo-dashboard .form-control:focus,
         .atonexo-dashboard .form-select:focus,
         .modal .form-control:focus,
         .modal .form-select:focus {
-            border-color: var(--verde-destaque);
-            box-shadow: 0 0 0 .2rem rgba(28, 89, 72, .12);
-        }
-        .atonexo-dashboard .btn-success,
-        .modal .btn-success {
-            --bs-btn-bg: var(--verde-principal);
-            --bs-btn-border-color: var(--verde-principal);
-            --bs-btn-hover-bg: var(--verde-escuro);
-            --bs-btn-hover-border-color: var(--verde-escuro);
-            --bs-btn-active-bg: var(--verde-escuro);
-            --bs-btn-active-border-color: var(--verde-escuro);
-        }
-        .atonexo-dashboard .btn-primary,
-        .modal .btn-primary {
-            --bs-btn-bg: var(--verde-destaque);
-            --bs-btn-border-color: var(--verde-destaque);
-            --bs-btn-hover-bg: var(--verde-escuro);
-            --bs-btn-hover-border-color: var(--verde-escuro);
-        }
-        .atonexo-dashboard .table,
-        .modal .table { --bs-table-color: var(--texto-principal); margin-bottom: 0; }
-        .atonexo-dashboard .table thead th,
-        .modal .table thead th {
-            color: var(--texto-secundario);
-            font-size: .76rem;
-            font-weight: 750;
-            letter-spacing: .025em;
-            text-transform: uppercase;
-            white-space: nowrap;
-            border-bottom-color: var(--borda);
-        }
-        .atonexo-dashboard .table td,
-        .atonexo-dashboard .table th,
-        .modal .table td,
-        .modal .table th { padding: .85rem .75rem; }
-        .atonexo-dashboard .table-hover tbody tr:hover { --bs-table-hover-bg: #F6F9F7; }
-        .atonexo-dashboard .pagination { margin-top: 1rem; }
-        .atonexo-dashboard .page-link {
-            color: var(--verde-principal);
-            border-color: var(--borda);
-        }
-        .atonexo-dashboard .page-item.active .page-link {
-            background: var(--verde-principal);
-            border-color: var(--verde-principal);
-        }
-        .atonexo-dashboard .nav-tabs + .tab-content { padding-top: 1.15rem; }
-        .atonexo-dashboard .table-responsive { border-radius: .65rem; }
-        .demo-notice {
-            border: 1px solid #E7D8B3;
-            border-radius: .8rem;
-            background: #FFF9E9;
-            color: #6F5318;
-            padding: .8rem 1rem;
-            font-size: .88rem;
-        }
-        .modal-content {
-            border: 1px solid var(--borda);
-            border-radius: 1rem;
-            overflow: hidden;
-        }
-        .modal-header.bg-success {
-            background: var(--verde-principal) !important;
-        }
-        .modal .card { border: 0; border-radius: .8rem; }
-        .table-empty { color: var(--texto-secundario); padding: 2rem 1rem !important; }
-        @media (max-width: 575.98px) {
-            #adminTabs { flex-wrap: nowrap; overflow-x: auto; }
-            #adminTabs .nav-link { white-space: nowrap; padding: .7rem .8rem; }
-            .dashboard-topline .btn { width: 100%; }
-            .atonexo-dashboard .table td, .atonexo-dashboard .table th { padding: .7rem .55rem; }
+            border-color:var(--verde-destaque);
+            box-shadow:0 0 0 .2rem rgba(28,89,72,.12);
         }
 
+        .atonexo-dashboard .btn-success,
+        .modal .btn-success {
+            --bs-btn-bg:var(--verde-principal);
+            --bs-btn-border-color:var(--verde-principal);
+            --bs-btn-hover-bg:var(--verde-escuro);
+            --bs-btn-hover-border-color:var(--verde-escuro);
+        }
+
+        .atonexo-dashboard .btn-primary,
+        .modal .btn-primary {
+            --bs-btn-bg:var(--verde-destaque);
+            --bs-btn-border-color:var(--verde-destaque);
+            --bs-btn-hover-bg:var(--verde-escuro);
+            --bs-btn-hover-border-color:var(--verde-escuro);
+        }
+
+        .atonexo-dashboard .table { --bs-table-color:var(--texto-principal);margin-bottom:0; }
+
+        .atonexo-dashboard .table thead th {
+            color:var(--texto-secundario);
+            font-size:.76rem;
+            font-weight:750;
+            letter-spacing:.025em;
+            text-transform:uppercase;
+            white-space:nowrap;
+            border-bottom-color:var(--borda);
+        }
+
+        .atonexo-dashboard .table td,
+        .atonexo-dashboard .table th { padding:.85rem .75rem; }
+
+        .atonexo-dashboard .table-hover tbody tr:hover { --bs-table-hover-bg:#F6F9F7; }
+
+        .atonexo-dashboard .pagination { margin-top:1rem; }
+
+        .atonexo-dashboard .page-link {
+            color:var(--verde-principal);
+            border-color:var(--borda);
+        }
+
+        .atonexo-dashboard .page-item.active .page-link {
+            background:var(--verde-principal);
+            border-color:var(--verde-principal);
+        }
+
+        .atonexo-dashboard .table-responsive { border-radius:.65rem; }
+
+        .demo-notice {
+            border:1px solid #E7D8B3;
+            border-radius:.8rem;
+            background:#FFF9E9;
+            color:#6F5318;
+            padding:.8rem 1rem;
+            font-size:.88rem;
+        }
+
+        .modal-content {
+            border:1px solid var(--borda);
+            border-radius:1rem;
+            overflow:hidden;
+        }
+
+        .modal-header.bg-success { background:var(--verde-principal)!important; }
+        .modal .card { border:0;border-radius:.8rem; }
+        .table-empty { color:var(--texto-secundario);padding:2rem 1rem!important; }
+
+        @media(max-width:767.98px) {
+            .cabecalho-conteudo { padding-top:22px;padding-bottom:22px; }
+            .marca-institucional { align-items:flex-start;gap:12px; }
+            .logo-institucional { width:64px;height:64px; }
+            .identificacao-sistema { margin-top:18px; }
+            main { padding:32px 12px; }
+            .rodape .text-md-end { text-align:left!important;margin-top:7px; }
+        }
+
+        @media(max-width:575.98px) {
+            #adminTabs { flex-wrap:nowrap;overflow-x:auto; }
+            #adminTabs .nav-link { white-space:nowrap;padding:.7rem .8rem; }
+            .dashboard-topline .btn { width:100%; }
+            .atonexo-dashboard .table td,
+            .atonexo-dashboard .table th { padding:.7rem .55rem; }
+        }
+
+        @media(prefers-reduced-motion:reduce) {
+            *,*::before,*::after { transition-duration:.01ms!important; }
+        }
     </style>
 </head>
 
 <body>
 
-    <!-- =====================================================
-         CABEÇALHO INSTITUCIONAL
-         ===================================================== -->
-    <header class="cabecalho">
-        <div class="container cabecalho-conteudo">
-            <div class="row align-items-center">
-
-                <div class="col-lg-9">
-                    <div class="marca-institucional">
-
-                        <img
-                            src="https://tabpoa.github.io/tabelionatopoa/ato-nexo.png"
-                            alt="Logotipo AtoNexo"
-                            class="logo-institucional"
-                            width="76"
-                            height="76"
-                        >
-
-                        <div>
-                            <h1 class="nome-cartorio">
-                                2º Tabelionato de Protestos de Porto Alegre
-                            </h1>
-
-                            <p class="endereco-cartorio">
-                                Rua dos Andradas, 1234 • 4º Andar<br>
-                                Centro Histórico • Porto Alegre/RS • CEP 90020-008<br>
-                                CNPJ: 04.438.173/0001-47 •
-                                <a href="tel:+555130273500"
-                                   class="text-white text-decoration-none">
-                                    (51) 3027-3500
-                                </a>
-                            </p>
-                        </div>
-
+<header class="cabecalho">
+    <div class="container cabecalho-conteudo">
+        <div class="row align-items-center">
+            <div class="col-lg-9">
+                <div class="marca-institucional">
+                    <img src="https://tabpoa.github.io/tabelionatopoa/ato-nexo.png"
+                         alt="Logotipo AtoNexo" class="logo-institucional"
+                         width="76" height="76">
+                    <div>
+                        <h1 class="nome-cartorio">2º Tabelionato de Protestos de Porto Alegre</h1>
+                        <p class="endereco-cartorio">
+                            Rua dos Andradas, 1234 • 4º Andar<br>
+                            Centro Histórico • Porto Alegre/RS • CEP 90020-008<br>
+                            CNPJ: 04.438.173/0001-47 •
+                            <a href="tel:+555130273500" class="text-white text-decoration-none">(51) 3027-3500</a>
+                        </p>
                     </div>
-                </div>
-
-                <div class="col-lg-3 text-lg-end">
-                    <div class="identificacao-sistema">
-                        <span class="indicador-online"></span>
-                        <span>Sistema AtoNexo</span>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </header>
-
-    <!-- =====================================================
-         CONTEÚDO PRINCIPAL
-         ÁREA VAZIA PARA FUTURA IMPLEMENTAÇÃO.
-         Os novos componentes deverão ser inseridos dentro
-         desta seção, preservando o cabeçalho e o rodapé.
-         ===================================================== -->
-    <!-- ATO:INICIO:CORPO:ADMIN -->
-    <main id="conteudo-principal" role="main">
-        <div class="container atonexo-dashboard">
-            <div class="dashboard-topline mb-4">
-                <div>
-                    <p class="text-uppercase small fw-bold mb-2" style="letter-spacing:.12em;color:var(--texto-secundario)">Gestão operacional</p>
-                    <h2 class="dashboard-title h2 mb-2">Painel Administrativo</h2>
-                    <p class="dashboard-subtitle mb-0">Distribuição de intimações, acompanhamento das diligências e gestão de acessos.</p>
-                </div>
-                <div class="d-flex align-items-center gap-2 flex-wrap">
-                    <span class="dashboard-status" id="status-conexao">Modo de demonstração</span>
-                    <button class="btn btn-outline-secondary" id="btn-recarregar" type="button"><i class="bi bi-arrow-clockwise me-1"></i> Atualizar painel</button>
-                    <button class="btn btn-outline-danger" id="btn-logout" type="button"><i class="bi bi-box-arrow-right me-1"></i> Sair</button>
                 </div>
             </div>
-            <div class="demo-notice mb-4" id="aviso-modo-demo" role="status" hidden></div>
-            <div class="row g-3 mb-4" aria-label="Resumo operacional">
-                <div class="col-6 col-xl-3"><div class="card dashboard-stat"><div class="card-body d-flex justify-content-between align-items-center gap-2"><div><div class="dashboard-stat-label mb-2">Intimações no painel</div><div class="dashboard-stat-value" id="stat-intimacoes">0</div></div><span class="dashboard-stat-icon"><i class="bi bi-envelope-paper"></i></span></div></div></div>
-                <div class="col-6 col-xl-3"><div class="card dashboard-stat"><div class="card-body d-flex justify-content-between align-items-center gap-2"><div><div class="dashboard-stat-label mb-2">Sem atribuição</div><div class="dashboard-stat-value" id="stat-pendentes">0</div></div><span class="dashboard-stat-icon"><i class="bi bi-inbox"></i></span></div></div></div>
-                <div class="col-6 col-xl-3"><div class="card dashboard-stat"><div class="card-body d-flex justify-content-between align-items-center gap-2"><div><div class="dashboard-stat-label mb-2">Intimadores</div><div class="dashboard-stat-value" id="stat-intimadores">0</div></div><span class="dashboard-stat-icon"><i class="bi bi-people"></i></span></div></div></div>
-                <div class="col-6 col-xl-3"><div class="card dashboard-stat"><div class="card-body d-flex justify-content-between align-items-center gap-2"><div><div class="dashboard-stat-label mb-2">Solicitações de acesso</div><div class="dashboard-stat-value" id="stat-usuarios">0</div></div><span class="dashboard-stat-icon"><i class="bi bi-person-check"></i></span></div></div></div>
-            </div>
-            <!-- Cabeçalho do Dashboard -->
-            <div class="d-flex justify-content-between align-items-center mb-4">
-            </div>
-
-            <!-- Navegação por Abas -->
-            <ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="intimacoes-tab" data-bs-toggle="tab" data-bs-target="#intimacoes" type="button" role="tab"><i class="bi bi-envelope-paper me-2"></i>Intimações</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="acompanhamento-tab" data-bs-toggle="tab" data-bs-target="#acompanhamento" type="button" role="tab"><i class="bi bi-clipboard-data me-2"></i>Acompanhamento</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="usuarios-tab" data-bs-toggle="tab" data-bs-target="#usuarios" type="button" role="tab"><i class="bi bi-people me-2"></i>Usuários</button>
-                </li>
-            </ul>
-
-            <!-- Conteúdo das Abas -->
-            <div class="tab-content" id="adminTabsContent">
-
-                <!-- ABA 1: INTIMAÇÕES -->
-                <div class="tab-pane fade show active" id="intimacoes" role="tabpanel">
-                    <div class="card atonexo-panel">
-                        <div class="card-body">
-                            <div class="row g-3 mb-3">
-                                <div class="col-md-8">
-                                    <input type="text" class="form-control" id="search-intimacoes" placeholder="Pesquisar por nome, empresa, CPF, CNPJ, CEP ou protocolo...">
-                                </div>
-                                <div class="col-md-4 d-flex gap-2">
-                                    <button class="btn btn-success w-100" id="btn-buscar-intimacoes"><i class="bi bi-search"></i> Buscar</button>
-                                    <button class="btn btn-primary w-100" id="btn-atribuir" disabled><i class="bi bi-person-plus"></i> Atribuir</button>
-                                </div>
-                            </div>
-
-                            <div class="table-responsive">
-                                <table class="table table-hover align-middle">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th><input type="checkbox" class="form-check-input" id="select-all-intimacoes"></th>
-                                            <th>ID</th>
-                                            <th>Devedor</th>
-                                            <th>CPF/CNPJ</th>
-                                            <th>Endereço</th>
-                                            <th>Status</th>
-                                            <th>Responsável</th>
-                                            <th class="text-end">Ação</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="tbody-intimacoes">
-                                        <tr><td colspan="8" class="text-center text-muted">Conectando ao Supabase...</td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <nav>
-                                <ul class="pagination justify-content-center mb-0" id="pagination-intimacoes"></ul>
-                            </nav>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ABA 2: ACOMPANHAMENTO -->
-                <div class="tab-pane fade" id="acompanhamento" role="tabpanel">
-                    <div class="card atonexo-panel">
-                        <div class="card-body">
-                            <div class="row g-3 mb-3">
-                                <div class="col-md-8">
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="bi bi-search"></i></span>
-                                        <input type="text" class="form-control" id="search-intimadores" placeholder="Pesquisar intimador por nome...">
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <button class="btn btn-success w-100" id="btn-buscar-intimadores-relatorio">
-                                        <i class="bi bi-funnel"></i> Filtrar
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="row g-3 mb-3">
-                                <div class="col-12 d-flex gap-2 justify-content-end">
-                                    <button class="btn btn-outline-secondary" id="btn-export-csv"><i class="bi bi-filetype-csv"></i> CSV</button>
-                                    <button class="btn btn-outline-secondary" id="btn-export-json"><i class="bi bi-filetype-json"></i> JSON</button>
-                                </div>
-                            </div>
-
-                            <div class="table-responsive">
-                                <table class="table table-hover align-middle">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Intimador</th>
-                                            <th class="text-center">Ativas</th>
-                                            <th class="text-center">Concluídas</th>
-                                            <th class="text-center">Pendentes</th>
-                                            <th class="text-end">Relatório</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="tbody-intimadores"></tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ABA 3: USUÁRIOS -->
-                <div class="tab-pane fade" id="usuarios" role="tabpanel">
-                    <div class="card atonexo-panel">
-                        <div class="card-body">
-                            <h5 class="card-title mb-3">Gerenciamento de Usuários</h5>
-                            <div class="table-responsive">
-                                <table class="table table-hover align-middle">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Nome</th>
-                                            <th>Email</th>
-                                            <th>Cargo Atual</th>
-                                            <th class="text-end">Ação</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="tbody-usuarios"></tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
+            <div class="col-lg-3 text-lg-end">
+                <div class="identificacao-sistema">
+                    <span class="indicador-online"></span>
+                    <span>Sistema AtoNexo</span>
                 </div>
             </div>
         </div>
-    </main>
+    </div>
+</header>
 
+<main id="conteudo-principal" role="main">
+    <div class="container atonexo-dashboard">
 
-    <!-- MODAL: ATRIBUIR INTIMADOR -->
-    <div class="modal fade" id="modalAtribuir" tabindex="-1" aria-labelledby="titulo-modal-atribuir" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title" id="titulo-modal-atribuir">Atribuir Intimações</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        <div class="dashboard-topline mb-4">
+            <div>
+                <p class="text-uppercase small fw-bold mb-2" style="letter-spacing:.12em;color:var(--texto-secundario)">Gestão operacional</p>
+                <h2 class="dashboard-title h2 mb-2">Painel Administrativo</h2>
+                <p class="dashboard-subtitle mb-0">Distribuição de intimações, acompanhamento das diligências e gestão de acessos.</p>
+            </div>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <span class="dashboard-status" id="status-conexao">Conectando...</span>
+                <button class="btn btn-outline-secondary" id="btn-recarregar" type="button">
+                    <i class="bi bi-arrow-clockwise me-1"></i> Atualizar painel
+                </button>
+                <button class="btn btn-outline-danger" id="btn-logout" type="button">
+                    <i class="bi bi-box-arrow-right me-1"></i> Sair
+                </button>
+            </div>
+        </div>
+
+        <div class="demo-notice mb-4" id="aviso-modo-demo" role="status" hidden></div>
+
+        <div class="row g-3 mb-4" aria-label="Resumo operacional">
+            <div class="col-6 col-xl-3">
+                <div class="card dashboard-stat"><div class="card-body d-flex justify-content-between align-items-center gap-2">
+                    <div><div class="dashboard-stat-label mb-2">Intimações no painel</div><div class="dashboard-stat-value" id="stat-intimacoes">0</div></div>
+                    <span class="dashboard-stat-icon"><i class="bi bi-envelope-paper"></i></span>
+                </div></div>
+            </div>
+            <div class="col-6 col-xl-3">
+                <div class="card dashboard-stat"><div class="card-body d-flex justify-content-between align-items-center gap-2">
+                    <div><div class="dashboard-stat-label mb-2">Sem atribuição</div><div class="dashboard-stat-value" id="stat-pendentes">0</div></div>
+                    <span class="dashboard-stat-icon"><i class="bi bi-inbox"></i></span>
+                </div></div>
+            </div>
+            <div class="col-6 col-xl-3">
+                <div class="card dashboard-stat"><div class="card-body d-flex justify-content-between align-items-center gap-2">
+                    <div><div class="dashboard-stat-label mb-2">Intimadores</div><div class="dashboard-stat-value" id="stat-intimadores">0</div></div>
+                    <span class="dashboard-stat-icon"><i class="bi bi-people"></i></span>
+                </div></div>
+            </div>
+            <div class="col-6 col-xl-3">
+                <div class="card dashboard-stat"><div class="card-body d-flex justify-content-between align-items-center gap-2">
+                    <div><div class="dashboard-stat-label mb-2">Solicitações de acesso</div><div class="dashboard-stat-value" id="stat-usuarios">0</div></div>
+                    <span class="dashboard-stat-icon"><i class="bi bi-person-check"></i></span>
+                </div></div>
+            </div>
+        </div>
+
+        <ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="intimacoes-tab" data-bs-toggle="tab" data-bs-target="#intimacoes" type="button" role="tab">
+                    <i class="bi bi-envelope-paper me-2"></i>Intimações
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="acompanhamento-tab" data-bs-toggle="tab" data-bs-target="#acompanhamento" type="button" role="tab">
+                    <i class="bi bi-clipboard-data me-2"></i>Acompanhamento
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="usuarios-tab" data-bs-toggle="tab" data-bs-target="#usuarios" type="button" role="tab">
+                    <i class="bi bi-people me-2"></i>Usuários
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="adminTabsContent">
+
+            <!-- ABA INTIMAÇÕES -->
+            <div class="tab-pane fade show active" id="intimacoes" role="tabpanel">
+                <div class="card atonexo-panel">
+                    <div class="card-body">
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" id="search-intimacoes"
+                                       placeholder="Pesquisar por nome, empresa, CPF, CNPJ, CEP ou protocolo...">
+                            </div>
+                            <div class="col-md-4 d-flex gap-2">
+                                <button class="btn btn-success w-100" id="btn-buscar-intimacoes">
+                                    <i class="bi bi-search"></i> Buscar
+                                </button>
+                                <button class="btn btn-primary w-100" id="btn-atribuir" disabled>
+                                    <i class="bi bi-person-plus"></i> Atribuir
+                                </button>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th><input type="checkbox" class="form-check-input" id="select-all-intimacoes"></th>
+                                        <th>ID</th><th>Devedor</th><th>CPF/CNPJ</th><th>Endereço</th>
+                                        <th>Status</th><th>Responsável</th><th class="text-end">Ação</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-intimacoes">
+                                    <tr><td colspan="8" class="text-center text-muted">Conectando ao Supabase...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <nav><ul class="pagination justify-content-center mb-0" id="pagination-intimacoes"></ul></nav>
+                    </div>
                 </div>
-                <div class="modal-body">
-                    <label for="select-intimador" class="form-label">Selecione o Intimador:</label>
-                    <select class="form-select" id="select-intimador">
-                        <option value="" selected disabled>Carregando intimadores...</option>
+            </div>
+
+            <!-- ABA ACOMPANHAMENTO -->
+            <div class="tab-pane fade" id="acompanhamento" role="tabpanel">
+                <div class="card atonexo-panel">
+                    <div class="card-body">
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-8">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                    <input type="text" class="form-control" id="search-intimadores" placeholder="Pesquisar intimador por nome...">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-success w-100" id="btn-buscar-intimadores-relatorio">
+                                    <i class="bi bi-funnel"></i> Filtrar
+                                </button>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2 justify-content-end mb-3">
+                            <button class="btn btn-outline-secondary" id="btn-export-csv"><i class="bi bi-filetype-csv"></i> CSV</button>
+                            <button class="btn btn-outline-secondary" id="btn-export-json"><i class="bi bi-filetype-json"></i> JSON</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr><th>Intimador</th><th class="text-center">Ativas</th><th class="text-center">Concluídas</th><th class="text-center">Pendentes</th><th class="text-end">Relatório</th></tr>
+                                </thead>
+                                <tbody id="tbody-intimadores"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ABA USUÁRIOS -->
+            <div class="tab-pane fade" id="usuarios" role="tabpanel">
+                <div class="card atonexo-panel">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                            <div>
+                                <h5 class="card-title mb-1">Gerenciamento de Usuários</h5>
+                                <p class="text-muted small mb-0">Atribua funções, altere permissões e gerencie o acesso ao sistema.</p>
+                            </div>
+                            <button class="btn btn-outline-success" type="button" id="btn-atualizar-usuarios">
+                                <i class="bi bi-arrow-clockwise me-1"></i> Atualizar usuários
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Identificação</th>
+                                        <th>Função</th>
+                                        <th>Status</th>
+                                        <th class="text-end">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-usuarios">
+                                    <tr><td colspan="5" class="text-center text-muted py-4">Carregando usuários...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="small text-muted mt-3">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Remover acesso altera o cadastro para pendente. Os registros e o histórico são preservados.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<!-- MODAL ATRIBUIR INTIMAÇÕES -->
+<div class="modal fade" id="modalAtribuir" tabindex="-1" aria-labelledby="titulo-modal-atribuir" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="titulo-modal-atribuir">Atribuir Intimações</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <label for="select-intimador" class="form-label">Selecione o Intimador:</label>
+                <select class="form-select" id="select-intimador">
+                    <option value="" selected disabled>Carregando intimadores...</option>
+                </select>
+                <p class="text-muted mt-3 small">As intimações selecionadas serão vinculadas a este usuário.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" id="btn-confirmar-atribuicao">Confirmar Atribuição</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL GERENCIAR USUÁRIO -->
+<div class="modal fade" id="modalGerenciarUsuario" tabindex="-1" aria-labelledby="titulo-modal-usuario" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="titulo-modal-usuario">
+                    <i class="bi bi-person-gear me-2"></i>Gerenciar usuário
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="usuario-edicao-id">
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Nome</label>
+                    <input type="text" class="form-control" id="usuario-edicao-nome" disabled>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Identificação da conta</label>
+                    <input type="text" class="form-control" id="usuario-edicao-identificacao" disabled>
+                </div>
+
+                <div class="mb-3">
+                    <label for="usuario-edicao-papel" class="form-label fw-semibold">Função no sistema</label>
+                    <select class="form-select" id="usuario-edicao-papel">
+                        <option value="administrador">Administrador</option>
+                        <option value="ti">TI</option>
+                        <option value="intimador">Intimador</option>
+                        <option value="usuario">Usuário</option>
                     </select>
-                    <p class="text-muted mt-3 small">As intimações selecionadas serão vinculadas a este usuário.</p>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-success" id="btn-confirmar-atribuicao">Confirmar Atribuição</button>
+
+                <div class="mb-3">
+                    <label for="usuario-edicao-status" class="form-label fw-semibold">Situação do cadastro</label>
+                    <select class="form-select" id="usuario-edicao-status">
+                        <option value="aprovado">Aprovado</option>
+                        <option value="pendente">Pendente / Sem acesso</option>
+                    </select>
                 </div>
+
+                <div class="alert alert-warning small mb-0">
+                    <i class="bi bi-exclamation-triangle me-1"></i>
+                    A alteração de função ou situação será aplicada ao cadastro do usuário.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" id="btn-salvar-usuario">
+                    <i class="bi bi-check-circle me-1"></i> Salvar alterações
+                </button>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Modal: Relatório Individual do Intimador -->
-    <div class="modal fade" id="modalRelatorioIndividual" tabindex="-1" aria-labelledby="titulo-modal-relatorio" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title" id="titulo-modal-relatorio">
-                        <i class="bi bi-clipboard-data"></i>
-                        Relatório Individual - <span id="nome-intimador-relatorio"></span>
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+<!-- MODAL RELATÓRIO INDIVIDUAL -->
+<div class="modal fade" id="modalRelatorioIndividual" tabindex="-1" aria-labelledby="titulo-modal-relatorio" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="titulo-modal-relatorio">
+                    <i class="bi bi-clipboard-data"></i>
+                    Relatório Individual - <span id="nome-intimador-relatorio"></span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-4">
+                    <div class="col-md-3"><div class="card bg-warning text-dark"><div class="card-body text-center"><h3 id="total-ativas-modal">0</h3><small>Em Andamento</small></div></div></div>
+                    <div class="col-md-3"><div class="card bg-success text-white"><div class="card-body text-center"><h3 id="total-concluidas-modal">0</h3><small>Concluídas</small></div></div></div>
+                    <div class="col-md-3"><div class="card bg-secondary text-white"><div class="card-body text-center"><h3 id="total-pendentes-modal">0</h3><small>Pendentes</small></div></div></div>
+                    <div class="col-md-3"><div class="card bg-primary text-white"><div class="card-body text-center"><h3 id="total-checkpoints-modal">0</h3><small>Total Checkpoints</small></div></div></div>
                 </div>
-                <div class="modal-body">
-                    <div class="row mb-4">
-                        <div class="col-md-3">
-                            <div class="card bg-warning text-dark">
-                                <div class="card-body text-center">
-                                    <h3 id="total-ativas-modal">0</h3>
-                                    <small>Em Andamento</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="card bg-success text-white">
-                                <div class="card-body text-center">
-                                    <h3 id="total-concluidas-modal">0</h3>
-                                    <small>Concluídas</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="card bg-secondary text-white">
-                                <div class="card-body text-center">
-                                    <h3 id="total-pendentes-modal">0</h3>
-                                    <small>Pendentes</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="card bg-primary text-white">
-                                <div class="card-body text-center">
-                                    <h3 id="total-checkpoints-modal">0</h3>
-                                    <small>Total Checkpoints</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="mb-3 d-flex gap-2 justify-content-end">
-                        <button class="btn btn-outline-success btn-sm" id="btn-export-individual-csv">
-                            <i class="bi bi-filetype-csv"></i> Exportar CSV
-                        </button>
-                        <button class="btn btn-outline-success btn-sm" id="btn-export-individual-json">
-                            <i class="bi bi-filetype-json"></i> Exportar JSON
-                        </button>
-                    </div>
+                <div class="mb-3 d-flex gap-2 justify-content-end">
+                    <button class="btn btn-outline-success btn-sm" id="btn-export-individual-csv"><i class="bi bi-filetype-csv"></i> Exportar CSV</button>
+                    <button class="btn btn-outline-success btn-sm" id="btn-export-individual-json"><i class="bi bi-filetype-json"></i> Exportar JSON</button>
+                </div>
 
-                    <div class="table-responsive">
-                        <table class="table table-hover table-sm">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Devedor</th>
-                                    <th>Status</th>
-                                    <th>Iniciada</th>
-                                    <th>Concluída</th>
-                                    <th>Checkpoints</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-diligencias-intimador">
-                                <tr><td colspan="6" class="text-center">Carregando...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm">
+                        <thead class="table-light">
+                            <tr><th>Devedor</th><th>Status</th><th>Iniciada</th><th>Concluída</th><th>Checkpoints</th><th>Ações</th></tr>
+                        </thead>
+                        <tbody id="tbody-diligencias-intimador">
+                            <tr><td colspan="6" class="text-center">Carregando...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
             </div>
         </div>
     </div>
+</div>
 
-
-<!-- ATO:FIM:CORPO:ADMIN -->
-
-    <!-- =====================================================
-         RODAPÉ INSTITUCIONAL
-         ===================================================== -->
-    <footer class="rodape">
-        <div class="container">
-            <div class="row align-items-center">
-
-                <div class="col-md-6">
-                    <p class="rodape-texto">
-                        &copy; <span id="anoAtual"></span>
-                        <span class="marca-atonexo">AtoNexo</span>.
-                        Todos os direitos reservados.
-                    </p>
-                </div>
-
-                <div class="col-md-6 text-md-end">
-                    <p class="rodape-texto">
-                        Tecnologia a serviço da organização e da eficiência.
-                    </p>
-                </div>
-
+<footer class="rodape">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <p class="rodape-texto">
+                    &copy; <span id="anoAtual"></span>
+                    <span class="marca-atonexo">AtoNexo</span>. Todos os direitos reservados.
+                </p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <p class="rodape-texto">Tecnologia a serviço da organização e da eficiência.</p>
             </div>
         </div>
-    </footer>
+    </div>
+</footer>
 
-    <!-- =====================================================
-         JAVASCRIPT ESSENCIAL
-         ===================================================== -->
-    <!-- ATO:INICIO:JS:RODAPE -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
-        "use strict";
+"use strict";
 
-        // Atualiza automaticamente o ano do rodapé.
-        document.getElementById("anoAtual").textContent =
-            new Date().getFullYear();
-    </script>
-<!-- ATO:FIM:JS:RODAPE -->
+/* =========================================================
+   CONFIGURAÇÃO
+   ========================================================= */
 
+const ATONEXO_CONFIG = Object.freeze({
+    supabaseUrl: "https://dlxqahkjhuocsssosqyj.supabase.co",
+    supabasePublishableKey: "sb_publishable_IJ704qHttTZHtI_q8E7CCw_siVAy7Ex",
+    pageSize: 10,
+    realtime: true,
+    rpcAtribuir: "atonexo_atribuir_intimacoes",
+    rpcRetirar: "atonexo_retirar_intimacoes"
+});
 
-    <!-- Bootstrap 5.3.8: componentes de abas e modais -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Supabase JS v2: conexão real com o projeto AtoNexo -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- ATO:INICIO:JS:DASHBOARD -->
-    <script>
-    "use strict";
+const DESTINO_LOGIN = "https://tabpoa.github.io/tabelionatopoa/login.html";
 
-    /* =========================================================
-       ATONEXO — DASHBOARD ADMINISTRATIVO / SUPABASE
-       Estrutura real confirmada:
-       - perfis_usuarios
-       - intimacoes
-       - intimacoes_historico
-       - codigos_ocorrencia
-       Operações de atribuição/retirada usam RPCs transacionais.
-       ========================================================= */
-    const ATONEXO_CONFIG = Object.freeze({
-        supabaseUrl: "https://dlxqahkjhuocsssosqyj.supabase.co",
-        // Chave publicável (sb_publishable_...). Nunca usar service_role no navegador.
-        supabasePublishableKey: "sb_publishable_IJ704qHttTZHtI_q8E7CCw_siVAy7Ex",
-        pageSize: 10,
-        realtime: true,
-        rpcAtribuir: "atonexo_atribuir_intimacoes",
-        rpcRetirar: "atonexo_retirar_intimacoes"
-    });
+const estado = {
+    supabase: null,
+    usuario: null,
+    perfil: null,
+    paginaIntimacoes: 1,
+    buscaIntimacoes: "",
+    totalIntimacoes: 0,
+    intimacoesPagina: [],
+    intimadores: [],
+    intimadorSelecionadoId: null,
+    diligenciasSelecionadas: [],
+    realtimeChannel: null,
+    usuarios: []
+};
 
-    const estado = {
-        supabase: null, usuario: null, perfil: null,
-        paginaIntimacoes: 1, buscaIntimacoes: "", totalIntimacoes: 0,
-        intimacoesPagina: [], intimadores: [],
-        intimadorSelecionadoId: null, diligenciasSelecionadas: [],
-        realtimeChannel: null, carregando: false
+const el = id => document.getElementById(id);
+
+const escapeHTML = value => String(value ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
+}[c]));
+
+const dataBR = value => value ? new Date(value).toLocaleString("pt-BR") : "—";
+
+const endereco = i => [
+    i.logradouro, i.numero, i.complemento,
+    i.bairro, i.cidade, i.uf
+].filter(Boolean).join(", ") || "—";
+
+const nomePapel = p => ({
+    administrador:"Administrador",
+    ti:"TI",
+    intimador:"Intimador",
+    usuario:"Usuário"
+}[p] || p || "—");
+
+function mensagem(texto, tipo="info") {
+    const aviso = el("aviso-modo-demo");
+    aviso.hidden = false;
+    aviso.className = `alert alert-${tipo} mb-4`;
+    aviso.textContent = texto;
+    window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function limparMensagem() {
+    const aviso = el("aviso-modo-demo");
+    aviso.hidden = true;
+    aviso.textContent = "";
+}
+
+function statusBadge(i) {
+    if (!i.intimador_id) return '<span class="badge text-bg-secondary">Disponível</span>';
+    if (i.situacao === "concluida" || i.situacao === "concluída") {
+        return '<span class="badge text-bg-success">Concluída</span>';
+    }
+    return '<span class="badge text-bg-info">Atribuída</span>';
+}
+
+function baixarArquivo(nome, conteudo, tipo) {
+    const blob = new Blob(["\uFEFF",conteudo],{type:tipo});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = nome;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+}
+
+const csvCell = v => '"' + String(v ?? "").replace(/"/g,'""') + '"';
+
+/* =========================================================
+   AUTENTICAÇÃO E AUTORIZAÇÃO
+   ========================================================= */
+
+async function iniciarSupabase() {
+    if (!window.supabase?.createClient) {
+        throw new Error("A biblioteca Supabase JS não foi carregada.");
+    }
+
+    estado.supabase = window.supabase.createClient(
+        ATONEXO_CONFIG.supabaseUrl,
+        ATONEXO_CONFIG.supabasePublishableKey,
+        {
+            auth:{
+                persistSession:true,
+                autoRefreshToken:true,
+                detectSessionInUrl:true
+            },
+            realtime:{params:{eventsPerSecond:5}}
+        }
+    );
+
+    const {data,error} = await estado.supabase.auth.getSession();
+    if (error) throw error;
+
+    if (!data.session) {
+        mensagem("Sua sessão não está ativa. Faça login para acessar o painel administrativo.","warning");
+        setTimeout(()=>window.location.replace(DESTINO_LOGIN),1800);
+        throw new Error("Sessão não autenticada.");
+    }
+
+    estado.usuario = data.session.user;
+
+    const {data:perfil,error:erroPerfil} = await estado.supabase
+        .from("perfis_usuarios")
+        .select("id,nome_completo,status_cadastro,papel")
+        .eq("id",estado.usuario.id)
+        .maybeSingle();
+
+    if (erroPerfil) throw erroPerfil;
+
+    if (!perfil || perfil.status_cadastro !== "aprovado" || perfil.papel !== "administrador") {
+        await estado.supabase.auth.signOut();
+        window.location.replace(DESTINO_LOGIN);
+        throw new Error("Acesso negado. Esta página é exclusiva para administradores aprovados.");
+    }
+
+    estado.perfil = perfil;
+    el("status-conexao").textContent = `Conectado • ${perfil.nome_completo || "Administrador"}`;
+
+    return true;
+}
+
+/* =========================================================
+   INTIMAÇÕES
+   ========================================================= */
+
+async function listarIntimacoes({busca="",pagina=1,limite=ATONEXO_CONFIG.pageSize}={}) {
+    let q = estado.supabase
+        .from("intimacoes")
+        .select(
+            "id,cartorio,categoria,protocolo,devedor,cpf_cnpj,logradouro,numero,complemento,bairro,cep,cidade,uf,apresentante,referencia,tipo_titulo,data_apresentacao,data_vencimento,valor_titulo,observacoes,criado_por,criado_em,intimador_id,atribuido_por,atribuido_em,situacao,atualizado_em",
+            {count:"exact"}
+        );
+
+    const termo = busca.trim().replace(/[(),]/g," ");
+
+    if (termo) {
+        const like = `%${termo}%`;
+        q = q.or([
+            `devedor.ilike.${like}`,
+            `cpf_cnpj.ilike.${like}`,
+            `cep.ilike.${like}`,
+            `protocolo.ilike.${like}`,
+            `logradouro.ilike.${like}`,
+            `apresentante.ilike.${like}`
+        ].join(","));
+    }
+
+    const inicio = (pagina-1)*limite;
+    const {data,error,count} = await q
+        .order("criado_em",{ascending:false})
+        .range(inicio,inicio+limite-1);
+
+    if (error) throw error;
+
+    return {dados:data||[],total:count||0,pagina,limite};
+}
+
+async function renderIntimacoes(pagina=estado.paginaIntimacoes,busca=estado.buscaIntimacoes) {
+    estado.paginaIntimacoes = pagina;
+    estado.buscaIntimacoes = busca;
+
+    const tbody = el("tbody-intimacoes");
+    tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted py-4"><span class="spinner-border spinner-border-sm me-2"></span>Consultando Supabase…</td></tr>';
+
+    try {
+        const r = await listarIntimacoes({busca,pagina});
+        estado.intimacoesPagina = r.dados;
+        estado.totalIntimacoes = r.total;
+
+        tbody.innerHTML = r.dados.length ? r.dados.map(i => {
+            const ocupado = !!i.intimador_id;
+
+            return `<tr>
+                <td><input type="checkbox" class="form-check-input cliente-checkbox" value="${escapeHTML(i.id)}" ${ocupado?"disabled":""} aria-label="Selecionar intimação ${escapeHTML(i.id)}"></td>
+                <td class="fw-semibold">${escapeHTML(i.id)}</td>
+                <td><div class="fw-semibold">${escapeHTML(i.devedor)}</div><small class="text-muted">${escapeHTML(i.protocolo)} • ${escapeHTML(i.categoria)}</small></td>
+                <td>${escapeHTML(i.cpf_cnpj||"—")}</td>
+                <td><div>${escapeHTML(endereco(i))}</div><small class="text-muted">CEP ${escapeHTML(i.cep||"—")}</small></td>
+                <td>${statusBadge(i)}</td>
+                <td>${escapeHTML(i.intimador_id ? (i.intimador_nome||"Atribuída") : "—")}<small class="d-block text-muted">${i.atribuido_em?dataBR(i.atribuido_em):""}</small></td>
+                <td class="text-end">${ocupado
+                    ? `<button class="btn btn-sm btn-outline-danger btn-retirar" data-id="${escapeHTML(i.id)}"><i class="bi bi-person-dash"></i> Retirar</button>`
+                    : "<span class='text-muted small'>Aguardando atribuição</span>"}</td>
+            </tr>`;
+        }).join("") : '<tr><td colspan="8" class="text-center text-muted py-4">Nenhuma intimação encontrada.</td></tr>';
+
+        tbody.querySelectorAll(".btn-retirar").forEach(b => {
+            b.addEventListener("click",()=>retirarIntimacoes([b.dataset.id]));
+        });
+
+        renderPaginacao(r.total,r.limite,r.pagina);
+        atualizarBotaoAtribuir();
+
+        el("stat-intimacoes").textContent = r.total;
+        el("stat-pendentes").textContent = r.dados.filter(i=>!i.intimador_id).length;
+
+    } catch(e) {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center text-danger py-4">${escapeHTML(e.message)}</td></tr>`;
+        throw e;
+    }
+}
+
+function renderPaginacao(total,limite,pagina) {
+    const totalPaginas = Math.max(1,Math.ceil(total/limite));
+    const ul = el("pagination-intimacoes");
+    ul.innerHTML = "";
+
+    const add = (label,p,disabled=false,active=false) => {
+        const li = document.createElement("li");
+        li.className = `page-item ${disabled?"disabled":""} ${active?"active":""}`;
+        li.innerHTML = `<button class="page-link" type="button">${label}</button>`;
+        li.querySelector("button").addEventListener("click",()=>renderIntimacoes(p,estado.buscaIntimacoes));
+        ul.appendChild(li);
     };
 
-    const el = id => document.getElementById(id);
-    const escapeHTML = value => String(value ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
-    const dataBR = value => value ? new Date(value).toLocaleString("pt-BR") : "—";
-    const endereco = i => [i.logradouro, i.numero, i.complemento, i.bairro, i.cidade, i.uf].filter(Boolean).join(", ") || "—";
-    const nomePapel = p => ({ administrador:"Administrador", ti:"TI", intimador:"Intimador", usuario:"Usuário" }[p] || p || "—");
+    add("Anterior",Math.max(1,pagina-1),pagina===1);
 
-    function mensagem(texto, tipo="info") {
-        const aviso = el("aviso-modo-demo");
-        aviso.hidden = false;
-        aviso.className = `alert alert-${tipo} mb-4`;
-        aviso.textContent = texto;
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-    function limparMensagem() {
-        const aviso = el("aviso-modo-demo");
-        aviso.hidden = true;
-        aviso.textContent = "";
-    }
-    function statusBadge(i) {
-        if (!i.intimador_id) return '<span class="badge text-bg-secondary">Disponível</span>';
-        if (i.situacao === "concluida" || i.situacao === "concluída") return '<span class="badge text-bg-success">Concluída</span>';
-        return '<span class="badge text-bg-info">Atribuída</span>';
-    }
-    function baixarArquivo(nome, conteudo, tipo) {
-        const blob = new Blob(["\uFEFF", conteudo], { type: tipo });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a"); a.href=url; a.download=nome;
-        document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-    }
-    const csvCell = v => '"' + String(v ?? "").replace(/"/g, '""') + '"';
-
-    async function iniciarSupabase() {
-        if (!window.supabase?.createClient) throw new Error("A biblioteca Supabase JS não foi carregada.");
-        if (!ATONEXO_CONFIG.supabasePublishableKey) throw new Error("Configure a chave publicável do Supabase em ATONEXO_CONFIG.");
-        estado.supabase = window.supabase.createClient(ATONEXO_CONFIG.supabaseUrl, ATONEXO_CONFIG.supabasePublishableKey, {
-            auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
-            realtime: { params: { eventsPerSecond: 5 } }
-        });
-        const { data, error } = await estado.supabase.auth.getSession();
-        if (error) throw error;
-        if (!data.session) {
-            mensagem("Sua sessão não está ativa. Faça login para acessar o painel administrativo.", "warning");
-            setTimeout(() => { window.location.href = "login.html"; }, 1800);
-            throw new Error("Sessão não autenticada.");
-        }
-        estado.usuario = data.session.user;
-        const perfil = await estado.supabase.from("perfis_usuarios")
-            .select("id,nome_completo,status_cadastro,papel")
-            .eq("id", estado.usuario.id).maybeSingle();
-        if (perfil.error) throw perfil.error;
-        if (!perfil.data || perfil.data.status_cadastro !== "aprovado" || perfil.data.papel !== "administrador") {
-            await estado.supabase.auth.signOut();
-            throw new Error("Acesso negado. Esta página é exclusiva para administradores aprovados.");
-        }
-        estado.perfil = perfil.data;
-        el("status-conexao").textContent = `Conectado • ${perfil.data.nome_completo}`;
-        el("status-conexao").classList.add("text-success");
-        return true;
+    for (let p=Math.max(1,pagina-2);p<=Math.min(totalPaginas,pagina+2);p++) {
+        add(String(p),p,false,p===pagina);
     }
 
-    async function listarIntimacoes({ busca="", pagina=1, limite=ATONEXO_CONFIG.pageSize }={}) {
-        let q = estado.supabase.from("intimacoes").select("id,cartorio,categoria,protocolo,devedor,cpf_cnpj,logradouro,numero,complemento,bairro,cep,cidade,uf,apresentante,referencia,tipo_titulo,data_apresentacao,data_vencimento,valor_titulo,observacoes,criado_por,criado_em,intimador_id,atribuido_por,atribuido_em,situacao,atualizado_em", { count:"exact" });
-        const termo = busca.trim().replace(/[(),]/g, " ");
-        if (termo) {
-            const like = `%${termo}%`;
-            q = q.or([`devedor.ilike.${like}`,`cpf_cnpj.ilike.${like}`,`cep.ilike.${like}`,`protocolo.ilike.${like}`,`logradouro.ilike.${like}`,`apresentante.ilike.${like}`].join(","));
-        }
-        const inicio=(pagina-1)*limite;
-        const { data, error, count } = await q.order("criado_em",{ascending:false}).range(inicio,inicio+limite-1);
-        if (error) throw error;
-        return { dados:data||[], total:count||0, pagina, limite };
+    add("Próxima",Math.min(totalPaginas,pagina+1),pagina===totalPaginas);
+}
+
+async function listarIntimadores(filtro="") {
+    const termo = filtro.trim();
+
+    let q = estado.supabase.from("perfis_usuarios")
+        .select("id,nome_completo,status_cadastro,papel")
+        .eq("papel","intimador")
+        .eq("status_cadastro","aprovado")
+        .order("nome_completo",{ascending:true});
+
+    if (termo) q = q.ilike("nome_completo",`%${termo.replace(/[%_,]/g," ")}%`);
+
+    const {data,error} = await q;
+    if (error) throw error;
+    return data||[];
+}
+
+/* =========================================================
+   USUÁRIOS — LISTAGEM E GERENCIAMENTO
+   ========================================================= */
+
+async function listarUsuarios() {
+    const {data,error} = await estado.supabase
+        .from("perfis_usuarios")
+        .select("id,nome_completo,status_cadastro,papel")
+        .order("nome_completo",{ascending:true});
+
+    if (error) throw error;
+    return data||[];
+}
+
+function badgeStatusUsuario(status) {
+    if (status === "aprovado") {
+        return '<span class="badge text-bg-success">Aprovado</span>';
     }
 
-    async function listarUsuarios() {
-        const { data, error } = await estado.supabase.from("perfis_usuarios")
-            .select("id,nome_completo,status_cadastro,papel,criado_em")
-            .order("nome_completo",{ascending:true});
-        if (error) throw error;
-        return data||[];
-    }
-    async function listarIntimadores(filtro="") {
-        const termo=filtro.trim();
-        let q=estado.supabase.from("perfis_usuarios")
-            .select("id,nome_completo,status_cadastro,papel")
-            .eq("papel","intimador").eq("status_cadastro","aprovado")
-            .order("nome_completo",{ascending:true});
-        if(termo) q=q.ilike("nome_completo",`%${termo.replace(/[%_,]/g," ")}%`);
-        const {data,error}=await q;
-        if(error) throw error;
-        return data||[];
-    }
+    return '<span class="badge text-bg-secondary">Pendente / Sem acesso</span>';
+}
 
-    async function renderIntimacoes(pagina=estado.paginaIntimacoes,busca=estado.buscaIntimacoes) {
-        estado.paginaIntimacoes=pagina; estado.buscaIntimacoes=busca;
-        const tbody=el("tbody-intimacoes");
-        tbody.innerHTML='<tr><td colspan="8" class="text-center text-muted py-4"><span class="spinner-border spinner-border-sm me-2"></span>Consultando Supabase…</td></tr>';
-        try {
-            const r=await listarIntimacoes({busca,pagina});
-            estado.intimacoesPagina=r.dados; estado.totalIntimacoes=r.total;
-            tbody.innerHTML=r.dados.length?r.dados.map(i=>{
-                const ocupado=!!i.intimador_id;
-                const podeMarcar=!ocupado;
+async function renderUsuarios() {
+    const tbody = el("tbody-usuarios");
+
+    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4"><span class="spinner-border spinner-border-sm me-2"></span>Carregando usuários...</td></tr>';
+
+    try {
+        const usuarios = await listarUsuarios();
+        estado.usuarios = usuarios;
+
+        if (!usuarios.length) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">Nenhum usuário cadastrado.</td></tr>';
+        } else {
+            tbody.innerHTML = usuarios.map(u => {
+                const proprioUsuario = u.id === estado.usuario.id;
+                const identificacao = u.id;
+
                 return `<tr>
-                    <td><input type="checkbox" class="form-check-input cliente-checkbox" value="${escapeHTML(i.id)}" ${podeMarcar?"":"disabled"} aria-label="Selecionar intimação ${escapeHTML(i.id)}"></td>
-                    <td class="fw-semibold">${escapeHTML(i.id)}</td>
-                    <td><div class="fw-semibold">${escapeHTML(i.devedor)}</div><small class="text-muted">${escapeHTML(i.protocolo)} • ${escapeHTML(i.categoria)}</small></td>
-                    <td>${escapeHTML(i.cpf_cnpj||"—")}</td>
-                    <td><div>${escapeHTML(endereco(i))}</div><small class="text-muted">CEP ${escapeHTML(i.cep||"—")}</small></td>
-                    <td>${statusBadge(i)}</td>
-                    <td>${escapeHTML(i.intimador_id ? (i.intimador_nome||"Atribuída") : "—")}<small class="d-block text-muted">${i.atribuido_em?dataBR(i.atribuido_em):""}</small></td>
-                    <td class="text-end">${ocupado?`<button class="btn btn-sm btn-outline-danger btn-retirar" data-id="${escapeHTML(i.id)}"><i class="bi bi-person-dash"></i> Retirar</button>`:"<span class='text-muted small'>Aguardando atribuição</span>"}</td>
+                    <td>
+                        <div class="fw-semibold">${escapeHTML(u.nome_completo||"Nome não informado")}</div>
+                        ${proprioUsuario?'<small class="text-success">Sua conta</small>':""}
+                    </td>
+                    <td><small class="text-muted">${escapeHTML(identificacao)}</small></td>
+                    <td>${escapeHTML(nomePapel(u.papel))}</td>
+                    <td>${badgeStatusUsuario(u.status_cadastro)}</td>
+                    <td class="text-end">
+                        <div class="d-flex justify-content-end gap-2 flex-wrap">
+                            <button type="button" class="btn btn-sm btn-outline-success btn-editar-usuario"
+                                data-id="${escapeHTML(u.id)}">
+                                <i class="bi bi-pencil-square me-1"></i>Gerenciar
+                            </button>
+                            ${proprioUsuario
+                                ? '<button type="button" class="btn btn-sm btn-outline-secondary" disabled title="Não é permitido remover o próprio acesso por aqui"><i class="bi bi-lock"></i></button>'
+                                : `<button type="button" class="btn btn-sm btn-outline-danger btn-remover-acesso"
+                                    data-id="${escapeHTML(u.id)}">
+                                    <i class="bi bi-person-x me-1"></i>Remover acesso
+                                  </button>`}
+                        </div>
+                    </td>
                 </tr>`;
-            }).join(""):'<tr><td colspan="8" class="text-center text-muted py-4">Nenhuma intimação encontrada.</td></tr>';
-            tbody.querySelectorAll(".btn-retirar").forEach(b=>b.addEventListener("click",()=>retirarIntimacoes([b.dataset.id])));
-            renderPaginacao(r.total,r.limite,r.pagina);
-            atualizarBotaoAtribuir();
-            el("stat-intimacoes").textContent=r.total;
-            el("stat-pendentes").textContent=r.dados.filter(i=>!i.intimador_id).length;
-        } catch(e) { tbody.innerHTML=`<tr><td colspan="8" class="text-center text-danger py-4">${escapeHTML(e.message)}</td></tr>`; throw e; }
-    }
-    function renderPaginacao(total,limite,pagina) {
-        const totalPaginas=Math.max(1,Math.ceil(total/limite)), ul=el("pagination-intimacoes");
-        ul.innerHTML="";
-        const add=(label,p,disabled=false,active=false)=>{const li=document.createElement("li");li.className=`page-item ${disabled?"disabled":""} ${active?"active":""}`;li.innerHTML=`<button class="page-link" type="button">${label}</button>`;li.querySelector("button").addEventListener("click",()=>renderIntimacoes(p,estado.buscaIntimacoes));ul.appendChild(li);};
-        add("Anterior",Math.max(1,pagina-1),pagina===1);
-        for(let p=Math.max(1,pagina-2);p<=Math.min(totalPaginas,pagina+2);p++) add(String(p),p,false,p===pagina);
-        add("Próxima",Math.min(totalPaginas,pagina+1),pagina===totalPaginas);
-    }
-    async function renderUsuarios() {
-        const tbody=el("tbody-usuarios"); tbody.innerHTML='<tr><td colspan="4" class="text-center">Carregando…</td></tr>';
-        try {
-            const usuarios=await listarUsuarios();
-            tbody.innerHTML=usuarios.map(u=>`<tr><td>${escapeHTML(u.nome_completo)}</td><td>—</td><td>${escapeHTML(nomePapel(u.papel))} <span class="badge ${u.status_cadastro==="aprovado"?"text-bg-success":"text-bg-secondary"}">${escapeHTML(u.status_cadastro)}</span></td><td class="text-end"><span class="text-muted small">Consulta</span></td></tr>`).join("")||'<tr><td colspan="4" class="text-center">Nenhum usuário.</td></tr>';
-            el("stat-usuarios").textContent=usuarios.filter(u=>u.status_cadastro==="pendente").length;
-        } catch(e){tbody.innerHTML=`<tr><td colspan="4" class="text-danger">${escapeHTML(e.message)}</td></tr>`;throw e;}
-    }
-    async function renderRelatorios(filtro=el("search-intimadores").value) {
-        const tbody=el("tbody-intimadores"); tbody.innerHTML='<tr><td colspan="5" class="text-center">Carregando intimadores…</td></tr>';
-        try {
-            const pessoas=await listarIntimadores(filtro); estado.intimadores=pessoas;
-            // O resumo é calculado sobre as intimações atualmente visíveis ao administrador.
-            const {data,error}=await estado.supabase.from("intimacoes").select("intimador_id,situacao").not("intimador_id","is",null);
-            if(error) throw error;
-            tbody.innerHTML=pessoas.map(u=>{
-                const regs=(data||[]).filter(i=>i.intimador_id===u.id);
-                const ativas=regs.length;
-                return `<tr><td><div class="fw-semibold">${escapeHTML(u.nome_completo)}</div><small class="text-muted">ID: ${escapeHTML(u.id)}</small></td><td class="text-center">${ativas}</td><td class="text-center">—</td><td class="text-center">—</td><td class="text-end"><button class="btn btn-sm btn-outline-success btn-ver-detalhes" data-id="${escapeHTML(u.id)}" data-nome="${escapeHTML(u.nome_completo)}">Ver intimações</button></td></tr>`;
-            }).join("")||'<tr><td colspan="5" class="text-center">Nenhum intimador encontrado.</td></tr>';
-            tbody.querySelectorAll(".btn-ver-detalhes").forEach(b=>b.addEventListener("click",()=>abrirRelatorioIndividual(b.dataset.id,b.dataset.nome)));
-            el("stat-intimadores").textContent=pessoas.length;
-        } catch(e){tbody.innerHTML=`<tr><td colspan="5" class="text-danger">${escapeHTML(e.message)}</td></tr>`;throw e;}
-    }
-    async function abrirRelatorioIndividual(id,nome) {
-        estado.intimadorSelecionadoId=id; el("nome-intimador-relatorio").textContent=nome;
-        const {data,error}=await estado.supabase.from("intimacoes").select("*").eq("intimador_id",id).order("atribuido_em",{ascending:false});
-        if(error){mensagem(error.message,"danger");return;}
-        estado.diligenciasSelecionadas=data||[];
-        el("total-ativas-modal").textContent=data.length;
-        el("total-concluidas-modal").textContent=data.filter(i=>i.situacao==="concluida").length;
-        el("total-pendentes-modal").textContent=data.filter(i=>i.situacao==="pendente").length;
-        el("total-checkpoints-modal").textContent="—";
-        el("tbody-diligencias-intimador").innerHTML=data.length?data.map(i=>`<tr><td>${escapeHTML(i.devedor)}</td><td>${statusBadge(i)}</td><td>${escapeHTML(dataBR(i.atribuido_em))}</td><td>${escapeHTML(i.situacao||"—")}</td><td>—</td><td><span class="text-muted small">Diligências ainda não integradas</span></td></tr>`).join(""):'<tr><td colspan="6" class="text-center">Nenhuma intimação atribuída.</td></tr>';
-        bootstrap.Modal.getOrCreateInstance(el("modalRelatorioIndividual")).show();
-    }
-    async function abrirModalAtribuicao() {
-        const ids=[...document.querySelectorAll(".cliente-checkbox:checked")].map(c=>c.value);
-        if(!ids.length)return;
-        try {
-            const pessoas=await listarIntimadores("");
-            const select=el("select-intimador");
-            select.innerHTML='<option value="" selected disabled>Selecione um intimador…</option>'+pessoas.map(u=>`<option value="${escapeHTML(u.id)}">${escapeHTML(u.nome_completo)} • ${escapeHTML(u.id)}</option>`).join("");
-            if(!pessoas.length)select.innerHTML='<option value="">Nenhum intimador aprovado disponível</option>';
-            select.dataset.intimacaoIds=JSON.stringify(ids);
-            el("titulo-modal-atribuir").textContent=`Atribuir ${ids.length} intimação(ões)`;
-            bootstrap.Modal.getOrCreateInstance(el("modalAtribuir")).show();
-        }catch(e){mensagem(e.message,"danger");}
-    }
-    function atualizarBotaoAtribuir(){el("btn-atribuir").disabled=document.querySelectorAll(".cliente-checkbox:checked").length===0;}
+            }).join("");
+        }
 
-    async function atribuirIntimacoes(ids,intimadorId) {
-        // A RPC valida atomicamente a titularidade do administrador e o bloqueio do intimador.
-        const {data,error}=await estado.supabase.rpc(ATONEXO_CONFIG.rpcAtribuir,{p_intimacao_ids:ids.map(Number),p_intimador_id:intimadorId});
-        if(error)throw error;
-        return data;
+        el("stat-usuarios").textContent = usuarios.filter(u=>u.status_cadastro==="pendente").length;
+
+        tbody.querySelectorAll(".btn-editar-usuario").forEach(btn => {
+            btn.addEventListener("click",()=>abrirGerenciamentoUsuario(btn.dataset.id));
+        });
+
+        tbody.querySelectorAll(".btn-remover-acesso").forEach(btn => {
+            btn.addEventListener("click",()=>removerAcessoUsuario(btn.dataset.id));
+        });
+
+    } catch(e) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-danger py-4">${escapeHTML(e.message)}</td></tr>`;
+        throw e;
     }
-    async function retirarIntimacoes(ids) {
-        if(!confirm(`Retirar ${ids.length} intimação(ões) do intimador atual?`))return;
-        const {data,error}=await estado.supabase.rpc(ATONEXO_CONFIG.rpcRetirar,{p_intimacao_ids:ids.map(Number)});
-        if(error)throw error;
-        mensagem("Solicitação de retirada processada. O histórico da tabela de intimações registra a alteração.","success");
+}
+
+function abrirGerenciamentoUsuario(id) {
+    const usuario = estado.usuarios.find(u=>u.id===id);
+
+    if (!usuario) {
+        mensagem("Usuário não encontrado na listagem atual.","warning");
+        return;
+    }
+
+    if (usuario.id === estado.usuario.id) {
+        mensagem("Por segurança, não é permitido alterar a própria função ou situação nesta tela.","warning");
+        return;
+    }
+
+    el("usuario-edicao-id").value = usuario.id;
+    el("usuario-edicao-nome").value = usuario.nome_completo||"";
+    el("usuario-edicao-identificacao").value = usuario.id;
+    el("usuario-edicao-papel").value = usuario.papel||"usuario";
+    el("usuario-edicao-status").value = usuario.status_cadastro||"pendente";
+
+    bootstrap.Modal.getOrCreateInstance(el("modalGerenciarUsuario")).show();
+}
+
+async function salvarAlteracoesUsuario() {
+    const id = el("usuario-edicao-id").value;
+    const papel = el("usuario-edicao-papel").value;
+    const status = el("usuario-edicao-status").value;
+    const btn = el("btn-salvar-usuario");
+
+    const papeisValidos = ["administrador","ti","intimador","usuario"];
+    const statusValidos = ["aprovado","pendente"];
+
+    if (!id) {
+        mensagem("Não foi identificado o usuário que será alterado.","warning");
+        return;
+    }
+
+    if (id === estado.usuario.id) {
+        mensagem("Não é permitido alterar a própria conta por esta tela.","warning");
+        return;
+    }
+
+    if (!papeisValidos.includes(papel) || !statusValidos.includes(status)) {
+        mensagem("Função ou situação inválida.","warning");
+        return;
+    }
+
+    const usuarioAtual = estado.usuarios.find(u=>u.id===id);
+
+    if (!usuarioAtual) {
+        mensagem("O usuário não foi encontrado. Atualize a listagem.","warning");
+        return;
+    }
+
+    if (usuarioAtual.papel === "administrador" &&
+        (papel !== "administrador" || status !== "aprovado")) {
+        const confirmacao = confirm(
+            "Você está alterando o acesso de uma conta administradora. Deseja continuar?"
+        );
+        if (!confirmacao) return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Salvando...';
+
+    try {
+        const {data,error} = await estado.supabase
+            .from("perfis_usuarios")
+            .update({
+                papel,
+                status_cadastro:status
+            })
+            .eq("id",id)
+            .select("id,papel,status_cadastro")
+            .maybeSingle();
+
+        if (error) throw error;
+
+        if (!data) {
+            throw new Error("Nenhum registro foi alterado. Verifique a política RLS de atualização de perfis_usuarios.");
+        }
+
+        bootstrap.Modal.getOrCreateInstance(el("modalGerenciarUsuario")).hide();
+
+        mensagem("Cadastro atualizado com sucesso. A nova função e a situação foram salvas.","success");
+
+        await renderUsuarios();
+
+    } catch(e) {
+        mensagem(
+            "Não foi possível atualizar o usuário: "+e.message,
+            "danger"
+        );
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-check-circle me-1"></i> Salvar alterações';
+    }
+}
+
+async function removerAcessoUsuario(id) {
+    const usuario = estado.usuarios.find(u=>u.id===id);
+
+    if (!usuario) {
+        mensagem("Usuário não encontrado.","warning");
+        return;
+    }
+
+    if (id === estado.usuario.id) {
+        mensagem("Você não pode remover o próprio acesso.","warning");
+        return;
+    }
+
+    const confirmado = confirm(
+        `Remover o acesso de ${usuario.nome_completo||"este usuário"}?\n\n`+
+        "O cadastro será marcado como pendente. O histórico e os registros relacionados serão preservados."
+    );
+
+    if (!confirmado) return;
+
+    try {
+        const {data,error} = await estado.supabase
+            .from("perfis_usuarios")
+            .update({status_cadastro:"pendente"})
+            .eq("id",id)
+            .select("id,status_cadastro")
+            .maybeSingle();
+
+        if (error) throw error;
+
+        if (!data) {
+            throw new Error("Nenhum registro foi alterado. Verifique a política RLS de atualização de perfis_usuarios.");
+        }
+
+        mensagem("Acesso removido. O cadastro foi marcado como pendente e o histórico foi preservado.","success");
+        await renderUsuarios();
+
+    } catch(e) {
+        mensagem("Não foi possível remover o acesso: "+e.message,"danger");
+    }
+}
+
+/* =========================================================
+   ACOMPANHAMENTO E RELATÓRIOS
+   ========================================================= */
+
+async function renderRelatorios(filtro=el("search-intimadores").value) {
+    const tbody = el("tbody-intimadores");
+    tbody.innerHTML = '<tr><td colspan="5" class="text-center">Carregando intimadores…</td></tr>';
+
+    try {
+        const pessoas = await listarIntimadores(filtro);
+        estado.intimadores = pessoas;
+
+        const {data,error} = await estado.supabase
+            .from("intimacoes")
+            .select("intimador_id,situacao")
+            .not("intimador_id","is",null);
+
+        if (error) throw error;
+
+        tbody.innerHTML = pessoas.map(u => {
+            const regs = (data||[]).filter(i=>i.intimador_id===u.id);
+            const ativas = regs.length;
+
+            return `<tr>
+                <td>
+                    <div class="fw-semibold">${escapeHTML(u.nome_completo)}</div>
+                    <small class="text-muted">ID: ${escapeHTML(u.id)}</small>
+                </td>
+                <td class="text-center">${ativas}</td>
+                <td class="text-center">—</td>
+                <td class="text-center">—</td>
+                <td class="text-end">
+                    <button class="btn btn-sm btn-outline-success btn-ver-detalhes"
+                        data-id="${escapeHTML(u.id)}" data-nome="${escapeHTML(u.nome_completo)}">
+                        Ver intimações
+                    </button>
+                </td>
+            </tr>`;
+        }).join("") || '<tr><td colspan="5" class="text-center">Nenhum intimador encontrado.</td></tr>';
+
+        tbody.querySelectorAll(".btn-ver-detalhes").forEach(b => {
+            b.addEventListener("click",()=>abrirRelatorioIndividual(b.dataset.id,b.dataset.nome));
+        });
+
+        el("stat-intimadores").textContent = pessoas.length;
+
+    } catch(e) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-danger">${escapeHTML(e.message)}</td></tr>`;
+        throw e;
+    }
+}
+
+async function abrirRelatorioIndividual(id,nome) {
+    estado.intimadorSelecionadoId = id;
+    el("nome-intimador-relatorio").textContent = nome;
+
+    const {data,error} = await estado.supabase
+        .from("intimacoes")
+        .select("*")
+        .eq("intimador_id",id)
+        .order("atribuido_em",{ascending:false});
+
+    if (error) {
+        mensagem(error.message,"danger");
+        return;
+    }
+
+    estado.diligenciasSelecionadas = data||[];
+
+    el("total-ativas-modal").textContent = data.length;
+    el("total-concluidas-modal").textContent = data.filter(i=>i.situacao==="concluida").length;
+    el("total-pendentes-modal").textContent = data.filter(i=>i.situacao==="pendente").length;
+    el("total-checkpoints-modal").textContent = "—";
+
+    el("tbody-diligencias-intimador").innerHTML = data.length
+        ? data.map(i=>`<tr>
+            <td>${escapeHTML(i.devedor)}</td>
+            <td>${statusBadge(i)}</td>
+            <td>${escapeHTML(dataBR(i.atribuido_em))}</td>
+            <td>${escapeHTML(i.situacao||"—")}</td>
+            <td>—</td>
+            <td><span class="text-muted small">Diligências ainda não integradas</span></td>
+          </tr>`).join("")
+        : '<tr><td colspan="6" class="text-center">Nenhuma intimação atribuída.</td></tr>';
+
+    bootstrap.Modal.getOrCreateInstance(el("modalRelatorioIndividual")).show();
+}
+
+/* =========================================================
+   ATRIBUIÇÃO E RETIRADA DE INTIMAÇÕES
+   ========================================================= */
+
+async function abrirModalAtribuicao() {
+    const ids = [...document.querySelectorAll(".cliente-checkbox:checked")].map(c=>c.value);
+    if (!ids.length) return;
+
+    try {
+        const pessoas = await listarIntimadores("");
+        const select = el("select-intimador");
+
+        select.innerHTML =
+            '<option value="" selected disabled>Selecione um intimador…</option>'+
+            pessoas.map(u=>`<option value="${escapeHTML(u.id)}">${escapeHTML(u.nome_completo)} • ${escapeHTML(u.id)}</option>`).join("");
+
+        if (!pessoas.length) {
+            select.innerHTML = '<option value="">Nenhum intimador aprovado disponível</option>';
+        }
+
+        select.dataset.intimacaoIds = JSON.stringify(ids);
+        el("titulo-modal-atribuir").textContent = `Atribuir ${ids.length} intimação(ões)`;
+
+        bootstrap.Modal.getOrCreateInstance(el("modalAtribuir")).show();
+
+    } catch(e) {
+        mensagem(e.message,"danger");
+    }
+}
+
+function atualizarBotaoAtribuir() {
+    el("btn-atribuir").disabled =
+        document.querySelectorAll(".cliente-checkbox:checked").length===0;
+}
+
+async function atribuirIntimacoes(ids,intimadorId) {
+    const {data,error} = await estado.supabase.rpc(
+        ATONEXO_CONFIG.rpcAtribuir,
+        {p_intimacao_ids:ids.map(Number),p_intimador_id:intimadorId}
+    );
+
+    if (error) throw error;
+    return data;
+}
+
+async function retirarIntimacoes(ids) {
+    if (!confirm(`Retirar ${ids.length} intimação(ões) do intimador atual?`)) return;
+
+    const {data,error} = await estado.supabase.rpc(
+        ATONEXO_CONFIG.rpcRetirar,
+        {p_intimacao_ids:ids.map(Number)}
+    );
+
+    if (error) throw error;
+
+    mensagem("Solicitação de retirada processada. O histórico da tabela de intimações registra a alteração.","success");
+    await atualizarPainel();
+}
+
+async function confirmarAtribuicao() {
+    const intimadorId = el("select-intimador").value;
+    const ids = JSON.parse(el("select-intimador").dataset.intimacaoIds||"[]");
+
+    if (!intimadorId) {
+        mensagem("Selecione um intimador.","warning");
+        return;
+    }
+
+    const btn = el("btn-confirmar-atribuicao");
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processando…';
+
+    try {
+        const result = await atribuirIntimacoes(ids,intimadorId);
+
+        bootstrap.Modal.getOrCreateInstance(el("modalAtribuir")).hide();
+
+        mensagem(result?.message||`${ids.length} intimação(ões) atribuída(s) com sucesso.`,"success");
         await atualizarPainel();
+
+    } catch(e) {
+        mensagem(e.message,"danger");
+    } finally {
+        btn.disabled = false;
+        btn.textContent = "Confirmar Atribuição";
     }
-    async function confirmarAtribuicao() {
-        const intimadorId=el("select-intimador").value;
-        const ids=JSON.parse(el("select-intimador").dataset.intimacaoIds||"[]");
-        if(!intimadorId){mensagem("Selecione um intimador.","warning");return;}
-        const btn=el("btn-confirmar-atribuicao");btn.disabled=true;btn.innerHTML='<span class="spinner-border spinner-border-sm me-2"></span>Processando…';
-        try {
-            const result=await atribuirIntimacoes(ids,intimadorId);
-            bootstrap.Modal.getOrCreateInstance(el("modalAtribuir")).hide();
-            mensagem(result?.message||`${ids.length} intimação(ões) atribuída(s) com sucesso.`,"success");
-            await atualizarPainel();
-        }catch(e){mensagem(e.message,"danger");}
-        finally{btn.disabled=false;btn.textContent="Confirmar Atribuição";}
-    }
-    async function atualizarPainel(){
-        limparMensagem();
-        await Promise.all([renderIntimacoes(estado.paginaIntimacoes,estado.buscaIntimacoes),renderUsuarios(),renderRelatorios("")]);
-    }
-    function exportarCSVGeral(){
-        const linhas=[["ID","Cartório","Categoria","Protocolo","Devedor","CPF/CNPJ","Endereço","CEP","Situação","Intimador ID","Atribuído por","Atribuído em"]];
-        estado.intimacoesPagina.forEach(i=>linhas.push([i.id,i.cartorio,i.categoria,i.protocolo,i.devedor,i.cpf_cnpj,endereco(i),i.cep,i.situacao,i.intimador_id,i.atribuido_por,i.atribuido_em]));
-        baixarArquivo(`atonexo-intimacoes-pagina-${new Date().toISOString().slice(0,10)}.csv`,linhas.map(l=>l.map(csvCell).join(";")).join("\r\n"),"text/csv;charset=utf-8");
-    }
-    async function exportarJSONGeral(){
-        const {data,error}=await estado.supabase.from("intimacoes").select("*").order("criado_em",{ascending:false});
-        if(error){mensagem(error.message,"danger");return;}
-        baixarArquivo(`atonexo-intimacoes-${new Date().toISOString().slice(0,10)}.json`,JSON.stringify({gerado_em:new Date().toISOString(),gerado_por:estado.usuario.id,registros:data},null,2),"application/json;charset=utf-8");
-    }
-    function exportarCSVIndividual(){
-        const linhas=[["ID","Protocolo","Devedor","Situação","Intimador","Atribuído por","Atribuído em"]];
-        estado.diligenciasSelecionadas.forEach(i=>linhas.push([i.id,i.protocolo,i.devedor,i.situacao,i.intimador_id,i.atribuido_por,i.atribuido_em]));
-        baixarArquivo(`atonexo-intimador-${estado.intimadorSelecionadoId}.csv`,linhas.map(l=>l.map(csvCell).join(";")).join("\r\n"),"text/csv;charset=utf-8");
-    }
-    function exportarJSONIndividual(){baixarArquivo(`atonexo-intimador-${estado.intimadorSelecionadoId}.json`,JSON.stringify({gerado_em:new Date().toISOString(),intimador_id:estado.intimadorSelecionadoId,intimacoes:estado.diligenciasSelecionadas},null,2),"application/json;charset=utf-8");}
-    function iniciarRealtime(){
-        if(!ATONEXO_CONFIG.realtime)return;
-        estado.realtimeChannel=estado.supabase.channel("atonexo-admin-intimacoes")
-            .on("postgres_changes",{event:"*",schema:"public",table:"intimacoes"},()=>renderIntimacoes(estado.paginaIntimacoes,estado.buscaIntimacoes).catch(e=>mensagem(e.message,"danger")))
-            .subscribe();
+}
+
+/* =========================================================
+   ATUALIZAÇÃO GERAL E EXPORTAÇÕES
+   ========================================================= */
+
+async function atualizarPainel() {
+    limparMensagem();
+
+    await Promise.all([
+        renderIntimacoes(estado.paginaIntimacoes,estado.buscaIntimacoes),
+        renderUsuarios(),
+        renderRelatorios("")
+    ]);
+}
+
+function exportarCSVGeral() {
+    const linhas = [[
+        "ID","Cartório","Categoria","Protocolo","Devedor","CPF/CNPJ",
+        "Endereço","CEP","Situação","Intimador ID","Atribuído por","Atribuído em"
+    ]];
+
+    estado.intimacoesPagina.forEach(i=>linhas.push([
+        i.id,i.cartorio,i.categoria,i.protocolo,i.devedor,i.cpf_cnpj,
+        endereco(i),i.cep,i.situacao,i.intimador_id,i.atribuido_por,i.atribuido_em
+    ]));
+
+    baixarArquivo(
+        `atonexo-intimacoes-pagina-${new Date().toISOString().slice(0,10)}.csv`,
+        linhas.map(l=>l.map(csvCell).join(";")).join("\r\n"),
+        "text/csv;charset=utf-8"
+    );
+}
+
+async function exportarJSONGeral() {
+    const {data,error} = await estado.supabase
+        .from("intimacoes")
+        .select("*")
+        .order("criado_em",{ascending:false});
+
+    if (error) {
+        mensagem(error.message,"danger");
+        return;
     }
 
-    document.addEventListener("DOMContentLoaded",async()=>{
-        el("anoAtual").textContent=new Date().getFullYear();
-        el("btn-buscar-intimacoes").addEventListener("click",()=>renderIntimacoes(1,el("search-intimacoes").value).catch(e=>mensagem(e.message,"danger")));
-        el("search-intimacoes").addEventListener("keydown",e=>{if(e.key==="Enter")el("btn-buscar-intimacoes").click();});
-        el("btn-buscar-intimadores-relatorio").addEventListener("click",()=>renderRelatorios(el("search-intimadores").value));
-        el("search-intimadores").addEventListener("keydown",e=>{if(e.key==="Enter")el("btn-buscar-intimadores-relatorio").click();});
-        el("acompanhamento-tab").addEventListener("shown.bs.tab",()=>renderRelatorios().catch(e=>mensagem(e.message,"danger")));
-        el("btn-export-csv").addEventListener("click",exportarCSVGeral);
-        el("btn-export-json").addEventListener("click",exportarJSONGeral);
-        el("btn-export-individual-csv").addEventListener("click",exportarCSVIndividual);
-        el("btn-export-individual-json").addEventListener("click",exportarJSONIndividual);
-        el("select-all-intimacoes").addEventListener("change",e=>{document.querySelectorAll(".cliente-checkbox:not(:disabled)").forEach(c=>c.checked=e.target.checked);atualizarBotaoAtribuir();});
-        document.addEventListener("change",e=>{if(e.target.matches(".cliente-checkbox"))atualizarBotaoAtribuir();});
-        el("btn-atribuir").addEventListener("click",abrirModalAtribuicao);
-        el("btn-confirmar-atribuicao").addEventListener("click",confirmarAtribuicao);
-        el("btn-recarregar").addEventListener("click",()=>atualizarPainel().catch(e=>mensagem(e.message,"danger")));
-        el("btn-logout").addEventListener("click",async()=>{const {error}=await estado.supabase.auth.signOut();if(error)mensagem(error.message,"danger");else window.location.href="login.html";});
-        try{await iniciarSupabase();await atualizarPainel();iniciarRealtime();}
-        catch(e){el("status-conexao").textContent="Sem conexão";mensagem(e.message,"danger");console.error("AtoNexo:",e);}
+    baixarArquivo(
+        `atonexo-intimacoes-${new Date().toISOString().slice(0,10)}.json`,
+        JSON.stringify({
+            gerado_em:new Date().toISOString(),
+            gerado_por:estado.usuario.id,
+            registros:data
+        },null,2),
+        "application/json;charset=utf-8"
+    );
+}
+
+function exportarCSVIndividual() {
+    const linhas = [["ID","Protocolo","Devedor","Situação","Intimador","Atribuído por","Atribuído em"]];
+
+    estado.diligenciasSelecionadas.forEach(i=>linhas.push([
+        i.id,i.protocolo,i.devedor,i.situacao,i.intimador_id,i.atribuido_por,i.atribuido_em
+    ]));
+
+    baixarArquivo(
+        `atonexo-intimador-${estado.intimadorSelecionadoId}.csv`,
+        linhas.map(l=>l.map(csvCell).join(";")).join("\r\n"),
+        "text/csv;charset=utf-8"
+    );
+}
+
+function exportarJSONIndividual() {
+    baixarArquivo(
+        `atonexo-intimador-${estado.intimadorSelecionadoId}.json`,
+        JSON.stringify({
+            gerado_em:new Date().toISOString(),
+            intimador_id:estado.intimadorSelecionadoId,
+            intimacoes:estado.diligenciasSelecionadas
+        },null,2),
+        "application/json;charset=utf-8"
+    );
+}
+
+/* =========================================================
+   REALTIME
+   ========================================================= */
+
+function iniciarRealtime() {
+    if (!ATONEXO_CONFIG.realtime) return;
+
+    estado.realtimeChannel = estado.supabase
+        .channel("atonexo-admin-intimacoes")
+        .on(
+            "postgres_changes",
+            {event:"*",schema:"public",table:"intimacoes"},
+            ()=>renderIntimacoes(estado.paginaIntimacoes,estado.buscaIntimacoes)
+                .catch(e=>mensagem(e.message,"danger"))
+        )
+        .subscribe();
+}
+
+/* =========================================================
+   EVENTOS DA INTERFACE
+   ========================================================= */
+
+document.addEventListener("DOMContentLoaded",async()=>{
+    el("anoAtual").textContent = new Date().getFullYear();
+
+    el("btn-buscar-intimacoes").addEventListener("click",()=>{
+        renderIntimacoes(1,el("search-intimacoes").value)
+            .catch(e=>mensagem(e.message,"danger"));
     });
-    </script>
-    <!-- ATO:FIM:JS:DASHBOARD -->
+
+    el("search-intimacoes").addEventListener("keydown",e=>{
+        if (e.key==="Enter") el("btn-buscar-intimacoes").click();
+    });
+
+    el("btn-buscar-intimadores-relatorio").addEventListener("click",()=>{
+        renderRelatorios(el("search-intimadores").value);
+    });
+
+    el("search-intimadores").addEventListener("keydown",e=>{
+        if (e.key==="Enter") el("btn-buscar-intimadores-relatorio").click();
+    });
+
+    el("acompanhamento-tab").addEventListener("shown.bs.tab",()=>{
+        renderRelatorios().catch(e=>mensagem(e.message,"danger"));
+    });
+
+    el("usuarios-tab").addEventListener("shown.bs.tab",()=>{
+        renderUsuarios().catch(e=>mensagem(e.message,"danger"));
+    });
+
+    el("btn-atualizar-usuarios").addEventListener("click",()=>{
+        renderUsuarios().catch(e=>mensagem(e.message,"danger"));
+    });
+
+    el("btn-salvar-usuario").addEventListener("click",salvarAlteracoesUsuario);
+
+    el("btn-export-csv").addEventListener("click",exportarCSVGeral);
+    el("btn-export-json").addEventListener("click",exportarJSONGeral);
+    el("btn-export-individual-csv").addEventListener("click",exportarCSVIndividual);
+    el("btn-export-individual-json").addEventListener("click",exportarJSONIndividual);
+
+    el("select-all-intimacoes").addEventListener("change",e=>{
+        document.querySelectorAll(".cliente-checkbox:not(:disabled)").forEach(c=>{
+            c.checked = e.target.checked;
+        });
+        atualizarBotaoAtribuir();
+    });
+
+    document.addEventListener("change",e=>{
+        if (e.target.matches(".cliente-checkbox")) atualizarBotaoAtribuir();
+    });
+
+    el("btn-atribuir").addEventListener("click",abrirModalAtribuicao);
+    el("btn-confirmar-atribuicao").addEventListener("click",confirmarAtribuicao);
+
+    el("btn-recarregar").addEventListener("click",()=>{
+        atualizarPainel().catch(e=>mensagem(e.message,"danger"));
+    });
+
+    el("btn-logout").addEventListener("click",async()=>{
+        if (!estado.supabase) return;
+
+        const {error} = await estado.supabase.auth.signOut();
+
+        if (error) mensagem(error.message,"danger");
+        else window.location.replace(DESTINO_LOGIN);
+    });
+
+    try {
+        await iniciarSupabase();
+        await atualizarPainel();
+        iniciarRealtime();
+
+    } catch(e) {
+        el("status-conexao").textContent = "Sem conexão";
+        mensagem(e.message,"danger");
+        console.error("AtoNexo:",e);
+    }
+});
+</script>
 
 </body>
 </html>
