@@ -534,9 +534,6 @@
 
       /*
        * CONFIGURAÇÃO DO PROJETO ATONEXO
-       *
-       * Não substitua estes dados pelos do projeto Supabase antigo.
-       * A chave publishable é destinada ao uso no navegador.
        */
       const SUPABASE_URL =
         "https://dlxqahkjhuocsssosqyj.supabase.co";
@@ -544,12 +541,22 @@
       const SUPABASE_PUBLISHABLE_KEY =
         "sb_publishable_IJ704qHttTZHtI_q8E7CCw_siVAy7Ex";
 
-      const DESTINO_TI =
-        "https://tabpoa.github.io/tabelionatopoa/cadastro-intimacoes.html";
+      /*
+       * DESTINOS DE CADA PAPEL
+       */
+      const DESTINOS = Object.freeze({
+        administrador:
+          "https://tabpoa.github.io/tabelionatopoa/atonexo-dashboard-admin.html",
+
+        ti:
+          "https://tabpoa.github.io/tabelionatopoa/cadastro-intimacoes.html",
+
+        intimador:
+          "https://tabpoa.github.io/tabelionatopoa/intimador.html"
+      });
 
       /*
-       * O escopo desta função evita declarações const/let globais
-       * que possam conflitar com outros scripts da página.
+       * ELEMENTOS DA PÁGINA
        */
       const loginForm = document.getElementById("loginForm");
       const signupForm = document.getElementById("signupForm");
@@ -565,6 +572,9 @@
       document.getElementById("currentYear").textContent =
         new Date().getFullYear();
 
+      /*
+       * MENSAGENS
+       */
       function showMessage(element, message, type = "danger") {
         element.textContent = message;
         element.className = `alert alert-${type}`;
@@ -576,21 +586,30 @@
         element.classList.add("d-none");
       }
 
+      /*
+       * ESTADOS DOS BOTÕES
+       */
       function setLoginLoading(loading) {
         loginButton.disabled = loading;
+
         loginButtonText.textContent = loading
           ? "Verificando acesso..."
           : "Entrar no sistema";
+
         loginSpinner.classList.toggle("d-none", !loading);
       }
 
       function setSignupLoading(loading) {
         signupButton.disabled = loading;
+
         signupButton.textContent = loading
           ? "Enviando solicitação..."
           : "Criar solicitação";
       }
 
+      /*
+       * TRATAMENTO DE ERROS
+       */
       function readableError(error) {
         const message = String(error?.message || "");
 
@@ -618,10 +637,12 @@
       }
 
       /*
-       * Inicializa o cliente sem declarar uma variável global chamada
-       * "supabase", evitando conflito com a biblioteca carregada acima.
+       * INICIALIZAÇÃO DO SUPABASE
        */
-      if (!window.supabase || typeof window.supabase.createClient !== "function") {
+      if (
+        !window.supabase ||
+        typeof window.supabase.createClient !== "function"
+      ) {
         showMessage(
           loginMessage,
           "A biblioteca de autenticação não carregou. Recarregue a página e tente novamente."
@@ -631,23 +652,146 @@
 
       const supabaseClient = window.supabase.createClient(
         SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY
+        SUPABASE_PUBLISHABLE_KEY,
+        {
+          auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true
+          }
+        }
       );
 
       /*
-       * Mostrar/ocultar a senha.
+       * CONSULTA O PERFIL DO USUÁRIO AUTENTICADO
+       *
+       * A consulta utiliza o ID da sessão atual.
+       * A política RLS deve permitir que o usuário consulte
+       * seu próprio registro em perfis_usuarios.
+       */
+      async function consultarPerfil(usuarioId) {
+        const { data: perfil, error } = await supabaseClient
+          .from("perfis_usuarios")
+          .select("id,nome_completo,status_cadastro,papel")
+          .eq("id", usuarioId)
+          .maybeSingle();
+
+        if (error) {
+          throw new Error(
+            "Não foi possível consultar o perfil do usuário: " +
+            error.message
+          );
+        }
+
+        if (!perfil) {
+          throw new Error(
+            "A conta foi autenticada, mas não foi encontrado um perfil correspondente na tabela perfis_usuarios."
+          );
+        }
+
+        return perfil;
+      }
+
+      /*
+       * VALIDAÇÃO E REDIRECIONAMENTO
+       *
+       * Somente usuários aprovados podem entrar.
+       * Cada papel possui seu próprio destino.
+       */
+      async function validarEEncaminhar(usuario) {
+        if (!usuario?.id) {
+          throw new Error(
+            "Não foi possível identificar o usuário autenticado."
+          );
+        }
+
+        const perfil = await consultarPerfil(usuario.id);
+
+        if (perfil.status_cadastro !== "aprovado") {
+          await supabaseClient.auth.signOut();
+
+          throw new Error(
+            "Seu cadastro ainda não foi aprovado. Entre em contato com o administrador do sistema."
+          );
+        }
+
+        const destino = DESTINOS[perfil.papel];
+
+        if (!destino) {
+          await supabaseClient.auth.signOut();
+
+          throw new Error(
+            "Seu cadastro está aprovado, mas seu papel não possui acesso autorizado ao sistema."
+          );
+        }
+
+        /*
+         * Redirecionamento conforme o papel cadastrado
+         * e aprovado no banco de dados.
+         */
+        window.location.replace(destino);
+      }
+
+      /*
+       * SESSÃO JÁ EXISTENTE
+       *
+       * Se o usuário já estiver autenticado, não precisa
+       * informar novamente e-mail e senha.
+       *
+       * O sistema consulta seu perfil e encaminha
+       * para a página correspondente.
+       */
+      async function verificarSessaoExistente() {
+        try {
+          const { data, error } =
+            await supabaseClient.auth.getSession();
+
+          if (error) {
+            throw error;
+          }
+
+          const usuario = data?.session?.user;
+
+          if (usuario) {
+            setLoginLoading(true);
+            await validarEEncaminhar(usuario);
+          }
+
+        } catch (error) {
+          showMessage(
+            loginMessage,
+            readableError(error)
+          );
+
+          setLoginLoading(false);
+        }
+      }
+
+      /*
+       * MOSTRAR / OCULTAR SENHA
        */
       document
         .getElementById("toggleLoginPassword")
         .addEventListener("click", function () {
-          const passwordInput = document.getElementById("loginPassword");
+          const passwordInput =
+            document.getElementById("loginPassword");
+
           const icon = this.querySelector("i");
           const isPassword = passwordInput.type === "password";
 
           passwordInput.type = isPassword ? "text" : "password";
-          icon.className = isPassword ? "bi bi-eye-slash" : "bi bi-eye";
+
+          icon.className = isPassword
+            ? "bi bi-eye-slash"
+            : "bi bi-eye";
+
           this.setAttribute(
             "aria-label",
+            isPassword ? "Ocultar senha" : "Mostrar senha"
+          );
+
+          this.setAttribute(
+            "title",
             isPassword ? "Ocultar senha" : "Mostrar senha"
           );
         });
@@ -655,13 +799,15 @@
       /*
        * LOGIN
        *
-       * 1. Autentica o usuário no Supabase Auth.
+       * 1. Autentica no Supabase Auth.
        * 2. Consulta o perfil em public.perfis_usuarios.
-       * 3. Verifica a aprovação e o papel.
-       * 4. Redireciona o usuário TI.
+       * 3. Verifica se o cadastro está aprovado.
+       * 4. Identifica o papel do usuário.
+       * 5. Encaminha para a página correspondente.
        */
       loginForm.addEventListener("submit", async (event) => {
         event.preventDefault();
+
         clearMessage(loginMessage);
 
         if (!loginForm.checkValidity()) {
@@ -691,75 +837,33 @@
           }
 
           if (!authData?.user) {
-            throw new Error("O Supabase não retornou um usuário autenticado.");
-          }
-
-          /*
-           * A consulta usa o ID do usuário autenticado.
-           * A política RLS precisa permitir que o usuário leia
-           * o próprio perfil.
-           */
-          const { data: perfil, error: perfilError } =
-            await supabaseClient
-              .from("perfis_usuarios")
-              .select("nome_completo, status_cadastro, papel")
-              .eq("id", authData.user.id)
-              .maybeSingle();
-
-          if (perfilError) {
             throw new Error(
-              "A autenticação ocorreu, mas não foi possível consultar o perfil: " +
-              perfilError.message
+              "O Supabase não retornou um usuário autenticado."
             );
           }
 
-          if (!perfil) {
-            await supabaseClient.auth.signOut();
-
-            throw new Error(
-              "A conta foi autenticada, mas não foi encontrado um perfil na tabela perfis_usuarios para este usuário."
-            );
-          }
-
-          if (perfil.status_cadastro !== "aprovado") {
-            await supabaseClient.auth.signOut();
-
-            throw new Error(
-              "Seu cadastro ainda não foi aprovado. Entre em contato com o administrador do sistema."
-            );
-          }
-
-          if (perfil.papel !== "ti") {
-            await supabaseClient.auth.signOut();
-
-            throw new Error(
-              "Seu cadastro está aprovado, mas seu perfil não possui acesso a esta página."
-            );
-          }
-
-          /*
-           * Redirecionamento do perfil TI.
-           */
-          window.location.replace(DESTINO_TI);
+          await validarEEncaminhar(authData.user);
 
         } catch (error) {
-          showMessage(loginMessage, readableError(error));
-        } finally {
+          showMessage(
+            loginMessage,
+            readableError(error)
+          );
+
           setLoginLoading(false);
         }
       });
 
       /*
-       * CADASTRO
+       * CADASTRO PÚBLICO
        *
-       * O cadastro cria a conta no Supabase Auth.
-       * O perfil pendente deve ser criado pela configuração do banco
-       * (por exemplo, pelo trigger já configurado no projeto).
-       *
-       * Não se atribui papel administrativo pelo formulário público.
+       * O formulário não permite escolher ou atribuir papel.
+       * O perfil deve ser criado como pendente pela configuração
+       * existente no banco de dados.
        */
       signupForm.addEventListener("submit", async (event) => {
         event.preventDefault();
+
         clearMessage(signupMessage);
 
         if (!signupForm.checkValidity()) {
@@ -813,26 +917,25 @@
         setSignupLoading(true);
 
         try {
-          const { data, error } = await supabaseClient.auth.signUp({
-            email,
-            password,
-            options: {
-              emailRedirectTo: window.location.origin +
-                window.location.pathname,
-              data: {
-                nome_completo: nome
+          const { data, error } =
+            await supabaseClient.auth.signUp({
+              email,
+              password,
+              options: {
+                emailRedirectTo:
+                  window.location.origin +
+                  window.location.pathname,
+
+                data: {
+                  nome_completo: nome
+                }
               }
-            }
-          });
+            });
 
           if (error) {
             throw error;
           }
 
-          /*
-           * Se a confirmação por e-mail estiver habilitada,
-           * normalmente será necessário confirmar o endereço.
-           */
           const confirmationRequired =
             data.user && !data.session;
 
@@ -844,6 +947,7 @@
             );
 
             signupForm.reset();
+
           } else if (data.user) {
             showMessage(
               signupMessage,
@@ -852,6 +956,7 @@
             );
 
             signupForm.reset();
+
           } else {
             showMessage(
               signupMessage,
@@ -861,7 +966,11 @@
           }
 
         } catch (error) {
-          showMessage(signupMessage, readableError(error));
+          showMessage(
+            signupMessage,
+            readableError(error)
+          );
+
         } finally {
           setSignupLoading(false);
         }
@@ -890,18 +999,22 @@
             return;
           }
 
-          const button = document.getElementById("forgotPasswordButton");
+          const button =
+            document.getElementById("forgotPasswordButton");
+
           button.disabled = true;
           button.textContent = "Enviando...";
 
           try {
             const redirectTo =
-              window.location.origin + window.location.pathname;
+              window.location.origin +
+              window.location.pathname;
 
             const { error } =
-              await supabaseClient.auth.resetPasswordForEmail(email, {
-                redirectTo
-              });
+              await supabaseClient.auth.resetPasswordForEmail(
+                email,
+                { redirectTo }
+              );
 
             if (error) {
               throw error;
@@ -914,12 +1027,21 @@
             );
 
           } catch (error) {
-            showMessage(loginMessage, readableError(error));
+            showMessage(
+              loginMessage,
+              readableError(error)
+            );
+
           } finally {
             button.disabled = false;
             button.textContent = "Esqueci minha senha";
           }
         });
+
+      /*
+       * VERIFICA A SESSÃO AO ABRIR A PÁGINA
+       */
+      verificarSessaoExistente();
 
     })();
   </script>
