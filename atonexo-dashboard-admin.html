@@ -478,9 +478,7 @@
                     <button class="btn btn-outline-danger" id="btn-logout" type="button"><i class="bi bi-box-arrow-right me-1"></i> Sair</button>
                 </div>
             </div>
-            <div class="demo-notice mb-4" id="aviso-modo-demo" role="status">
-                <i class="bi bi-info-circle me-1"></i> <strong>Protótipo visual:</strong> os dados exibidos são fictícios e as alterações ficam apenas nesta página. A conexão com o Supabase será ativada depois de conferirmos as tabelas, colunas, permissões e políticas RLS existentes.
-            </div>
+            <div class="demo-notice mb-4" id="aviso-modo-demo" role="status" hidden></div>
             <div class="row g-3 mb-4" aria-label="Resumo operacional">
                 <div class="col-6 col-xl-3"><div class="card dashboard-stat"><div class="card-body d-flex justify-content-between align-items-center gap-2"><div><div class="dashboard-stat-label mb-2">Intimações no painel</div><div class="dashboard-stat-value" id="stat-intimacoes">0</div></div><span class="dashboard-stat-icon"><i class="bi bi-envelope-paper"></i></span></div></div></div>
                 <div class="col-6 col-xl-3"><div class="card dashboard-stat"><div class="card-body d-flex justify-content-between align-items-center gap-2"><div><div class="dashboard-stat-label mb-2">Sem atribuição</div><div class="dashboard-stat-value" id="stat-pendentes">0</div></div><span class="dashboard-stat-icon"><i class="bi bi-inbox"></i></span></div></div></div>
@@ -513,7 +511,7 @@
                         <div class="card-body">
                             <div class="row g-3 mb-3">
                                 <div class="col-md-8">
-                                    <input type="text" class="form-control" id="search-intimacoes" placeholder="Pesquisar por CEP, CPF/CNPJ ou UID...">
+                                    <input type="text" class="form-control" id="search-intimacoes" placeholder="Pesquisar por nome, empresa, CPF, CNPJ, CEP ou protocolo...">
                                 </div>
                                 <div class="col-md-4 d-flex gap-2">
                                     <button class="btn btn-success w-100" id="btn-buscar-intimacoes"><i class="bi bi-search"></i> Buscar</button>
@@ -531,10 +529,12 @@
                                             <th>CPF/CNPJ</th>
                                             <th>Endereço</th>
                                             <th>Status</th>
+                                            <th>Responsável</th>
+                                            <th class="text-end">Ação</th>
                                         </tr>
                                     </thead>
                                     <tbody id="tbody-intimacoes">
-                                        <tr><td colspan="6" class="text-center text-muted">Carregando intimações...</td></tr>
+                                        <tr><td colspan="8" class="text-center text-muted">Conectando ao Supabase...</td></tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -761,353 +761,291 @@
 
     <!-- Bootstrap 5.3.8: componentes de abas e modais -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Supabase JS v2: carregado para a futura integração; consultas desativadas neste protótipo -->
+    <!-- Supabase JS v2: conexão real com o projeto AtoNexo -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- ATO:INICIO:JS:DASHBOARD -->
     <script>
     "use strict";
 
-    /*
-     * AtoNexo — camada de dados preparada para Supabase.
-     * IMPORTANTE: nenhuma consulta ou gravação remota é executada nesta versão.
-     * Antes de ligar, vamos conferir o esquema real, os papéis e as políticas RLS.
-     */
+    /* =========================================================
+       ATONEXO — DASHBOARD ADMINISTRATIVO / SUPABASE
+       Estrutura real confirmada:
+       - perfis_usuarios
+       - intimacoes
+       - intimacoes_historico
+       - codigos_ocorrencia
+       Operações de atribuição/retirada usam RPCs transacionais.
+       ========================================================= */
     const ATONEXO_CONFIG = Object.freeze({
-        mode: "demo", // trocar para "supabase" somente depois da revisão do banco
         supabaseUrl: "https://dlxqahkjhuocsssosqyj.supabase.co",
-        supabasePublishableKey: "" // preencher/validar na etapa de integração
+        // Chave publicável (sb_publishable_...). Nunca usar service_role no navegador.
+        supabasePublishableKey: "sb_publishable_IJ704qHttTZHtI_q8E7CCw_siVAy7Ex",
+        pageSize: 10,
+        realtime: true,
+        rpcAtribuir: "atonexo_atribuir_intimacoes",
+        rpcRetirar: "atonexo_retirar_intimacoes"
     });
 
-    const ATONEXO_REPOSITORY = {
-        async listarIntimacoes(filtro) { return DemoRepository.listarIntimacoes(filtro); },
-        async listarUsuarios() { return DemoRepository.listarUsuarios(); },
-        async alterarPapelUsuario(id, papel) { return DemoRepository.alterarPapelUsuario(id, papel); },
-        async listarIntimadores(filtro) { return DemoRepository.listarIntimadores(filtro); },
-        async listarDiligencias(intimadorId) { return DemoRepository.listarDiligencias(intimadorId); },
-        async atribuirIntimacoes(ids, intimadorId) { return DemoRepository.atribuirIntimacoes(ids, intimadorId); },
-        async recarregar() { return DemoRepository.recarregar(); }
-    };
-
-    // Dados exclusivamente fictícios para validar interface e fluxos sem tocar no banco.
-    const DemoRepository = (() => {
-        const usuarios = [
-            { id: "usr-demo-01", nome: "Ana Martins", email: "ana.martins@exemplo.invalid", papel: "administrador", status: "aprovado" },
-            { id: "usr-demo-02", nome: "Carlos Oliveira", email: "carlos.oliveira@exemplo.invalid", papel: "intimador", status: "aprovado" },
-            { id: "usr-demo-03", nome: "Marina Costa", email: "marina.costa@exemplo.invalid", papel: "intimador", status: "aprovado" },
-            { id: "usr-demo-04", nome: "Paulo Ribeiro", email: "paulo.ribeiro@exemplo.invalid", papel: "usuario", status: "pendente" }
-        ];
-        const intimacoes = [
-            { id: "DEMO-1001", devedor: "Comércio Exemplo Ltda.", cpf_cnpj: "12.345.678/0001-90", endereco: "Rua das Flores, 120", cep: "90010-120", status: "Pendente", intimador_id: null },
-            { id: "DEMO-1002", devedor: "João da Silva (fictício)", cpf_cnpj: "123.456.789-00", endereco: "Av. Central, 55", cep: "90020-001", status: "Atribuída", intimador_id: "usr-demo-02" },
-            { id: "DEMO-1003", devedor: "Empresa Modelo S.A.", cpf_cnpj: "98.765.432/0001-10", endereco: "Rua Norte, 800", cep: "90030-010", status: "Em andamento", intimador_id: "usr-demo-02" },
-            { id: "DEMO-1004", devedor: "Maria de Exemplo", cpf_cnpj: "987.654.321-00", endereco: "Rua Sul, 32", cep: "90040-020", status: "Concluída", intimador_id: "usr-demo-03" },
-            { id: "DEMO-1005", devedor: "Indústria de Teste Ltda.", cpf_cnpj: "11.222.333/0001-44", endereco: "Av. do Trabalho, 910", cep: "90050-030", status: "Pendente", intimador_id: null },
-            { id: "DEMO-1006", devedor: "Cliente Ilustrativo", cpf_cnpj: "111.222.333-44", endereco: "Rua do Mercado, 77", cep: "90060-040", status: "Atribuída", intimador_id: "usr-demo-03" },
-            { id: "DEMO-1007", devedor: "Oficina Demonstração", cpf_cnpj: "22.333.444/0001-55", endereco: "Rua das Acácias, 14", cep: "90070-050", status: "Pendente", intimador_id: null }
-        ];
-        const diligencias = [
-            { id: "d-demo-01", cliente_id: "DEMO-1002", intimador_id: "usr-demo-02", status: "em_andamento", iniciada_em: "2026-10-26T13:00:00Z", concluida_em: null, checkpoints: [{ sequencial: 1, data_hora: "2026-10-26T13:10:00Z", latitude: -30.03, longitude: -51.23, codigo_ocorrencia: "VISITA_INICIAL", justificativa: "Registro fictício de demonstração." }] },
-            { id: "d-demo-02", cliente_id: "DEMO-1003", intimador_id: "usr-demo-02", status: "pendente", iniciada_em: null, concluida_em: null, checkpoints: [] },
-            { id: "d-demo-03", cliente_id: "DEMO-1004", intimador_id: "usr-demo-03", status: "concluida", iniciada_em: "2026-10-24T10:00:00Z", concluida_em: "2026-10-24T11:20:00Z", checkpoints: [{ sequencial: 1, data_hora: "2026-10-24T10:20:00Z", latitude: -30.04, longitude: -51.22, codigo_ocorrencia: "ENTREGUE", justificativa: "Registro fictício de demonstração." }] },
-            { id: "d-demo-04", cliente_id: "DEMO-1006", intimador_id: "usr-demo-03", status: "em_andamento", iniciada_em: "2026-10-25T09:00:00Z", concluida_em: null, checkpoints: [] }
-        ];
-        return {
-            async listarIntimacoes({ busca = "", pagina = 1, limite = 10 } = {}) {
-                const termo = busca.trim().toLocaleLowerCase("pt-BR");
-                const filtradas = intimacoes.filter(i => !termo || [i.id, i.devedor, i.cpf_cnpj, i.cep, i.endereco].some(v => String(v || "").toLocaleLowerCase("pt-BR").includes(termo)));
-                const inicio = (pagina - 1) * limite;
-                return { dados: filtradas.slice(inicio, inicio + limite), total: filtradas.length, pagina, limite };
-            },
-            async listarUsuarios() { return structuredClone(usuarios); },
-            async alterarPapelUsuario(id, papel) {
-                const usuario = usuarios.find(u => u.id === id);
-                if (!usuario) throw new Error("Usuário de demonstração não encontrado.");
-                usuario.papel = papel;
-                usuario.status = "aprovado";
-                return structuredClone(usuario);
-            },
-            async listarIntimadores(filtro = "") {
-                const pessoas = usuarios.filter(u => u.papel === "intimador");
-                const termo = filtro.trim().toLocaleLowerCase("pt-BR");
-                return pessoas.filter(u => !termo || u.nome.toLocaleLowerCase("pt-BR").includes(termo)).map(u => {
-                    const ds = diligencias.filter(d => d.intimador_id === u.id);
-                    return { ...u, ativas: ds.filter(d => d.status === "em_andamento").length, concluidas: ds.filter(d => ["concluida", "encerrada"].includes(d.status)).length, pendentes: ds.filter(d => d.status === "pendente").length };
-                });
-            },
-            async listarDiligencias(intimadorId) {
-                return diligencias.filter(d => d.intimador_id === intimadorId).map(d => ({ ...d, cliente: intimacoes.find(i => i.id === d.cliente_id) || {}, checkpoints: structuredClone(d.checkpoints) }));
-            },
-            async atribuirIntimacoes(ids, intimadorId) {
-                const intimador = usuarios.find(u => u.id === intimadorId && u.papel === "intimador");
-                if (!intimador) throw new Error("Selecione um intimador válido.");
-                let total = 0;
-                intimacoes.forEach(i => {
-                    if (ids.includes(i.id)) {
-                        i.intimador_id = intimadorId;
-                        i.status = "Atribuída";
-                        total++;
-                    }
-                });
-                return { total };
-            },
-            async recarregar() { return true; },
-            todos: () => ({ usuarios, intimacoes, diligencias })
-        };
-    })();
-
     const estado = {
-        paginaIntimacoes: 1,
-        buscaIntimacoes: "",
-        intimadorSelecionadoId: null,
-        diligenciasSelecionadas: [],
-        checkpointsSelecionados: []
+        supabase: null, usuario: null, perfil: null,
+        paginaIntimacoes: 1, buscaIntimacoes: "", totalIntimacoes: 0,
+        intimacoesPagina: [], intimadores: [],
+        intimadorSelecionadoId: null, diligenciasSelecionadas: [],
+        realtimeChannel: null, carregando: false
     };
 
     const el = id => document.getElementById(id);
     const escapeHTML = value => String(value ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
     const dataBR = value => value ? new Date(value).toLocaleString("pt-BR") : "—";
-    const statusBadge = status => {
-        const s = String(status || "").toLowerCase();
-        if (["concluída", "concluida", "encerrada"].includes(s)) return '<span class="badge text-bg-success">Concluída</span>';
-        if (["em andamento", "em_andamento"].includes(s)) return '<span class="badge text-bg-warning">Em andamento</span>';
-        if (["atribuída", "atribuida"].includes(s)) return '<span class="badge text-bg-info">Atribuída</span>';
-        return '<span class="badge text-bg-secondary">Pendente</span>';
-    };
+    const endereco = i => [i.logradouro, i.numero, i.complemento, i.bairro, i.cidade, i.uf].filter(Boolean).join(", ") || "—";
+    const nomePapel = p => ({ administrador:"Administrador", ti:"TI", intimador:"Intimador", usuario:"Usuário" }[p] || p || "—");
 
+    function mensagem(texto, tipo="info") {
+        const aviso = el("aviso-modo-demo");
+        aviso.hidden = false;
+        aviso.className = `alert alert-${tipo} mb-4`;
+        aviso.textContent = texto;
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+    function limparMensagem() {
+        const aviso = el("aviso-modo-demo");
+        aviso.hidden = true;
+        aviso.textContent = "";
+    }
+    function statusBadge(i) {
+        if (!i.intimador_id) return '<span class="badge text-bg-secondary">Disponível</span>';
+        if (i.situacao === "concluida" || i.situacao === "concluída") return '<span class="badge text-bg-success">Concluída</span>';
+        return '<span class="badge text-bg-info">Atribuída</span>';
+    }
     function baixarArquivo(nome, conteudo, tipo) {
         const blob = new Blob(["\uFEFF", conteudo], { type: tipo });
         const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = nome;
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-        URL.revokeObjectURL(url);
+        const a = document.createElement("a"); a.href=url; a.download=nome;
+        document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
     }
-    function csvCell(value) {
-        const text = String(value ?? "");
-        return '"' + text.replace(/"/g, '""') + '"';
+    const csvCell = v => '"' + String(v ?? "").replace(/"/g, '""') + '"';
+
+    async function iniciarSupabase() {
+        if (!window.supabase?.createClient) throw new Error("A biblioteca Supabase JS não foi carregada.");
+        if (!ATONEXO_CONFIG.supabasePublishableKey) throw new Error("Configure a chave publicável do Supabase em ATONEXO_CONFIG.");
+        estado.supabase = window.supabase.createClient(ATONEXO_CONFIG.supabaseUrl, ATONEXO_CONFIG.supabasePublishableKey, {
+            auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
+            realtime: { params: { eventsPerSecond: 5 } }
+        });
+        const { data, error } = await estado.supabase.auth.getSession();
+        if (error) throw error;
+        if (!data.session) {
+            mensagem("Sua sessão não está ativa. Faça login para acessar o painel administrativo.", "warning");
+            setTimeout(() => { window.location.href = "login.html"; }, 1800);
+            throw new Error("Sessão não autenticada.");
+        }
+        estado.usuario = data.session.user;
+        const perfil = await estado.supabase.from("perfis_usuarios")
+            .select("id,nome_completo,status_cadastro,papel")
+            .eq("id", estado.usuario.id).maybeSingle();
+        if (perfil.error) throw perfil.error;
+        if (!perfil.data || perfil.data.status_cadastro !== "aprovado" || perfil.data.papel !== "administrador") {
+            await estado.supabase.auth.signOut();
+            throw new Error("Acesso negado. Esta página é exclusiva para administradores aprovados.");
+        }
+        estado.perfil = perfil.data;
+        el("status-conexao").textContent = `Conectado • ${perfil.data.nome_completo}`;
+        el("status-conexao").classList.add("text-success");
+        return true;
     }
 
-    async function renderIntimacoes(pagina = estado.paginaIntimacoes, busca = estado.buscaIntimacoes) {
-        estado.paginaIntimacoes = pagina;
-        estado.buscaIntimacoes = busca;
-        const tbody = el("tbody-intimacoes");
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center table-empty">Carregando registros…</td></tr>';
+    async function listarIntimacoes({ busca="", pagina=1, limite=ATONEXO_CONFIG.pageSize }={}) {
+        let q = estado.supabase.from("intimacoes").select("id,cartorio,categoria,protocolo,devedor,cpf_cnpj,logradouro,numero,complemento,bairro,cep,cidade,uf,apresentante,referencia,tipo_titulo,data_apresentacao,data_vencimento,valor_titulo,observacoes,criado_por,criado_em,intimador_id,atribuido_por,atribuido_em,situacao,atualizado_em", { count:"exact" });
+        const termo = busca.trim().replace(/[(),]/g, " ");
+        if (termo) {
+            const like = `%${termo}%`;
+            q = q.or([`devedor.ilike.${like}`,`cpf_cnpj.ilike.${like}`,`cep.ilike.${like}`,`protocolo.ilike.${like}`,`logradouro.ilike.${like}`,`apresentante.ilike.${like}`].join(","));
+        }
+        const inicio=(pagina-1)*limite;
+        const { data, error, count } = await q.order("criado_em",{ascending:false}).range(inicio,inicio+limite-1);
+        if (error) throw error;
+        return { dados:data||[], total:count||0, pagina, limite };
+    }
+
+    async function listarUsuarios() {
+        const { data, error } = await estado.supabase.from("perfis_usuarios")
+            .select("id,nome_completo,status_cadastro,papel,criado_em")
+            .order("nome_completo",{ascending:true});
+        if (error) throw error;
+        return data||[];
+    }
+    async function listarIntimadores(filtro="") {
+        const termo=filtro.trim();
+        let q=estado.supabase.from("perfis_usuarios")
+            .select("id,nome_completo,status_cadastro,papel")
+            .eq("papel","intimador").eq("status_cadastro","aprovado")
+            .order("nome_completo",{ascending:true});
+        if(termo) q=q.ilike("nome_completo",`%${termo.replace(/[%_,]/g," ")}%`);
+        const {data,error}=await q;
+        if(error) throw error;
+        return data||[];
+    }
+
+    async function renderIntimacoes(pagina=estado.paginaIntimacoes,busca=estado.buscaIntimacoes) {
+        estado.paginaIntimacoes=pagina; estado.buscaIntimacoes=busca;
+        const tbody=el("tbody-intimacoes");
+        tbody.innerHTML='<tr><td colspan="8" class="text-center text-muted py-4"><span class="spinner-border spinner-border-sm me-2"></span>Consultando Supabase…</td></tr>';
         try {
-            const resultado = await ATONEXO_REPOSITORY.listarIntimacoes({ busca, pagina, limite: 10 });
-            if (!resultado.dados.length) {
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center table-empty">Nenhuma intimação encontrada.</td></tr>';
-            } else {
-                tbody.innerHTML = resultado.dados.map(i => `<tr>
-                    <td><input type="checkbox" class="form-check-input cliente-checkbox" value="${escapeHTML(i.id)}" aria-label="Selecionar intimação ${escapeHTML(i.id)}" ${i.intimador_id ? "disabled" : ""}></td>
+            const r=await listarIntimacoes({busca,pagina});
+            estado.intimacoesPagina=r.dados; estado.totalIntimacoes=r.total;
+            tbody.innerHTML=r.dados.length?r.dados.map(i=>{
+                const ocupado=!!i.intimador_id;
+                const podeMarcar=!ocupado;
+                return `<tr>
+                    <td><input type="checkbox" class="form-check-input cliente-checkbox" value="${escapeHTML(i.id)}" ${podeMarcar?"":"disabled"} aria-label="Selecionar intimação ${escapeHTML(i.id)}"></td>
                     <td class="fw-semibold">${escapeHTML(i.id)}</td>
-                    <td>${escapeHTML(i.devedor)}</td><td>${escapeHTML(i.cpf_cnpj)}</td><td>${escapeHTML(i.endereco)}<div class="small text-secondary">${escapeHTML(i.cep)}</div></td>
-                    <td>${statusBadge(i.status)}</td></tr>`).join("");
-            }
-            renderPaginacao(resultado.total, resultado.limite, resultado.pagina);
-            el("select-all-intimacoes").checked = false;
+                    <td><div class="fw-semibold">${escapeHTML(i.devedor)}</div><small class="text-muted">${escapeHTML(i.protocolo)} • ${escapeHTML(i.categoria)}</small></td>
+                    <td>${escapeHTML(i.cpf_cnpj||"—")}</td>
+                    <td><div>${escapeHTML(endereco(i))}</div><small class="text-muted">CEP ${escapeHTML(i.cep||"—")}</small></td>
+                    <td>${statusBadge(i)}</td>
+                    <td>${escapeHTML(i.intimador_id ? (i.intimador_nome||"Atribuída") : "—")}<small class="d-block text-muted">${i.atribuido_em?dataBR(i.atribuido_em):""}</small></td>
+                    <td class="text-end">${ocupado?`<button class="btn btn-sm btn-outline-danger btn-retirar" data-id="${escapeHTML(i.id)}"><i class="bi bi-person-dash"></i> Retirar</button>`:"<span class='text-muted small'>Aguardando atribuição</span>"}</td>
+                </tr>`;
+            }).join(""):'<tr><td colspan="8" class="text-center text-muted py-4">Nenhuma intimação encontrada.</td></tr>';
+            tbody.querySelectorAll(".btn-retirar").forEach(b=>b.addEventListener("click",()=>retirarIntimacoes([b.dataset.id])));
+            renderPaginacao(r.total,r.limite,r.pagina);
             atualizarBotaoAtribuir();
-            atualizarResumo();
-        } catch (error) {
-            console.error(error);
-            tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger table-empty">Não foi possível carregar os dados: ${escapeHTML(error.message)}</td></tr>`;
-        }
+            el("stat-intimacoes").textContent=r.total;
+            el("stat-pendentes").textContent=r.dados.filter(i=>!i.intimador_id).length;
+        } catch(e) { tbody.innerHTML=`<tr><td colspan="8" class="text-center text-danger py-4">${escapeHTML(e.message)}</td></tr>`; throw e; }
     }
-
-    function renderPaginacao(total, limite, pagina) {
-        const totalPaginas = Math.max(1, Math.ceil(total / limite));
-        const ul = el("pagination-intimacoes");
-        if (total <= limite) { ul.innerHTML = ""; return; }
-        let html = `<li class="page-item ${pagina <= 1 ? "disabled" : ""}"><button class="page-link" data-page="${pagina - 1}" ${pagina <= 1 ? "disabled" : ""}>Anterior</button></li>`;
-        const primeiro = Math.max(1, Math.min(pagina - 2, totalPaginas - 4));
-        for (let i = primeiro; i <= Math.min(totalPaginas, primeiro + 4); i++) {
-            html += `<li class="page-item ${i === pagina ? "active" : ""}"><button class="page-link" data-page="${i}">${i}</button></li>`;
-        }
-        html += `<li class="page-item ${pagina >= totalPaginas ? "disabled" : ""}"><button class="page-link" data-page="${pagina + 1}" ${pagina >= totalPaginas ? "disabled" : ""}>Próximo</button></li>`;
-        ul.innerHTML = html;
-        ul.querySelectorAll("[data-page]").forEach(btn => btn.addEventListener("click", () => renderIntimacoes(Number(btn.dataset.page))));
+    function renderPaginacao(total,limite,pagina) {
+        const totalPaginas=Math.max(1,Math.ceil(total/limite)), ul=el("pagination-intimacoes");
+        ul.innerHTML="";
+        const add=(label,p,disabled=false,active=false)=>{const li=document.createElement("li");li.className=`page-item ${disabled?"disabled":""} ${active?"active":""}`;li.innerHTML=`<button class="page-link" type="button">${label}</button>`;li.querySelector("button").addEventListener("click",()=>renderIntimacoes(p,estado.buscaIntimacoes));ul.appendChild(li);};
+        add("Anterior",Math.max(1,pagina-1),pagina===1);
+        for(let p=Math.max(1,pagina-2);p<=Math.min(totalPaginas,pagina+2);p++) add(String(p),p,false,p===pagina);
+        add("Próxima",Math.min(totalPaginas,pagina+1),pagina===totalPaginas);
     }
-
     async function renderUsuarios() {
-        const tbody = el("tbody-usuarios");
+        const tbody=el("tbody-usuarios"); tbody.innerHTML='<tr><td colspan="4" class="text-center">Carregando…</td></tr>';
         try {
-            const usuarios = await ATONEXO_REPOSITORY.listarUsuarios();
-            tbody.innerHTML = usuarios.length ? usuarios.map(u => `<tr>
-                <td><div class="fw-semibold">${escapeHTML(u.nome)}</div><div class="small text-secondary">${escapeHTML(u.status)}</div></td>
-                <td>${escapeHTML(u.email)}</td>
-                <td><span class="badge ${u.papel === "administrador" ? "text-bg-primary" : u.papel === "intimador" ? "text-bg-success" : "text-bg-secondary"}">${escapeHTML(u.papel)}</span></td>
-                <td class="text-end"><select class="form-select form-select-sm d-inline-block w-auto" data-user-role="${escapeHTML(u.id)}" aria-label="Alterar papel de ${escapeHTML(u.nome)}">
-                    <option value="usuario" ${u.papel === "usuario" ? "selected" : ""}>Usuário</option>
-                    <option value="intimador" ${u.papel === "intimador" ? "selected" : ""}>Intimador</option>
-                    <option value="administrador" ${u.papel === "administrador" ? "selected" : ""}>Administrador</option>
-                </select></td></tr>`).join("") : '<tr><td colspan="4" class="text-center table-empty">Nenhum usuário encontrado.</td></tr>';
-            tbody.querySelectorAll("[data-user-role]").forEach(select => select.addEventListener("change", async () => {
-                const id = select.dataset.userRole, papel = select.value;
-                if (!confirm(`Alterar o papel deste usuário para "${papel}"?`)) { await renderUsuarios(); return; }
-                try { await ATONEXO_REPOSITORY.alterarPapelUsuario(id, papel); await renderUsuarios(); atualizarResumo(); }
-                catch (error) { alert(error.message); await renderUsuarios(); }
-            }));
-        } catch (error) {
-            tbody.innerHTML = `<tr><td colspan="4" class="text-center text-danger table-empty">${escapeHTML(error.message)}</td></tr>`;
-        }
+            const usuarios=await listarUsuarios();
+            tbody.innerHTML=usuarios.map(u=>`<tr><td>${escapeHTML(u.nome_completo)}</td><td>—</td><td>${escapeHTML(nomePapel(u.papel))} <span class="badge ${u.status_cadastro==="aprovado"?"text-bg-success":"text-bg-secondary"}">${escapeHTML(u.status_cadastro)}</span></td><td class="text-end"><span class="text-muted small">Consulta</span></td></tr>`).join("")||'<tr><td colspan="4" class="text-center">Nenhum usuário.</td></tr>';
+            el("stat-usuarios").textContent=usuarios.filter(u=>u.status_cadastro==="pendente").length;
+        } catch(e){tbody.innerHTML=`<tr><td colspan="4" class="text-danger">${escapeHTML(e.message)}</td></tr>`;throw e;}
     }
-
-    async function renderRelatorios(filtro = el("search-intimadores").value) {
-        const tbody = el("tbody-intimadores");
+    async function renderRelatorios(filtro=el("search-intimadores").value) {
+        const tbody=el("tbody-intimadores"); tbody.innerHTML='<tr><td colspan="5" class="text-center">Carregando intimadores…</td></tr>';
         try {
-            const pessoas = await ATONEXO_REPOSITORY.listarIntimadores(filtro);
-            tbody.innerHTML = pessoas.length ? pessoas.map(i => `<tr>
-                <td><div class="fw-semibold">${escapeHTML(i.nome)}</div><div class="small text-secondary">${escapeHTML(i.email)}</div></td>
-                <td class="text-center"><span class="badge text-bg-warning">${i.ativas}</span></td>
-                <td class="text-center"><span class="badge text-bg-success">${i.concluidas}</span></td>
-                <td class="text-center"><span class="badge text-bg-secondary">${i.pendentes}</span></td>
-                <td class="text-end"><button class="btn btn-sm btn-outline-success btn-ver-detalhes" data-id="${escapeHTML(i.id)}" data-nome="${escapeHTML(i.nome)}"><i class="bi bi-eye me-1"></i>Detalhes</button></td>
-                </tr>`).join("") : '<tr><td colspan="5" class="text-center table-empty">Nenhum intimador encontrado.</td></tr>';
-            tbody.querySelectorAll(".btn-ver-detalhes").forEach(btn => btn.addEventListener("click", () => abrirRelatorioIndividual(btn.dataset.id, btn.dataset.nome)));
-            atualizarResumo();
-        } catch (error) {
-            tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger table-empty">${escapeHTML(error.message)}</td></tr>`;
-        }
+            const pessoas=await listarIntimadores(filtro); estado.intimadores=pessoas;
+            // O resumo é calculado sobre as intimações atualmente visíveis ao administrador.
+            const {data,error}=await estado.supabase.from("intimacoes").select("intimador_id,situacao").not("intimador_id","is",null);
+            if(error) throw error;
+            tbody.innerHTML=pessoas.map(u=>{
+                const regs=(data||[]).filter(i=>i.intimador_id===u.id);
+                const ativas=regs.length;
+                return `<tr><td><div class="fw-semibold">${escapeHTML(u.nome_completo)}</div><small class="text-muted">ID: ${escapeHTML(u.id)}</small></td><td class="text-center">${ativas}</td><td class="text-center">—</td><td class="text-center">—</td><td class="text-end"><button class="btn btn-sm btn-outline-success btn-ver-detalhes" data-id="${escapeHTML(u.id)}" data-nome="${escapeHTML(u.nome_completo)}">Ver intimações</button></td></tr>`;
+            }).join("")||'<tr><td colspan="5" class="text-center">Nenhum intimador encontrado.</td></tr>';
+            tbody.querySelectorAll(".btn-ver-detalhes").forEach(b=>b.addEventListener("click",()=>abrirRelatorioIndividual(b.dataset.id,b.dataset.nome)));
+            el("stat-intimadores").textContent=pessoas.length;
+        } catch(e){tbody.innerHTML=`<tr><td colspan="5" class="text-danger">${escapeHTML(e.message)}</td></tr>`;throw e;}
     }
-
-    async function abrirRelatorioIndividual(intimadorId, intimadorNome) {
-        estado.intimadorSelecionadoId = intimadorId;
-        el("nome-intimador-relatorio").textContent = intimadorNome;
-        estado.diligenciasSelecionadas = await ATONEXO_REPOSITORY.listarDiligencias(intimadorId);
-        const ds = estado.diligenciasSelecionadas;
-        el("total-ativas-modal").textContent = ds.filter(d => d.status === "em_andamento").length;
-        el("total-concluidas-modal").textContent = ds.filter(d => ["concluida", "encerrada"].includes(d.status)).length;
-        el("total-pendentes-modal").textContent = ds.filter(d => d.status === "pendente").length;
-        el("total-checkpoints-modal").textContent = ds.reduce((n, d) => n + d.checkpoints.length, 0);
-        el("tbody-diligencias-intimador").innerHTML = ds.length ? ds.map(d => `<tr>
-            <td>${escapeHTML(d.cliente.devedor || "—")}</td><td>${statusBadge(d.status)}</td>
-            <td>${escapeHTML(dataBR(d.iniciada_em))}</td><td>${escapeHTML(dataBR(d.concluida_em))}</td>
-            <td><span class="badge text-bg-info">${d.checkpoints.length}</span></td>
-            <td><button class="btn btn-sm btn-outline-secondary" data-checkpoints="${escapeHTML(d.id)}"><i class="bi bi-geo-alt me-1"></i>Ver GPS</button></td></tr>`).join("") : '<tr><td colspan="6" class="text-center table-empty">Nenhuma diligência encontrada.</td></tr>';
-        el("tbody-diligencias-intimador").querySelectorAll("[data-checkpoints]").forEach(btn => btn.addEventListener("click", () => mostrarCheckpoints(btn.dataset.checkpoints)));
+    async function abrirRelatorioIndividual(id,nome) {
+        estado.intimadorSelecionadoId=id; el("nome-intimador-relatorio").textContent=nome;
+        const {data,error}=await estado.supabase.from("intimacoes").select("*").eq("intimador_id",id).order("atribuido_em",{ascending:false});
+        if(error){mensagem(error.message,"danger");return;}
+        estado.diligenciasSelecionadas=data||[];
+        el("total-ativas-modal").textContent=data.length;
+        el("total-concluidas-modal").textContent=data.filter(i=>i.situacao==="concluida").length;
+        el("total-pendentes-modal").textContent=data.filter(i=>i.situacao==="pendente").length;
+        el("total-checkpoints-modal").textContent="—";
+        el("tbody-diligencias-intimador").innerHTML=data.length?data.map(i=>`<tr><td>${escapeHTML(i.devedor)}</td><td>${statusBadge(i)}</td><td>${escapeHTML(dataBR(i.atribuido_em))}</td><td>${escapeHTML(i.situacao||"—")}</td><td>—</td><td><span class="text-muted small">Diligências ainda não integradas</span></td></tr>`).join(""):'<tr><td colspan="6" class="text-center">Nenhuma intimação atribuída.</td></tr>';
         bootstrap.Modal.getOrCreateInstance(el("modalRelatorioIndividual")).show();
     }
-
-    function mostrarCheckpoints(diligenciaId) {
-        const d = estado.diligenciasSelecionadas.find(item => item.id === diligenciaId);
-        if (!d) return;
-        const cps = d.checkpoints || [];
-        const texto = cps.length ? cps.map(cp => `#${cp.sequencial} • ${dataBR(cp.data_hora)} • ${cp.latitude ?? "—"}, ${cp.longitude ?? "—"} • ${cp.codigo_ocorrencia || "Sem código"} • ${cp.justificativa || ""}`).join("\\n") : "Nenhum checkpoint registrado.";
-        alert("Detalhes de localização (dados fictícios):\\n\\n" + texto);
-    }
-
     async function abrirModalAtribuicao() {
-        const ids = [...document.querySelectorAll(".cliente-checkbox:checked")].map(cb => cb.value);
-        if (!ids.length) return;
-        const intimadores = await ATONEXO_REPOSITORY.listarIntimadores("");
-        const select = el("select-intimador");
-        select.innerHTML = '<option value="" selected disabled>Selecione um intimador…</option>' + intimadores.map(i => `<option value="${escapeHTML(i.id)}">${escapeHTML(i.nome)}</option>`).join("");
-        if (!intimadores.length) select.innerHTML = '<option value="" disabled>Nenhum intimador cadastrado</option>';
-        select.dataset.intimacaoIds = JSON.stringify(ids);
-        bootstrap.Modal.getOrCreateInstance(el("modalAtribuir")).show();
+        const ids=[...document.querySelectorAll(".cliente-checkbox:checked")].map(c=>c.value);
+        if(!ids.length)return;
+        try {
+            const pessoas=await listarIntimadores("");
+            const select=el("select-intimador");
+            select.innerHTML='<option value="" selected disabled>Selecione um intimador…</option>'+pessoas.map(u=>`<option value="${escapeHTML(u.id)}">${escapeHTML(u.nome_completo)} • ${escapeHTML(u.id)}</option>`).join("");
+            if(!pessoas.length)select.innerHTML='<option value="">Nenhum intimador aprovado disponível</option>';
+            select.dataset.intimacaoIds=JSON.stringify(ids);
+            el("titulo-modal-atribuir").textContent=`Atribuir ${ids.length} intimação(ões)`;
+            bootstrap.Modal.getOrCreateInstance(el("modalAtribuir")).show();
+        }catch(e){mensagem(e.message,"danger");}
+    }
+    function atualizarBotaoAtribuir(){el("btn-atribuir").disabled=document.querySelectorAll(".cliente-checkbox:checked").length===0;}
+
+    async function atribuirIntimacoes(ids,intimadorId) {
+        // A RPC valida atomicamente a titularidade do administrador e o bloqueio do intimador.
+        const {data,error}=await estado.supabase.rpc(ATONEXO_CONFIG.rpcAtribuir,{p_intimacao_ids:ids.map(Number),p_intimador_id:intimadorId});
+        if(error)throw error;
+        return data;
+    }
+    async function retirarIntimacoes(ids) {
+        if(!confirm(`Retirar ${ids.length} intimação(ões) do intimador atual?`))return;
+        const {data,error}=await estado.supabase.rpc(ATONEXO_CONFIG.rpcRetirar,{p_intimacao_ids:ids.map(Number)});
+        if(error)throw error;
+        mensagem("Solicitação de retirada processada. O histórico da tabela de intimações registra a alteração.","success");
+        await atualizarPainel();
+    }
+    async function confirmarAtribuicao() {
+        const intimadorId=el("select-intimador").value;
+        const ids=JSON.parse(el("select-intimador").dataset.intimacaoIds||"[]");
+        if(!intimadorId){mensagem("Selecione um intimador.","warning");return;}
+        const btn=el("btn-confirmar-atribuicao");btn.disabled=true;btn.innerHTML='<span class="spinner-border spinner-border-sm me-2"></span>Processando…';
+        try {
+            const result=await atribuirIntimacoes(ids,intimadorId);
+            bootstrap.Modal.getOrCreateInstance(el("modalAtribuir")).hide();
+            mensagem(result?.message||`${ids.length} intimação(ões) atribuída(s) com sucesso.`,"success");
+            await atualizarPainel();
+        }catch(e){mensagem(e.message,"danger");}
+        finally{btn.disabled=false;btn.textContent="Confirmar Atribuição";}
+    }
+    async function atualizarPainel(){
+        limparMensagem();
+        await Promise.all([renderIntimacoes(estado.paginaIntimacoes,estado.buscaIntimacoes),renderUsuarios(),renderRelatorios("")]);
+    }
+    function exportarCSVGeral(){
+        const linhas=[["ID","Cartório","Categoria","Protocolo","Devedor","CPF/CNPJ","Endereço","CEP","Situação","Intimador ID","Atribuído por","Atribuído em"]];
+        estado.intimacoesPagina.forEach(i=>linhas.push([i.id,i.cartorio,i.categoria,i.protocolo,i.devedor,i.cpf_cnpj,endereco(i),i.cep,i.situacao,i.intimador_id,i.atribuido_por,i.atribuido_em]));
+        baixarArquivo(`atonexo-intimacoes-pagina-${new Date().toISOString().slice(0,10)}.csv`,linhas.map(l=>l.map(csvCell).join(";")).join("\r\n"),"text/csv;charset=utf-8");
+    }
+    async function exportarJSONGeral(){
+        const {data,error}=await estado.supabase.from("intimacoes").select("*").order("criado_em",{ascending:false});
+        if(error){mensagem(error.message,"danger");return;}
+        baixarArquivo(`atonexo-intimacoes-${new Date().toISOString().slice(0,10)}.json`,JSON.stringify({gerado_em:new Date().toISOString(),gerado_por:estado.usuario.id,registros:data},null,2),"application/json;charset=utf-8");
+    }
+    function exportarCSVIndividual(){
+        const linhas=[["ID","Protocolo","Devedor","Situação","Intimador","Atribuído por","Atribuído em"]];
+        estado.diligenciasSelecionadas.forEach(i=>linhas.push([i.id,i.protocolo,i.devedor,i.situacao,i.intimador_id,i.atribuido_por,i.atribuido_em]));
+        baixarArquivo(`atonexo-intimador-${estado.intimadorSelecionadoId}.csv`,linhas.map(l=>l.map(csvCell).join(";")).join("\r\n"),"text/csv;charset=utf-8");
+    }
+    function exportarJSONIndividual(){baixarArquivo(`atonexo-intimador-${estado.intimadorSelecionadoId}.json`,JSON.stringify({gerado_em:new Date().toISOString(),intimador_id:estado.intimadorSelecionadoId,intimacoes:estado.diligenciasSelecionadas},null,2),"application/json;charset=utf-8");}
+    function iniciarRealtime(){
+        if(!ATONEXO_CONFIG.realtime)return;
+        estado.realtimeChannel=estado.supabase.channel("atonexo-admin-intimacoes")
+            .on("postgres_changes",{event:"*",schema:"public",table:"intimacoes"},()=>renderIntimacoes(estado.paginaIntimacoes,estado.buscaIntimacoes).catch(e=>mensagem(e.message,"danger")))
+            .subscribe();
     }
 
-    function atualizarBotaoAtribuir() {
-        el("btn-atribuir").disabled = document.querySelectorAll(".cliente-checkbox:checked").length === 0;
-    }
-
-    function atualizarResumo() {
-        const dados = DemoRepository.todos();
-        el("stat-intimacoes").textContent = dados.intimacoes.length;
-        el("stat-pendentes").textContent = dados.intimacoes.filter(i => !i.intimador_id).length;
-        el("stat-intimadores").textContent = dados.usuarios.filter(u => u.papel === "intimador").length;
-        el("stat-usuarios").textContent = dados.usuarios.filter(u => u.status === "pendente").length;
-    }
-
-    function exportarCSVGeral() {
-        const { intimacoes, diligencias, usuarios } = DemoRepository.todos();
-        const linhas = [["ID", "Devedor", "CPF/CNPJ", "Endereço", "CEP", "Status", "Intimador"]];
-        intimacoes.forEach(i => linhas.push([i.id, i.devedor, i.cpf_cnpj, i.endereco, i.cep, i.status, usuarios.find(u => u.id === i.intimador_id)?.nome || "Não atribuído"]));
-        baixarArquivo(`atonexo-relatorio-intimacoes-${new Date().toISOString().slice(0,10)}.csv`, linhas.map(l => l.map(csvCell).join(";")).join("\r\n"), "text/csv;charset=utf-8");
-    }
-
-    function exportarJSONGeral() {
-        const dados = DemoRepository.todos();
-        baixarArquivo(`atonexo-auditoria-demo-${new Date().toISOString().slice(0,10)}.json`, JSON.stringify({ gerado_em: new Date().toISOString(), aviso: "Dados fictícios do protótipo; não representam registros reais.", ...dados }, null, 2), "application/json;charset=utf-8");
-    }
-
-    function exportarCSVIndividual() {
-        const ds = estado.diligenciasSelecionadas;
-        if (!ds.length) { alert("Não há diligências para exportar."); return; }
-        const linhas = [["ID", "Devedor", "Status", "Iniciada", "Concluída", "Checkpoints", "Código de ocorrência"]];
-        ds.forEach(d => linhas.push([d.id, d.cliente.devedor, d.status, d.iniciada_em, d.concluida_em, d.checkpoints.length, d.checkpoints.at(-1)?.codigo_ocorrencia || "—"]));
-        baixarArquivo(`atonexo-intimador-${estado.intimadorSelecionadoId}.csv`, linhas.map(l => l.map(csvCell).join(";")).join("\r\n"), "text/csv;charset=utf-8");
-    }
-
-    function exportarJSONIndividual() {
-        baixarArquivo(`atonexo-intimador-${estado.intimadorSelecionadoId}.json`, JSON.stringify({ gerado_em: new Date().toISOString(), intimador_id: estado.intimadorSelecionadoId, diligencias: estado.diligenciasSelecionadas }, null, 2), "application/json;charset=utf-8");
-    }
-
-    document.addEventListener("DOMContentLoaded", async () => {
-        el("anoAtual").textContent = new Date().getFullYear();
-        el("btn-buscar-intimacoes").addEventListener("click", () => renderIntimacoes(1, el("search-intimacoes").value));
-        el("search-intimacoes").addEventListener("keydown", e => { if (e.key === "Enter") renderIntimacoes(1, el("search-intimacoes").value); });
-        el("btn-buscar-intimadores-relatorio").addEventListener("click", () => renderRelatorios(el("search-intimadores").value));
-        el("search-intimadores").addEventListener("keydown", e => { if (e.key === "Enter") renderRelatorios(el("search-intimadores").value); });
-        el("acompanhamento-tab").addEventListener("shown.bs.tab", () => renderRelatorios());
-        el("btn-export-csv").addEventListener("click", exportarCSVGeral);
-        el("btn-export-json").addEventListener("click", exportarJSONGeral);
-        el("btn-export-individual-csv").addEventListener("click", exportarCSVIndividual);
-        el("btn-export-individual-json").addEventListener("click", exportarJSONIndividual);
-        el("select-all-intimacoes").addEventListener("change", e => {
-            document.querySelectorAll(".cliente-checkbox:not(:disabled)").forEach(cb => cb.checked = e.target.checked);
-            atualizarBotaoAtribuir();
-        });
-        document.addEventListener("change", e => {
-            if (e.target.matches(".cliente-checkbox")) atualizarBotaoAtribuir();
-        });
-        el("btn-atribuir").addEventListener("click", abrirModalAtribuicao);
-        el("btn-confirmar-atribuicao").addEventListener("click", async () => {
-            const intimadorId = el("select-intimador").value;
-            const ids = JSON.parse(el("select-intimador").dataset.intimacaoIds || "[]");
-            if (!intimadorId) { alert("Selecione um intimador."); return; }
-            try {
-                const resultado = await ATONEXO_REPOSITORY.atribuirIntimacoes(ids, intimadorId);
-                bootstrap.Modal.getOrCreateInstance(el("modalAtribuir")).hide();
-                await renderIntimacoes(estado.paginaIntimacoes, estado.buscaIntimacoes);
-                await renderRelatorios();
-                alert(`${resultado.total} intimação(ões) atribuída(s) no protótipo. Nenhuma alteração foi enviada ao Supabase.`);
-            } catch (error) { alert(error.message); }
-        });
-        el("btn-recarregar").addEventListener("click", async () => {
-            await ATONEXO_REPOSITORY.recarregar();
-            await Promise.all([renderIntimacoes(estado.paginaIntimacoes, estado.buscaIntimacoes), renderUsuarios(), renderRelatorios()]);
-        });
-        el("btn-logout").addEventListener("click", () => {
-            alert("O encerramento de sessão será conectado ao Supabase Auth na etapa de integração. Este protótipo não iniciou uma sessão.");
-        });
-
-        await Promise.all([renderIntimacoes(), renderUsuarios(), renderRelatorios("")]);
-        atualizarResumo();
+    document.addEventListener("DOMContentLoaded",async()=>{
+        el("anoAtual").textContent=new Date().getFullYear();
+        el("btn-buscar-intimacoes").addEventListener("click",()=>renderIntimacoes(1,el("search-intimacoes").value).catch(e=>mensagem(e.message,"danger")));
+        el("search-intimacoes").addEventListener("keydown",e=>{if(e.key==="Enter")el("btn-buscar-intimacoes").click();});
+        el("btn-buscar-intimadores-relatorio").addEventListener("click",()=>renderRelatorios(el("search-intimadores").value));
+        el("search-intimadores").addEventListener("keydown",e=>{if(e.key==="Enter")el("btn-buscar-intimadores-relatorio").click();});
+        el("acompanhamento-tab").addEventListener("shown.bs.tab",()=>renderRelatorios().catch(e=>mensagem(e.message,"danger")));
+        el("btn-export-csv").addEventListener("click",exportarCSVGeral);
+        el("btn-export-json").addEventListener("click",exportarJSONGeral);
+        el("btn-export-individual-csv").addEventListener("click",exportarCSVIndividual);
+        el("btn-export-individual-json").addEventListener("click",exportarJSONIndividual);
+        el("select-all-intimacoes").addEventListener("change",e=>{document.querySelectorAll(".cliente-checkbox:not(:disabled)").forEach(c=>c.checked=e.target.checked);atualizarBotaoAtribuir();});
+        document.addEventListener("change",e=>{if(e.target.matches(".cliente-checkbox"))atualizarBotaoAtribuir();});
+        el("btn-atribuir").addEventListener("click",abrirModalAtribuicao);
+        el("btn-confirmar-atribuicao").addEventListener("click",confirmarAtribuicao);
+        el("btn-recarregar").addEventListener("click",()=>atualizarPainel().catch(e=>mensagem(e.message,"danger")));
+        el("btn-logout").addEventListener("click",async()=>{const {error}=await estado.supabase.auth.signOut();if(error)mensagem(error.message,"danger");else window.location.href="login.html";});
+        try{await iniciarSupabase();await atualizarPainel();iniciarRealtime();}
+        catch(e){el("status-conexao").textContent="Sem conexão";mensagem(e.message,"danger");console.error("AtoNexo:",e);}
     });
-
-    /*
-     * Ponto de integração futuro (não ativar antes de revisar o esquema):
-     *
-     * async function criarRepositorioSupabase() {
-     *   if (!window.supabase || !ATONEXO_CONFIG.supabasePublishableKey) {
-     *     throw new Error("Configure a biblioteca e a chave pública do projeto.");
-     *   }
-     *   const client = window.supabase.createClient(
-     *     ATONEXO_CONFIG.supabaseUrl,
-     *     ATONEXO_CONFIG.supabasePublishableKey
-     *   );
-     *   // Aqui entram consultas validadas para:
-     *   // - auth.getSession() e verificação do perfil administrador;
-     *   // - user_registrations e perfis_usuarios (sem recriar tabelas);
-     *   // - tabelas de intimações/diligências/checkpoints, após conferência;
-     *   // - atribuições com validação de papel e RLS;
-     *   // - relatórios e trilha de auditoria.
-     *   return client;
-     * }
-     */
     </script>
     <!-- ATO:FIM:JS:DASHBOARD -->
 
