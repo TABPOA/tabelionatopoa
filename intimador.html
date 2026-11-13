@@ -1,1 +1,319 @@
 
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#123C32">
+  <meta name="description" content="Área do intimador do Sistema AtoNexo do 2º Tabelionato de Protestos de Porto Alegre.">
+
+  <title>AtoNexo | Área do Intimador</title>
+
+  <!-- Bootstrap 5.3.8 -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  >
+
+  <!-- Bootstrap Icons -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    rel="stylesheet"
+  >
+
+  <!-- Fonte Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+
+  <!-- Supabase JavaScript v2 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --verde: #123C32;
+      --verde-escuro: #0B2B24;
+      --verde-medio: #1C5948;
+      --fundo: #F3F6F4;
+      --verde-claro: #E8F1EC;
+      --texto: #1D3029;
+      --texto-suave: #687870;
+      --borda: #DCE5DF;
+      --branco: #FFFFFF;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      background: var(--fundo);
+      color: var(--texto);
+      font-family: "Inter", sans-serif;
+    }
+
+    /* ========================================
+       CABEÇALHO
+    ======================================== */
+
+    .topbar {
+      background: var(--verde-escuro);
+      color: var(--branco);
+      padding: 17px 24px;
+      box-shadow: 0 2px 10px rgba(11, 43, 36, 0.12);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      flex-shrink: 0;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: var(--branco);
+      color: var(--verde);
+      font-size: 22px;
+    }
+
+    .brand small {
+      display: block;
+      margin-top: 3px;
+      color: #C4D8CE;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0;
+    }
+
+    .header-label {
+      color: #C4D8CE;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    /* ========================================
+       ÁREA PRINCIPAL
+       
+       Espaço reservado para as funcionalidades
+       da página do intimador.
+       
+       Futuras implementações:
+       - Identificação do intimador
+       - Intimações atribuídas
+       - Detalhes da intimação
+       - Início da diligência
+       - Registro de checkpoints
+       - Registro de ocorrências
+       - Encerramento da diligência
+    ======================================== */
+
+    main {
+      flex: 1;
+      width: 100%;
+      padding: 32px 16px;
+    }
+
+    .content-container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* ========================================
+       RODAPÉ
+    ======================================== */
+
+    footer {
+      padding: 20px 16px;
+      background: var(--verde-escuro);
+      color: #C4D8CE;
+      text-align: center;
+      font-size: 11px;
+      line-height: 1.8;
+    }
+
+    footer strong {
+      color: var(--branco);
+      font-weight: 700;
+    }
+
+    /* ========================================
+       RESPONSIVIDADE
+    ======================================== */
+
+    @media (max-width: 576px) {
+      .topbar {
+        padding: 15px 18px;
+      }
+
+      .header-label {
+        display: none;
+      }
+
+      main {
+        padding: 24px 14px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ========================================
+       CABEÇALHO DO SISTEMA
+  ======================================== -->
+
+  <header class="topbar">
+    <div class="container">
+      <div class="d-flex align-items-center justify-content-between">
+
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">
+            <i class="bi bi-diagram-3"></i>
+          </div>
+
+          <div>
+            Sistema AtoNexo
+            <small>Gestão de intimações</small>
+          </div>
+        </div>
+
+        <div class="header-label">
+          <i class="bi bi-person-badge me-1"></i>
+          Área do Intimador
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================
+       CONTEÚDO PRINCIPAL
+       
+       RESERVADO PARA AS PRÓXIMAS ETAPAS.
+       
+       As funcionalidades serão implementadas
+       progressivamente nesta área.
+  ======================================== -->
+
+  <main id="areaPrincipal">
+    <div class="content-container">
+
+      <!--
+        FUTURA ESTRUTURA:
+
+        1. Cabeçalho de identificação do intimador.
+        2. Painel de intimações atribuídas.
+        3. Visualização dos dados da intimação.
+        4. Execução e acompanhamento da diligência.
+        5. Registro das ocorrências.
+        6. Histórico das atividades.
+      -->
+
+    </div>
+  </main>
+
+  <!-- ========================================
+       RODAPÉ INSTITUCIONAL
+  ======================================== -->
+
+  <footer>
+    <strong>2º Tabelionato de Protestos de Porto Alegre</strong><br>
+    Rua dos Andradas, 1234 • 4º Andar • Centro Histórico • Porto Alegre/RS<br>
+    CEP 90020-008 • (51) 3027-3500<br>
+    © <span id="currentYear"></span> AtoNexo
+  </footer>
+
+  <!-- Bootstrap JavaScript -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    (() => {
+      "use strict";
+
+      /* ========================================
+         CONFIGURAÇÃO DO SUPABASE
+
+         Mantida a mesma configuração utilizada
+         nas demais páginas do AtoNexo.
+      ======================================== */
+
+      const SUPABASE_URL =
+        "https://dlxqahkjhuocsssosqyj.supabase.co";
+
+      const SUPABASE_PUBLISHABLE_KEY =
+        "sb_publishable_IJ704qHttTZHtI_q8E7CCw_siVAy7Ex";
+
+      /* ========================================
+         INICIALIZAÇÃO DO SUPABASE
+
+         O cliente fica preparado para as próximas
+         implementações da área do intimador.
+      ======================================== */
+
+      if (
+        !window.supabase ||
+        typeof window.supabase.createClient !== "function"
+      ) {
+        console.error(
+          "A biblioteca do Supabase não foi carregada."
+        );
+        return;
+      }
+
+      const supabaseClient = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY,
+        {
+          auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true
+          }
+        }
+      );
+
+      /*
+       * CLIENTE DISPONÍVEL PARA AS FUTURAS FUNÇÕES.
+       *
+       * Próximas etapas poderão utilizar:
+       *
+       * supabaseClient.auth.getUser()
+       * supabaseClient.from("intimacoes")
+       * supabaseClient.from("intimacoes_historico")
+       *
+       * A validação de acesso e as operações da
+       * diligência serão implementadas posteriormente.
+       */
+
+      /* ========================================
+         ANO AUTOMÁTICO NO RODAPÉ
+      ======================================== */
+
+      document.getElementById("currentYear").textContent =
+        new Date().getFullYear();
+
+    })();
+  </script>
+
+</body>
+</html>
+
