@@ -133,17 +133,23 @@
       font-size: 12px;
       font-weight: 600;
       text-decoration: none;
+      cursor: pointer;
       transition: background 0.2s ease;
     }
 
-    .btn-logout:hover {
+    .btn-logout:hover:not(:disabled) {
       background: rgba(255,255,255,0.12);
       color: var(--branco);
     }
 
+    .btn-logout:disabled {
+      opacity: 0.7;
+      cursor: wait;
+    }
+
     /* ========================================
        ÁREA PRINCIPAL
-
+       
        Espaço reservado para as funcionalidades
        futuras da página do intimador.
     ======================================== */
@@ -260,15 +266,16 @@
             Área do Intimador
           </span>
 
-          <!-- SAIR: RETORNA À PÁGINA INICIAL -->
-          <a
-            href="index.html"
+          <!-- BOTÃO DE SAÍDA COM LOGOUT REAL -->
+          <button
+            type="button"
             class="btn-logout"
+            id="logoutButton"
             title="Sair do sistema"
           >
             <i class="bi bi-box-arrow-right"></i>
-            Sair
-          </a>
+            <span id="logoutButtonText">Sair</span>
+          </button>
 
         </div>
 
@@ -319,10 +326,9 @@
     (() => {
       "use strict";
 
-      /*
-       * CONFIGURAÇÃO SUPABASE
-       * Mantida para as próximas funcionalidades.
-       */
+      /* ========================================
+         CONFIGURAÇÃO SUPABASE
+      ======================================== */
 
       const SUPABASE_URL =
         "https://dlxqahkjhuocsssosqyj.supabase.co";
@@ -330,9 +336,26 @@
       const SUPABASE_PUBLISHABLE_KEY =
         "sb_publishable_IJ704qHttTZHtI_q8E7CCw_siVAy7Ex";
 
-      /*
-       * INICIALIZAÇÃO DO CLIENTE
-       */
+      /* ========================================
+         ELEMENTOS DA PÁGINA
+      ======================================== */
+
+      const logoutButton =
+        document.getElementById("logoutButton");
+
+      const logoutButtonText =
+        document.getElementById("logoutButtonText");
+
+      /* ========================================
+         ANO AUTOMÁTICO NO RODAPÉ
+      ======================================== */
+
+      document.getElementById("currentYear").textContent =
+        new Date().getFullYear();
+
+      /* ========================================
+         INICIALIZAÇÃO DO SUPABASE
+      ======================================== */
 
       if (
         !window.supabase ||
@@ -341,6 +364,9 @@
         console.error(
           "A biblioteca do Supabase não foi carregada."
         );
+
+        logoutButton.disabled = true;
+        logoutButtonText.textContent = "Indisponível";
         return;
       }
 
@@ -356,19 +382,61 @@
         }
       );
 
-      /*
-       * CLIENTE DISPONÍVEL PARA AS PRÓXIMAS ETAPAS.
-       *
-       * A autenticação, validação de papel e as operações
-       * da diligência serão implementadas posteriormente.
-       */
+      /* ========================================
+         SAIR DO SISTEMA
 
-      /*
-       * ANO AUTOMÁTICO NO RODAPÉ
-       */
+         1. Impede cliques repetidos.
+         2. Encerra a sessão no Supabase Auth.
+         3. Aguarda a confirmação do logout.
+         4. Redireciona para index.html.
 
-      document.getElementById("currentYear").textContent =
-        new Date().getFullYear();
+         Se houver erro, permanece na página
+         e informa o problema.
+      ======================================== */
+
+      logoutButton.addEventListener("click", async () => {
+
+        if (logoutButton.disabled) {
+          return;
+        }
+
+        logoutButton.disabled = true;
+        logoutButtonText.textContent = "Saindo...";
+
+        try {
+
+          const { error } = await supabaseClient.auth.signOut({
+            scope: "local"
+          });
+
+          if (error) {
+            throw error;
+          }
+
+          // Sessão encerrada: retorna à página inicial.
+          window.location.replace("./index.html");
+
+        } catch (error) {
+
+          console.error("Erro ao encerrar a sessão:", error);
+
+          logoutButton.disabled = false;
+          logoutButtonText.textContent = "Sair";
+
+          alert(
+            "Não foi possível encerrar sua sessão. Tente novamente."
+          );
+        }
+      });
+
+      /* ========================================
+         CLIENTE SUPABASE DISPONÍVEL PARA
+         AS PRÓXIMAS FUNCIONALIDADES.
+
+         A validação de papel e as operações
+         das diligências serão implementadas
+         nas próximas etapas.
+      ======================================== */
 
     })();
   </script>
